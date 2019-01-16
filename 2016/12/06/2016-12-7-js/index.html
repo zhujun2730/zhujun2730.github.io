@@ -1,0 +1,336 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head prefix="og: http://ogp.me/ns#">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta name="description" content="you&#39;re here , there&#39;s nothing i fear …">
+    <title>Android 往 HTML 中注入JavaScript代码 | Anany&#39;s blog</title>
+
+    <!-- Open Graph -->
+    <meta name="description" content="显示在 WebView 中的一个 HTML 页面需要获取一段从 Android Native 传递过来的数据，比如点击 HTML 中的一个提交按钮后，这个 HTML 需要获取一段json字符串来做校验，该怎么办呢？">
+<meta name="keywords" content="Android,JavaScript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 往 HTML 中注入JavaScript代码">
+<meta property="og:url" content="https://zhujun2730.github.io/2016/12/06/2016-12-7-js/index.html">
+<meta property="og:site_name" content="Anany&#39;s blog">
+<meta property="og:description" content="显示在 WebView 中的一个 HTML 页面需要获取一段从 Android Native 传递过来的数据，比如点击 HTML 中的一个提交按钮后，这个 HTML 需要获取一段json字符串来做校验，该怎么办呢？">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/2016-12-7-1.png">
+<meta property="og:updated_time" content="2017-04-27T01:09:53.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android 往 HTML 中注入JavaScript代码">
+<meta name="twitter:description" content="显示在 WebView 中的一个 HTML 页面需要获取一段从 Android Native 传递过来的数据，比如点击 HTML 中的一个提交按钮后，这个 HTML 需要获取一段json字符串来做校验，该怎么办呢？">
+<meta name="twitter:image" content="http://7xijtp.com1.z0.glb.clouddn.com/2016-12-7-1.png">
+
+    <script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Person",
+  "email": "mailto:",
+  "image": "",
+  "name": "Anany",
+  "url": "https://zhujun2730.github.io"
+}
+</script>
+    <script>
+    var algoliaEnabled = false;
+    
+</script>
+
+    
+
+    
+    
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+    
+    
+    
+        <!-- stylesheets list from config.yml -->
+        
+        <link rel="stylesheet" href="/css/aloha.css">
+        
+        <link rel="stylesheet" href="//cdn.bootcss.com/semantic-ui/2.2.4/semantic.min.css">
+        
+        <link rel="stylesheet" href="//cdn.bootcss.com/magnific-popup.js/1.1.0/magnific-popup.min.css">
+        
+    
+
+</head>
+<body id="body" style="margin-bottom: 0;" class="pushable">
+
+    <div class="ui top fixed menu">
+        <a class="item" id="menu-icon"><i class="sidebar icon"></i></a>
+    </div>
+
+    <div id="menu-sidebar" class="ui left vertical sidebar menu">
+
+    <div id="sidebar-top">
+        <div class="content">
+            <h3>Anany&#39;s blog</h3>
+        </div>
+    </div>
+    <div class="ui container sidebar-card">
+    <div class="ui people shape content">
+        <div class="active side">
+            <div class="ui card">
+                <div class="image">
+                    <img class="ui medium bordered image" src="/images/avatar.jpg">
+                </div>
+                <div class="content">
+                    <a class="header">Anany</a>
+                    
+                        <div class="meta">
+                            水可载舟，亦可赛艇
+                        </div>
+                    
+                </div>
+                <div class="extra content">
+                    <div class="ui list">
+                        
+                        <div class="item">
+                            <i class="marker icon" style="float: left"></i>
+                            <div class="content">Shenzhen</div>
+                        </div>
+                        
+                        
+                    </div>
+
+                </div>
+                <div class="extra content">
+                    <div class="ui list">
+                        
+
+                                <a href="https://github.com/zhujun2730"><i class="large github icon" style="float: left"></i></a>
+
+                            
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+    
+    
+
+    
+
+    
+    <a href="/index.html" class="item">
+        <i class="home icon"></i>
+        首页
+    </a>
+
+    
+    
+
+    
+
+    
+    <a href="/about/index.html" class="item">
+        <i class="info icon"></i>
+        关于
+    </a>
+
+    
+
+    
+</div>
+
+    <div class="pusher body-content">
+        <div id="content" class="ui main container">
+            <!--<div class="ui one column grid">-->
+                <!--<div class="column">-->
+                    <!--<div class="ui main container">-->
+                        <div id="post-2016-12-7-js" class="ui main container article-type-post">
+
+    
+
+    <div class="ui divided grid">
+
+        <div class="two column row" id="article-content">
+
+            <div class="thirteen wide computer thirteen wide tablet sixteen wide mobile column">
+                
+
+<h1 class="ui header">
+    
+    Android 往 HTML 中注入JavaScript代码
+</h1>
+
+
+
+                <div class="article-inner">
+
+                    <div class="article-entry" itemprop="articleBody">
+                        
+                        <html><head><meta name="generator" content="Hexo 3.8.0"></head><body><p>&#x663E;&#x793A;&#x5728; WebView &#x4E2D;&#x7684;&#x4E00;&#x4E2A; HTML &#x9875;&#x9762;&#x9700;&#x8981;&#x83B7;&#x53D6;&#x4E00;&#x6BB5;&#x4ECE; Android Native &#x4F20;&#x9012;&#x8FC7;&#x6765;&#x7684;&#x6570;&#x636E;&#xFF0C;&#x6BD4;&#x5982;&#x70B9;&#x51FB; HTML &#x4E2D;&#x7684;&#x4E00;&#x4E2A;&#x63D0;&#x4EA4;&#x6309;&#x94AE;&#x540E;&#xFF0C;&#x8FD9;&#x4E2A; HTML &#x9700;&#x8981;&#x83B7;&#x53D6;&#x4E00;&#x6BB5;json&#x5B57;&#x7B26;&#x4E32;&#x6765;&#x505A;&#x6821;&#x9A8C;&#xFF0C;&#x8BE5;&#x600E;&#x4E48;&#x529E;&#x5462;&#xFF1F;<a id="more"></a><br><br>&#x5450;&#xFF0C;&#x8FD9;&#x91CC;<strong>&#x6709;&#x4E00;&#x79CD;&#x65B9;&#x5F0F;</strong>&#x5C31;&#x662F;&#x5F80; HTML &#x4E2D;&#x6CE8;&#x5165;&#x4E00;&#x6BB5;&#x53CC;&#x65B9;&#x7EA6;&#x5B9A;&#x597D;&#x540D;&#x79F0;&#x7684; js &#x65B9;&#x6CD5;&#x5757;&#xFF0C;&#x8FD9;&#x6837; HTML &#x5728;&#x70B9;&#x51FB;&#x63D0;&#x4EA4;&#x6309;&#x94AE;&#x65F6;&#x5C31;&#x53EF;&#x4EE5;&#x5148;&#x8C03;&#x7528;&#x8FD9;&#x6BB5;&#x6CE8;&#x5165;&#x7684; js &#x65B9;&#x6CD5;&#x83B7;&#x53D6;&#x5230; Android native &#x6BB5;&#x4F20;&#x9012;&#x7684;&#x6570;&#x636E;&#x3002;</p>
+<p>&#x539F;&#x7406;&#x5C31;&#x662F;&#xFF1A;<strong>&#x6267;&#x884C; js &#x7684; eval() &#x65B9;&#x6CD5;&#xFF0C;&#x5F80;&#x91CC;&#x9762;&#x585E;&#x4E00;&#x4E2A; function &#x5E76;&#x8FD4;&#x56DE;&#x4E00;&#x6BB5;&#x6570;&#x636E;</strong>&#xFF0C;js &#x5C31;&#x80FD;&#x8C03;&#x7528;&#x8FD9;&#x4E2A;&#x65B9;&#x6CD5;&#x62FF;&#x5230;&#x6570;&#x636E;&#x4E86;&#x3002;<br><br>&#x5982;&#x56FE;&#xFF1A;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/2016-12-7-1.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/2016-12-7-1.png" alt="" class="ui centered image"></a></p>
+<h3 id="&#x5728;-Android-&#x4E2D;&#x6CE8;&#x5165;"><a href="#&#x5728;-Android-&#x4E2D;&#x6CE8;&#x5165;" class="headerlink" title="&#x5728; Android &#x4E2D;&#x6CE8;&#x5165;:"></a>&#x5728; Android &#x4E2D;&#x6CE8;&#x5165;:</h3><hr>
+<p>&#x65B9;&#x6CD5;&#x5C31;&#x662F;&#xFF1A;&#x5B9E;&#x73B0;onPageFinished()&#x65B9;&#x6CD5;&#xFF0C;&#x5728;&#x52A0;&#x8F7D;HTML&#x5B8C;&#x6BD5;&#x7684;&#x65F6;&#x5019;&#x5F00;&#x59CB;&#x6CE8;&#x5165;&#x3002;<br><br><strong>&#x6CE8;&#x610F;</strong>&#xFF1A;&#x4E00;&#x5B9A;&#x8981;&#x6307;&#x5B9A; &#x201C;javascript:&#x201D; &#xFF08;&#x8FD9;&#x91CC; function &#x91CC;&#x9762;&#x7684;&#x5185;&#x5BB9;&#x53EF;&#x4EE5;&#x81EA;&#x7531;&#x53D1;&#x6325;&#xFF0C;&#x5E76;&#x4E0D;&#x4E00;&#x5B9A;&#x9075;&#x5FAA;&#x672C;&#x6587;&#x4E0A;&#x5199;&#x7684;&#x8FD9;&#x79CD;&#x4F8B;&#x5B50;&#xFF09;</p>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">String json = <span class="string">&quot;{&quot;</span>access_token<span class="string">&quot;:&quot;</span><span class="number">1</span><span class="string">&quot;,&quot;</span>client_id<span class="string">&quot;:&quot;</span><span class="number">2</span><span class="string">&quot;,&quot;</span>open_id<span class="string">&quot;:&quot;</span><span class="number">3</span><span class="string">&quot;}&quot;</span>;</span><br><span class="line">mWebView.setWebViewClient(<span class="keyword">new</span> WebViewClient() {</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPageFinished</span><span class="params">(WebView view, String url)</span> </span>{</span><br><span class="line">                <span class="keyword">super</span>.onPageFinished(view, url);</span><br><span class="line">                <span class="keyword">if</span>(url.contains(<span class="string">&quot;common&quot;</span>)){</span><br><span class="line">                    mWebView.loadUrl(<span class="string">&quot;javascript:&quot;</span> + <span class="string">&quot;eval(&apos;function getClientInfo(){return &quot;</span> + json + <span class="string">&quot;}&apos;)&quot;</span>);</span><br><span class="line">                }</span><br><span class="line">   }</span><br><span class="line">);</span><br></pre></td></tr></tbody></table></figure>
+<p>&#x8FD9;&#x6837;&#x5728; WebView &#x4E2D;&#x524D;&#x7AEF; HTML &#x5C31;&#x53EF;&#x4EE5;&#x8C03;&#x7528; Android Native &#x4F20;&#x9012;&#x8FC7;&#x6765;&#x7684;&#x6570;&#x636E;&#x4E86;&#x3002;</p>
+</body></html>
+                        
+                    </div>
+
+                    
+                    
+                    
+
+                    <div class="description post-description">
+    <span class="post-description-item">
+        <time datetime="2016-12-06T09:22:23.000Z" itemprop="datePublished">2016-12-06</time>
+
+    </span>
+    <span class="post-description-item">
+        
+
+    <span>
+        <i class="tags icon"></i>
+    </span>
+
+    
+    <span class="ui tiny label">
+        <a href="/tags/Android/">Android</a>
+    </span>
+
+    
+    <span class="ui tiny label">
+        <a href="/tags/JavaScript/">JavaScript</a>
+    </span>
+
+    
+
+    </span>
+</div>
+
+                </div>
+                
+                <div id="pagination" class="nav-web ui text container pagination">
+
+    <div class="ui stackable two column divided grid container">
+        <div class="row">
+            <div class="column nav-left">
+                
+
+                <a href="/2017/04/27/2017-4-27-SpringMVC-Property/" class="ui tiny button">
+
+                    <i class="angle left icon"></i>
+                    
+                    SpringMVC 加载配置文件
+                    
+
+                </a>
+
+                
+            </div>
+            <div class="column nav-right">
+                
+
+                <a href="/2016/03/22/sticky/" class="ui tiny button">
+                    
+                    EventBus sticky事件
+                    
+                    <i class="angle right icon"></i></a>
+                
+            </div>
+        </div>
+    </div>
+
+</div>
+                
+            </div>
+
+            
+            <div class="three wide computer three wide tablet column">
+
+                <div class="ui sticky article-toc" id="article-toc">
+                    <!-- toc -->
+                    <ol class="ui ordered list"><li><a href="#在-Android-中注入"><span>在 Android 中注入:</span></a></li></ol>
+                </div>
+
+            </div>
+            
+
+        </div>
+    </div>
+</div>
+
+
+<!-- disqus start -->
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+<!-- following code is copied form hexo theme Next, thanks a lot -->
+
+var disqus_shortname = 'anany';
+var disqus_identifier = '2016/12/06/2016-12-7-js/';
+var disqus_title = 'Android 往 HTML 中注入JavaScript代码';
+
+function run_disqus_script(disqus_script) {
+	var dsq = document.createElement('script');
+	dsq.type = 'text/javascript';
+	dsq.async = true;
+	dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+	(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}
+
+run_disqus_script('count.js');
+
+
+var disqus_config = function () {
+    this.page.url = disqus_url;
+    this.page.identifier = disqus_identifier;
+    this.page.title = disqus_title;
+};
+
+run_disqus_script('embed.js');
+
+
+
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                                
+<!-- disqus end -->
+
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        </div>
+        <div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <div class="ui inverted section divider"></div>
+        &copy; 2019 <a href="/">Anany</a>,
+        Powered by <a href="https://github.com/henryhuang/hexo-theme-aloha" target="_blank">Aloha</a> and <a href="http://hexo.io/" target="_blank">Hexo</a>.
+    </div>
+</div>
+
+    </div>
+
+
+
+
+<!-- scripts list from theme config.yml -->
+
+<script src="//cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+
+<script src="//cdn.bootcss.com/semantic-ui/2.2.4/semantic.min.js"></script>
+
+<script src="//cdn.bootcss.com/algoliasearch/3.18.1/algoliasearch.min.js"></script>
+
+<script src="//cdn.bootcss.com/algoliasearch-helper-js/2.13.0/algoliasearch.helper.min.js"></script>
+
+<script src="/js/semantic-ui-algolia.js"></script>
+
+<script src="/js/aloha-events.js"></script>
+
+
+
+</body>
+</html>

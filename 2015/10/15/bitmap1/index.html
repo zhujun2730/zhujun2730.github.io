@@ -1,0 +1,457 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head prefix="og: http://ogp.me/ns#">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta name="description" content="you&#39;re here , there&#39;s nothing i fear …">
+    <title>Android Bitmap 优化(1) - 图片压缩 | Anany&#39;s blog</title>
+
+    <!-- Open Graph -->
+    <meta name="description" content="一直以来Bitmap都是开发中很棘手的问题，这个问题就是传说中的OOM(java.lang.OutofMemoryError - 内存溢出)，那么Bitmap为何如此丧失，令无数Android开发者所懊恼？">
+<meta name="keywords" content="Android,Bitmap图片压缩">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Bitmap 优化(1) - 图片压缩">
+<meta property="og:url" content="https://zhujun2730.github.io/2015/10/15/bitmap1/index.html">
+<meta property="og:site_name" content="Anany&#39;s blog">
+<meta property="og:description" content="一直以来Bitmap都是开发中很棘手的问题，这个问题就是传说中的OOM(java.lang.OutofMemoryError - 内存溢出)，那么Bitmap为何如此丧失，令无数Android开发者所懊恼？">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/999796A0-59C9-4FA8-AA35-E59254522E06.png">
+<meta property="og:image" content="http://hukai.me/images/android_perf_2_pixel_decode.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/B7A97154-0C8E-4787-9431-F3C28A92AEE1.png?imageView/1/w/400/h/400">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/533D7CAA-1943-4DFD-907F-061B44E258E7.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/android_perf_2_sacle_bitmap_insamplesize.png.jpg">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/A3932AD8-C385-406E-830C-A304DB8D38CB.png">
+<meta property="og:image" content="http://hukai.me/images/android_perf_2_inbitmap_old.png">
+<meta property="og:image" content="http://hukai.me/images/android_perf_2_inbitmap_new.png">
+<meta property="og:image" content="http://hukai.me/images/android_perf_2_inbitmap_code.png">
+<meta property="og:updated_time" content="2016-12-08T09:38:33.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android Bitmap 优化(1) - 图片压缩">
+<meta name="twitter:description" content="一直以来Bitmap都是开发中很棘手的问题，这个问题就是传说中的OOM(java.lang.OutofMemoryError - 内存溢出)，那么Bitmap为何如此丧失，令无数Android开发者所懊恼？">
+<meta name="twitter:image" content="http://7xijtp.com1.z0.glb.clouddn.com/999796A0-59C9-4FA8-AA35-E59254522E06.png">
+
+    <script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Person",
+  "email": "mailto:",
+  "image": "",
+  "name": "Anany",
+  "url": "https://zhujun2730.github.io"
+}
+</script>
+    <script>
+    var algoliaEnabled = false;
+    
+</script>
+
+    
+
+    
+    
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+    
+    
+    
+        <!-- stylesheets list from config.yml -->
+        
+        <link rel="stylesheet" href="/css/aloha.css">
+        
+        <link rel="stylesheet" href="//cdn.bootcss.com/semantic-ui/2.2.4/semantic.min.css">
+        
+        <link rel="stylesheet" href="//cdn.bootcss.com/magnific-popup.js/1.1.0/magnific-popup.min.css">
+        
+    
+
+</head>
+<body id="body" style="margin-bottom: 0;" class="pushable">
+
+    <div class="ui top fixed menu">
+        <a class="item" id="menu-icon"><i class="sidebar icon"></i></a>
+    </div>
+
+    <div id="menu-sidebar" class="ui left vertical sidebar menu">
+
+    <div id="sidebar-top">
+        <div class="content">
+            <h3>Anany&#39;s blog</h3>
+        </div>
+    </div>
+    <div class="ui container sidebar-card">
+    <div class="ui people shape content">
+        <div class="active side">
+            <div class="ui card">
+                <div class="image">
+                    <img class="ui medium bordered image" src="/images/avatar.jpg">
+                </div>
+                <div class="content">
+                    <a class="header">Anany</a>
+                    
+                        <div class="meta">
+                            水可载舟，亦可赛艇
+                        </div>
+                    
+                </div>
+                <div class="extra content">
+                    <div class="ui list">
+                        
+                        <div class="item">
+                            <i class="marker icon" style="float: left"></i>
+                            <div class="content">Shenzhen</div>
+                        </div>
+                        
+                        
+                    </div>
+
+                </div>
+                <div class="extra content">
+                    <div class="ui list">
+                        
+
+                                <a href="https://github.com/zhujun2730"><i class="large github icon" style="float: left"></i></a>
+
+                            
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+    
+    
+
+    
+
+    
+    <a href="/index.html" class="item">
+        <i class="home icon"></i>
+        首页
+    </a>
+
+    
+    
+
+    
+
+    
+    <a href="/about/index.html" class="item">
+        <i class="info icon"></i>
+        关于
+    </a>
+
+    
+
+    
+</div>
+
+    <div class="pusher body-content">
+        <div id="content" class="ui main container">
+            <!--<div class="ui one column grid">-->
+                <!--<div class="column">-->
+                    <!--<div class="ui main container">-->
+                        <div id="post-bitmap1" class="ui main container article-type-post">
+
+    
+
+    <div class="ui divided grid">
+
+        <div class="two column row" id="article-content">
+
+            <div class="thirteen wide computer thirteen wide tablet sixteen wide mobile column">
+                
+
+<h1 class="ui header">
+    
+    Android Bitmap 优化(1) - 图片压缩
+</h1>
+
+
+
+                <div class="article-inner">
+
+                    <div class="article-entry" itemprop="articleBody">
+                        
+                        <html><head><meta name="generator" content="Hexo 3.8.0"></head><body><p>&#x4E00;&#x76F4;&#x4EE5;&#x6765;Bitmap&#x90FD;&#x662F;&#x5F00;&#x53D1;&#x4E2D;&#x5F88;&#x68D8;&#x624B;&#x7684;&#x95EE;&#x9898;&#xFF0C;&#x8FD9;&#x4E2A;&#x95EE;&#x9898;&#x5C31;&#x662F;&#x4F20;&#x8BF4;&#x4E2D;&#x7684;OOM(java.lang.OutofMemoryError - &#x5185;&#x5B58;&#x6EA2;&#x51FA;)&#xFF0C;&#x90A3;&#x4E48;Bitmap&#x4E3A;&#x4F55;&#x5982;&#x6B64;&#x4E27;&#x5931;&#xFF0C;&#x4EE4;&#x65E0;&#x6570;Android&#x5F00;&#x53D1;&#x8005;&#x6240;&#x61CA;&#x607C;&#xFF1F;<br><a id="more"></a></p>
+<h2 id="Bitmap&#x5F15;&#x53D1;OOM&#x7684;&#x539F;&#x56E0;"><a href="#Bitmap&#x5F15;&#x53D1;OOM&#x7684;&#x539F;&#x56E0;" class="headerlink" title="Bitmap&#x5F15;&#x53D1;OOM&#x7684;&#x539F;&#x56E0;"></a>Bitmap&#x5F15;&#x53D1;OOM&#x7684;&#x539F;&#x56E0;</h2><ol class="ui list">
+<li><p>&#x7531;&#x4E8E;&#x6BCF;&#x4E2A;&#x673A;&#x578B;&#x5728;&#x7F16;&#x8BD1;ROM&#x65F6;&#x90FD;&#x8BBE;&#x7F6E;&#x4E86;&#x4E00;&#x4E2A;&#x5E94;&#x7528;&#x5806;&#x5185;&#x5B58;VM&#x503C;&#x4E0A;&#x9650;dalvik.vm.heapgrowthlimit&#xFF0C;&#x7528;&#x6765;&#x9650;&#x5B9A;&#x6BCF;&#x4E2A;&#x5E94;&#x7528;&#x53EF;&#x7528;&#x7684;&#x6700;&#x5927;&#x5185;&#x5B58;&#xFF0C;&#x8D85;&#x51FA;&#x8FD9;&#x4E2A;&#x6700;&#x5927;&#x503C;&#x5C06;&#x4F1A;&#x62A5;OOM&#x3002;&#x8FD9;&#x4E2A;&#x9600;&#x503C;&#xFF0C;&#x4E00;&#x822C;&#x6839;&#x636E;&#x624B;&#x673A;&#x5C4F;&#x5E55;dpi&#x5927;&#x5C0F;&#x9012;&#x589E;&#xFF0C;dpi&#x8D8A;&#x5C0F;&#x7684;&#x624B;&#x673A;&#xFF0C;&#x6BCF;&#x4E2A;&#x5E94;&#x7528;&#x53EF;&#x7528;&#x6700;&#x5927;&#x5185;&#x5B58;&#x5C31;&#x8D8A;&#x4F4E;&#x3002;&#x4F8B;&#x5982;&#x6211;&#x7684;Z3c&#xFF0C;xhdpi&#x7684;VM&#x9600;&#x503C;&#x662F;192M&#xFF0C;&#x4F46;&#x662F;&#x5230;&#x4E86;nexus s hdpi&#x4E0A;&#x53EA;&#x6709;&#x53EF;&#x601C;&#x7684;48M&#x3002;&#x8FD9;&#x6837;&#xFF0C;&#x5F53;&#x4E00;&#x4E2A;activity&#x4E2D;&#x52A0;&#x8F7D;&#x591A;&#x5F20;&#x5927;&#x56FE;&#x540E;&#xFF0C;&#x5C31;&#x5F88;&#x5BB9;&#x6613;OOM&#x4E86;&#x3002;&#x6709;&#x5173;&#x5E94;&#x7528;&#x5185;&#x5B58;&#x9600;&#x503C;&#x7684;&#x53C2;&#x8003;&#x53EF;&#x4EE5;&#x770B;&#x8FD9;&#x91CC;3.7&#x8282;&#xFF1A;<br><a href="http://static.googleusercontent.com/media/source.android.com/en//compatibility/android-cdd.pdf" target="_blank" rel="noopener">http://static.googleusercontent.com/media/source.android.com/en//compatibility/android-cdd.pdf</a></p>
+</li>
+<li><p>&#x56FE;&#x7247;&#x5206;&#x8FA8;&#x7387;&#x8D8A;&#x9AD8;&#xFF0C;&#x6D88;&#x8017;&#x7684;&#x5185;&#x5B58;&#x8D8A;&#x9AD8;&#xFF0C;&#x5F53;&#x52A0;&#x8F7D;&#x9AD8;&#x5206;&#x8FA8;&#x7387;&#x56FE;&#x7247;&#x7684;&#x65F6;&#x5019;&#xFF0C;&#x5C06;&#x4F1A;&#x975E;&#x5E38;&#x5360;&#x7528;&#x5185;&#x5B58;&#xFF0C;&#x4E00;&#x65E6;&#x5904;&#x7406;&#x4E0D;&#x5F53;&#x5C31;&#x4F1A;OOM&#x3002;&#x4F8B;&#x5982;&#xFF0C;&#x4E00;&#x5F20;500W&#x50CF;&#x7D20;&#x7684;&#x7167;&#x7247;&#x7684;&#x5206;&#x8FA8;&#x7387;&#x662F;&#xFF1A;2592x1936&#x3002;&#x5982;&#x679C;Bitmap&#x4F7F;&#x7528; ARGB_8888 32&#x4F4D;&#x6765;&#x5E73;&#x94FA;&#x663E;&#x793A;&#x7684;&#x8BDD;&#xFF0C;&#x5360;&#x7528;&#x7684;&#x5185;&#x5B58;&#x662F;2592x1936x4&#x4E2A;&#x5B57;&#x8282;&#xFF0C;&#x5360;&#x7528;&#x5C06;&#x8FD1;19M&#x5185;&#x5B58;&#xFF0C;my god&#xFF0C;&#x52A0;&#x8F7D;&#x4E0D;&#x5230;10&#x5F20;&#x8FD9;&#x79CD;&#x9AD8;&#x8D28;&#x91CF;&#x7167;&#x7247;&#xFF0C;&#x5E94;&#x7528;&#x5C06;&#x76F4;&#x63A5;&#x6302;&#x6389;&#xFF0C;&#x62A5;OOM</p>
+</li>
+<li>&#x5728;&#x4F7F;&#x7528;ListView, GridView&#x7B49;&#x8FD9;&#x4E9B;&#x5927;&#x91CF;&#x52A0;&#x8F7D;view&#x7684;&#x7EC4;&#x4EF6;&#x65F6;&#xFF0C;&#x5982;&#x679C;&#x6CA1;&#x6709;&#x5408;&#x7406;&#x7684;&#x5904;&#x7406;&#x7F13;&#x5B58;&#xFF0C;&#x5927;&#x91CF;&#x52A0;&#x8F7D;Bitmap&#x7684;&#x65F6;&#x5019;&#xFF0C;&#x4E5F;&#x5C06;&#x5BB9;&#x6613;&#x5F15;&#x53D1;OOM</li>
+</ol>
+<h2 id="&#x4ECB;&#x7ECD;Bitmap"><a href="#&#x4ECB;&#x7ECD;Bitmap" class="headerlink" title="&#x4ECB;&#x7ECD;Bitmap"></a>&#x4ECB;&#x7ECD;Bitmap</h2><p>&#x5DE5;&#x6B32;&#x5584;&#x5176;&#x4E8B;&#x5FC5;&#x5148;&#x5229;&#x5176;&#x5668;&#xFF0C;&#x60F3;&#x8981;&#x9AD8;&#x6548;&#x52A0;&#x8F7D;Bitmap&#xFF0C;&#x4E86;&#x89E3;Bitmap&#x662F;&#x5FC5;&#x4E0D;&#x53EF;&#x5C11;&#x7684;&#x3002;Bitmap&#x6709;&#x51E0;&#x4E2A;&#x91CD;&#x8981;&#x7684;&#x6210;&#x5458;&#x53D8;&#x91CF;&#x548C;&#x65B9;&#x6CD5;&#xFF0C;&#x4E0B;&#x9762;&#x5F00;&#x59CB;&#x4ECB;&#x7ECD;&#xFF1A;</p>
+<h3 id="Bitmap-Config"><a href="#Bitmap-Config" class="headerlink" title="Bitmap.Config"></a>Bitmap.Config</h3><p>&#x4E00;&#x5F20;&#x56FE;&#x7247;Bitmap&#x6240;&#x5360;&#x7528;&#x7684;&#x5185;&#x5B58; = <strong>&#x56FE;&#x7247;&#x957F;&#x5EA6; x &#x56FE;&#x7247;&#x5BBD;&#x5EA6; x &#x4E00;&#x4E2A;&#x50CF;&#x7D20;&#x70B9;&#x5360;&#x7528;&#x7684;&#x5B57;&#x8282;&#x6570;</strong><br>&#x800C;Bitmap.Config&#xFF0C;&#x6B63;&#x662F;&#x6307;&#x5B9A;&#x5355;&#x4F4D;&#x50CF;&#x7D20;&#x5360;&#x7528;&#x7684;&#x5B57;&#x8282;&#x6570;&#x7684;&#x91CD;&#x8981;&#x53C2;&#x6570;&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/999796A0-59C9-4FA8-AA35-E59254522E06.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/999796A0-59C9-4FA8-AA35-E59254522E06.png" alt="" class="ui centered image"></a><br>&#x5176;&#x4E2D;&#xFF0C;A&#x4EE3;&#x8868;&#x900F;&#x660E;&#x5EA6;&#xFF1B;R&#x4EE3;&#x8868;&#x7EA2;&#x8272;&#xFF1B;G&#x4EE3;&#x8868;&#x7EFF;&#x8272;&#xFF1B;B&#x4EE3;&#x8868;&#x84DD;&#x8272;&#x3002;</p>
+<ul class="ui list">
+<li><strong>ALPHA_8</strong><br>&#x8868;&#x793A;8&#x4F4D;Alpha&#x4F4D;&#x56FE;,&#x5373;A=8,&#x4E00;&#x4E2A;&#x50CF;&#x7D20;&#x70B9;&#x5360;&#x7528;1&#x4E2A;&#x5B57;&#x8282;,&#x5B83;&#x6CA1;&#x6709;&#x989C;&#x8272;,&#x53EA;&#x6709;&#x900F;&#x660E;&#x5EA6;</li>
+<li><strong>ARGB_4444</strong><br>&#x8868;&#x793A;16&#x4F4D;ARGB&#x4F4D;&#x56FE;&#xFF0C;&#x5373;A=4,R=4,G=4,B=4,&#x4E00;&#x4E2A;&#x50CF;&#x7D20;&#x70B9;&#x5360;4+4+4+4=16&#x4F4D;&#xFF0C;2&#x4E2A;&#x5B57;&#x8282;</li>
+<li><strong>ARGB_8888</strong><br>&#x8868;&#x793A;32&#x4F4D;ARGB&#x4F4D;&#x56FE;&#xFF0C;&#x5373;A=8,R=8,G=8,B=8,&#x4E00;&#x4E2A;&#x50CF;&#x7D20;&#x70B9;&#x5360;8+8+8+8=32&#x4F4D;&#xFF0C;4&#x4E2A;&#x5B57;&#x8282;</li>
+<li><strong>RGB_565</strong><br>&#x8868;&#x793A;16&#x4F4D;RGB&#x4F4D;&#x56FE;,&#x5373;R=5,G=6,B=5,&#x5B83;&#x6CA1;&#x6709;&#x900F;&#x660E;&#x5EA6;,&#x4E00;&#x4E2A;&#x50CF;&#x7D20;&#x70B9;&#x5360;5+6+5=16&#x4F4D;&#xFF0C;2&#x4E2A;&#x5B57;&#x8282;</li>
+</ul>
+<p>Bitmap.Config&#x4E3B;&#x8981;&#x4F5C;&#x7528;&#x662F;&#xFF1A;&#x4EE5;&#x4F55;&#x79CD;&#x65B9;&#x5F0F;&#x50CF;&#x7D20;&#x5B58;&#x50A8;&#x3002;<u>&#x4E0D;&#x540C;&#x7684;&#x914D;&#x7F6E;&#x5C06;&#x4F1A;&#x5F71;&#x54CD;&#x56FE;&#x50CF;&#x7684;&#x753B;&#x8D28;(&#x8272;&#x5F69;&#x6DF1;&#x5EA6;)&#xFF0C;&#x4F4D;&#x6570;&#x8D8A;&#x9AD8;&#x753B;&#x8D28;&#x8D8A;&#x9AD8;&#xFF0C;&#x663E;&#x7136;&#x5728;&#x8FD9;&#x91CC;ARGB_8888&#x662F;&#x6700;&#x5360;&#x5185;&#x5B58;&#x7684;&#x3002;&#x5F53;&#x7136;&#xFF0C;&#x753B;&#x8D28;&#x8D8A;&#x9AD8;&#x4E5F;&#x5C31;&#x8D8A;&#x5360;&#x5185;&#x5B58;&#x4E86;&#x3002;</u></p>
+<blockquote>
+<p>Tips&#xFF1A;&#x7531;&#x4E8E;ARGB_4444&#x7684;&#x753B;&#x8D28;&#x60E8;&#x4E0D;&#x5FCD;&#x7779;&#xFF0C;&#x4E00;&#x822C;&#x5047;&#x5982;&#x5BF9;&#x56FE;&#x7247;&#x6CA1;&#x6709;&#x900F;&#x660E;&#x5EA6;&#x8981;&#x6C42;&#x7684;&#x8BDD;&#xFF0C;&#x53EF;&#x4EE5;&#x6539;&#x6210;RGB_565&#xFF0C;&#x76F8;&#x6BD4;ARGB_8888&#x5C06;&#x8282;&#x7701;&#x4E00;&#x534A;&#x7684;&#x5185;&#x5B58;&#x5F00;&#x9500;&#x3002;</p>
+</blockquote>
+<h3 id="&#x914D;&#x7F6E;&#x4E0D;&#x540C;Bitmap-Config&#x5728;&#x76F8;&#x540C;&#x5206;&#x8FA8;&#x7387;&#x4E0B;&#x7684;&#x5360;&#x7528;&#x5185;&#x5B58;&#x60C5;&#x51B5;"><a href="#&#x914D;&#x7F6E;&#x4E0D;&#x540C;Bitmap-Config&#x5728;&#x76F8;&#x540C;&#x5206;&#x8FA8;&#x7387;&#x4E0B;&#x7684;&#x5360;&#x7528;&#x5185;&#x5B58;&#x60C5;&#x51B5;" class="headerlink" title="&#x914D;&#x7F6E;&#x4E0D;&#x540C;Bitmap.Config&#x5728;&#x76F8;&#x540C;&#x5206;&#x8FA8;&#x7387;&#x4E0B;&#x7684;&#x5360;&#x7528;&#x5185;&#x5B58;&#x60C5;&#x51B5;"></a>&#x914D;&#x7F6E;&#x4E0D;&#x540C;Bitmap.Config&#x5728;&#x76F8;&#x540C;&#x5206;&#x8FA8;&#x7387;&#x4E0B;&#x7684;&#x5360;&#x7528;&#x5185;&#x5B58;&#x60C5;&#x51B5;</h3><p>&#x4E00;&#x5F20;&#x56FE;&#x7247;Bitmap&#x6240;&#x5360;&#x7528;&#x7684;&#x5185;&#x5B58; = &#x56FE;&#x7247;&#x957F;&#x5EA6; x &#x56FE;&#x7247;&#x5BBD;&#x5EA6; x &#x4E00;&#x4E2A;&#x50CF;&#x7D20;&#x70B9;&#x5360;&#x7528;&#x7684;&#x5B57;&#x8282;&#x6570;</p>
+<table>
+<thead>
+<tr>
+<th>Bitmap.Config</th>
+<th style="text-align:center">&#x5206;&#x8FA8;&#x7387;100x100&#x7684;&#x56FE;&#x7247;&#x5360;&#x7528;&#x5185;&#x5B58;&#x7684;&#x5927;&#x5C0F;</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ALPHA_8</td>
+<td style="text-align:center">100x100x1 = 10000 byte ~= 9.77 KB</td>
+</tr>
+<tr>
+<td>ARGB_4444</td>
+<td style="text-align:center">100x100x2 = 20000 byte ~= 19.53 kb</td>
+</tr>
+<tr>
+<td>ARGB_8888</td>
+<td style="text-align:center">100x100x4 = 40000 byte ~= 39.06 KB</td>
+</tr>
+<tr>
+<td>RGB_565</td>
+<td style="text-align:center">100x100x2 = 20000 byte ~= 19.53 KB</td>
+</tr>
+</tbody>
+</table>
+<p><strong>&#x5728;Android&#x91CC;&#x9762;&#x53EF;&#x4EE5;&#x901A;&#x8FC7;&#x4E0B;&#x9762;&#x7684;&#x4EE3;&#x7801;&#x6765;&#x8BBE;&#x7F6E;&#x89E3;&#x7801;&#x7387;</strong>&#xFF1A;<br><a class="magnific-img" href="http://hukai.me/images/android_perf_2_pixel_decode.png"><img src="http://hukai.me/images/android_perf_2_pixel_decode.png" alt="" class="ui centered image"></a></p>
+<h3 id="Bitmap-CompressFormat"><a href="#Bitmap-CompressFormat" class="headerlink" title="Bitmap.CompressFormat"></a>Bitmap.CompressFormat</h3><p>&#x4ECE;&#x5B57;&#x9762;&#x4E0A;&#x7406;&#x89E3;&#xFF0C;&#x5B83;&#x7684;&#x542B;&#x4E49;&#x662F;&#xFF1A;<u><strong>Bitmap&#x538B;&#x7F29;&#x683C;&#x5F0F;</strong></u><br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> CompressFormat {</span><br><span class="line">JPEG    (<span class="number">0</span>),</span><br><span class="line">PNG     (<span class="number">1</span>),</span><br><span class="line">WEBP    (<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">CompressFormat(<span class="keyword">int</span> nativeInt) {</span><br><span class="line"><span class="keyword">this</span>.nativeInt = nativeInt;</span><br><span class="line">}</span><br><span class="line"><span class="keyword">final</span> <span class="keyword">int</span> nativeInt;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x55EF;&#xFF0C;&#x5176;&#x5B9E;&#x8FD9;&#x4E2A;&#x53C2;&#x6570;&#x5F88;&#x7B80;&#x5355;&#xFF0C;&#x5C31;&#x662F;&#x6307;&#x5B9A;Bitmap&#x662F;&#x4EE5;JPEG&#x3001;PNG&#x8FD8;&#x662F;WEBP&#x683C;&#x5F0F;&#x6765;&#x538B;&#x7F29;</p>
+<h3 id="Bitmap-compress-&#x65B9;&#x6CD5;"><a href="#Bitmap-compress-&#x65B9;&#x6CD5;" class="headerlink" title="Bitmap.compress()&#x65B9;&#x6CD5;"></a>Bitmap.compress()&#x65B9;&#x6CD5;</h3><p>&#x91CD;&#x78C5;&#x65B9;&#x6CD5;&#x6765;&#x4E86;&#xFF0C;&#x901A;&#x8FC7;&#x8FD9;&#x4E2A;&#x65B9;&#x6CD5;&#xFF0C;&#x53EF;&#x4EE5;&#x5B9E;&#x73B0;&#x56FE;&#x7247;&#x7684;&#x538B;&#x7F29;&#x3002;&#x4F7F;&#x7528;&#x8BE5;&#x65B9;&#x6CD5;&#x9700;&#x8981;&#x4F20;&#x4E09;&#x4E2A;&#x53C2;&#x6570;&#x8FDB;&#x53BB;&#xFF1A;CompressFormat&#x3001;int&#x7C7B;&#x578B;&#x7684;quality&#x3001;OutputStream</p>
+<ul class="ui list">
+<li><strong>CompressFormat</strong><br> &#x6307;&#x5B9A;Bitmap&#x7684;&#x538B;&#x7F29;&#x683C;&#x5F0F;&#xFF0C;&#x53EF;&#x9009;&#x62E9;JPEG&#x3001;PNG&#x3001;WEBP</li>
+<li><p><strong>int&#x7C7B;&#x578B;&#x7684;quality</strong><br>&#x6307;&#x5B9A;Bitmap&#x7684;&#x538B;&#x7F29;&#x54C1;&#x8D28;&#xFF0C;&#x8303;&#x56F4;&#x662F;0 ~ 100&#xFF1B;&#x8BE5;&#x503C;&#x8D8A;&#x9AD8;&#xFF0C;&#x753B;&#x8D28;&#x8D8A;&#x9AD8;&#x3002;0&#x8868;&#x793A;&#x753B;&#x8D28;&#x6700;&#x5DEE;&#xFF0C;100&#x753B;&#x8D28;&#x6700;&#x9AD8;&#x3002;</p>
+</li>
+<li><p><strong>OutputStream</strong><br>&#x6307;&#x5B9A;Bitmap&#x7684;&#x5B57;&#x8282;&#x8F93;&#x51FA;&#x6D41;&#x3002;&#x4E00;&#x822C;&#x4F7F;&#x7528;&#xFF1A;</p>
+<blockquote>
+<p>ByteArrayOutputStream stream = new ByteArrayOutputStream();</p>
+</blockquote>
+</li>
+</ul>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Bitmap.compress()&#x65B9;&#x6CD5;</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">compress</span><span class="params">(CompressFormat format, </span></span></span><br><span class="line"><span class="function"><span class="params"><span class="keyword">int</span> quality, OutputStream stream)</span> </span>{</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (stream == <span class="keyword">null</span>) {</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> (quality &lt; <span class="number">0</span> || quality &gt; <span class="number">100</span>) {</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;quality must be 0..100&quot;</span>);</span><br><span class="line">    }</span><br><span class="line">    Trace.traceBegin(Trace.TRACE_TAG_RESOURCES, <span class="string">&quot;Bitmap.compress&quot;</span>);</span><br><span class="line">    <span class="keyword">boolean</span> result = nativeCompress(mFinalizer.mNativeBitmap, format.nativeInt,</span><br><span class="line">    quality, stream, <span class="keyword">new</span> <span class="keyword">byte</span>[WORKING_COMPRESS_STORAGE]);</span><br><span class="line">    Trace.traceEnd(Trace.TRACE_TAG_RESOURCES);</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="&#x6848;&#x4F8B;&#xFF1A;&#x5C06;&#x4E00;&#x4E2A;Bitmap&#x538B;&#x7F29;&#x6210;jpeg-quality&#x4E3A;10&#xFF0C;&#x4EE3;&#x7801;&#x5982;&#x4E0B;&#xFF1A;"><a href="#&#x6848;&#x4F8B;&#xFF1A;&#x5C06;&#x4E00;&#x4E2A;Bitmap&#x538B;&#x7F29;&#x6210;jpeg-quality&#x4E3A;10&#xFF0C;&#x4EE3;&#x7801;&#x5982;&#x4E0B;&#xFF1A;" class="headerlink" title="&#x6848;&#x4F8B;&#xFF1A;&#x5C06;&#x4E00;&#x4E2A;Bitmap&#x538B;&#x7F29;&#x6210;jpeg, quality&#x4E3A;10&#xFF0C;&#x4EE3;&#x7801;&#x5982;&#x4E0B;&#xFF1A;"></a>&#x6848;&#x4F8B;&#xFF1A;&#x5C06;&#x4E00;&#x4E2A;Bitmap&#x538B;&#x7F29;&#x6210;jpeg, quality&#x4E3A;10&#xFF0C;&#x4EE3;&#x7801;&#x5982;&#x4E0B;&#xFF1A;</h3><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>{</span><br><span class="line">  <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line"></span><br><span class="line">  setContentView(R.layout.activity_test3);</span><br><span class="line">  ImageView iv_1 = (ImageView) findViewById(R.id.iv_1);</span><br><span class="line">  ImageView iv_2 = (ImageView) findViewById(R.id.iv_2);</span><br><span class="line">  Bitmap bmp = BitmapFactory.</span><br><span class="line">  decodeResource(<span class="keyword">this</span>.getResources(), R.mipmap.test_pic);</span><br><span class="line">  iv_1.setImageBitmap(bmp);</span><br><span class="line">  ByteArrayOutputStream bos = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">  bmp.compress(Bitmap.CompressFormat.JPEG, <span class="number">10</span>, bos);</span><br><span class="line">  <span class="keyword">byte</span>[] bytes = bos.toByteArray();</span><br><span class="line">  bmp = BitmapFactory.decodeByteArray(bytes, <span class="number">0</span>, bytes.length);</span><br><span class="line">  iv_2.setImageBitmap(bmp);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<p>&#x8FD0;&#x884C;&#x6548;&#x679C;&#x56FE;&#xFF1A;&#x3010;&#x4E0B;&#x9762;&#x90A3;&#x5F20;&#x56FE;&#x660E;&#x663E;&#x8981;&#x6BD4;&#x4E0A;&#x4E00;&#x5F20;&#x753B;&#x8D28;&#x5DEE;&#x4E86;&#x5F88;&#x591A;&#x3011;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/B7A97154-0C8E-4787-9431-F3C28A92AEE1.png?imageView/1/w/400/h/400"><img src="http://7xijtp.com1.z0.glb.clouddn.com/B7A97154-0C8E-4787-9431-F3C28A92AEE1.png?imageView/1/w/400/h/400" alt="" class="ui centered image"></a></p>
+<h2 id="&#x4ECB;&#x7ECD;BitmapFactory"><a href="#&#x4ECB;&#x7ECD;BitmapFactory" class="headerlink" title="&#x4ECB;&#x7ECD;BitmapFactory"></a>&#x4ECB;&#x7ECD;BitmapFactory</h2><p>&#x4ECE;&#x4E0A;&#x9762;&#x90A3;&#x4E2A;&#x6848;&#x4F8B;&#x7684;&#x4EE3;&#x7801;&#x53EF;&#x4EE5;&#x53D1;&#x73B0;&#xFF0C;&#x83B7;&#x53D6;Bitmap&#x4E0D;&#x662F;&#x901A;&#x8FC7;&#x6784;&#x9020;new&#x51FA;&#x6765;&#x7684;&#xFF0C;&#x800C;&#x662F;&#x901A;&#x8FC7;BitmapFactory&#x201D;&#x5236;&#x9020;&#x201D;&#x51FA;&#x6765;&#x7684;&#x3002;BitmapFactory&#x662F;&#x83B7;&#x53D6;Bitmap&#x548C;&#x538B;&#x7F29;Bitmap&#x7684;&#x91CD;&#x8981;&#x7C7B;&#xFF0C;&#x4E0B;&#x9762;&#x5F00;&#x59CB;&#x4ECB;&#x7ECD;BitmapFactory&#x51E0;&#x4E2A;&#x91CD;&#x8981;&#x7684;&#x6210;&#x5458;&#x53D8;&#x91CF;&#x548C;&#x65B9;&#x6CD5;&#xFF1A;</p>
+<h3 id="&#x901A;&#x8FC7;BitmapFactory&#x89E3;&#x7801;-&#x83B7;&#x53D6;-Bitmap&#x7684;&#x51E0;&#x79CD;&#x65B9;&#x5F0F;"><a href="#&#x901A;&#x8FC7;BitmapFactory&#x89E3;&#x7801;-&#x83B7;&#x53D6;-Bitmap&#x7684;&#x51E0;&#x79CD;&#x65B9;&#x5F0F;" class="headerlink" title="&#x901A;&#x8FC7;BitmapFactory&#x89E3;&#x7801;(&#x83B7;&#x53D6;)Bitmap&#x7684;&#x51E0;&#x79CD;&#x65B9;&#x5F0F;"></a>&#x901A;&#x8FC7;BitmapFactory&#x89E3;&#x7801;(&#x83B7;&#x53D6;)Bitmap&#x7684;&#x51E0;&#x79CD;&#x65B9;&#x5F0F;</h3><ul class="ui list">
+<li><p><strong>decodeFile()</strong>   //&#x4ECE;SD&#x5361;&#x6587;&#x4EF6;&#x8BFB;&#x53D6;</p>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Bitmap bm = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory()</span><br><span class="line">.getAbsolutePath()+<span class="string">&quot;/photo.jpg&quot;</span>);</span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p><strong>decodeResource()</strong>&#xA0;&#xA0;&#xA0;//&#x4ECE;&#x8D44;&#x6E90;&#x6587;&#x4EF6;res&#x8BFB;&#x53D6;</p>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Bitmap bm = BitmapFactory.decodeResource(<span class="keyword">this</span>.getResources(), R.mipmap.test_pic);</span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p><strong>decodeStream()</strong>&#xA0;&#xA0;&#xA0;//&#x4ECE;&#x8F93;&#x5165;&#x6D41;&#x8BFB;&#x53D6;</p>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Bitmap bm = BitmapFactory.decodeStream(inputStream);</span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p><strong>decodeByteArray()</strong>&#xA0;&#xA0;&#xA0;//&#x4ECE;&#x5B57;&#x8282;&#x6570;&#x7EC4;&#x8BFB;&#x53D6;</p>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Bitmap bm = BitmapFactory.decodeByteArray(bytes, <span class="number">0</span>, bytes.length);</span><br></pre></td></tr></tbody></table></figure>
+</li>
+</ul>
+<h3 id="BitmapFactory-Options"><a href="#BitmapFactory-Options" class="headerlink" title="BitmapFactory.Options"></a><strong>BitmapFactory.Options</strong></h3><p>BitmapFactory&#x5728;&#x4F7F;&#x7528;&#x65B9;&#x6CD5;decodeFile()&#x3001;decodeResource()&#x89E3;&#x7801;&#x56FE;&#x7247;&#x65F6;&#xFF0C;&#x53EF;&#x4EE5;&#x6307;&#x5B9A;&#x5B83;&#x7684;BitmapFactory.Options&#x3002;<u><strong>&#x8FD9;&#x4E2A;&#x53C2;&#x6570;&#x4F5C;&#x7528;&#x975E;&#x5E38;&#x5927;&#xFF0C;&#x5B83;&#x53EF;&#x4EE5;&#x8BBE;&#x7F6E;Bitmap&#x7684;&#x91C7;&#x6837;&#x7387;&#xFF0C;&#x901A;&#x8FC7;&#x6539;&#x53D8;&#x56FE;&#x7247;&#x7684;&#x5BBD;&#x5EA6;&#x3001;&#x9AD8;&#x5EA6;&#x3001;&#x7F29;&#x653E;&#x6BD4;&#x4F8B;&#x7B49;&#xFF0C;&#x4EE5;&#x8FBE;&#x5230;&#x964D;&#x4F4E;&#x56FE;&#x7247;&#x7684;&#x50CF;&#x7D20;&#x7684;&#x76EE;&#x7684;&#xFF0C;&#x8FD9;&#x6837;&#x53EF;&#x4EE5;&#x505A;&#x5230;&#x56FE;&#x7247;&#x538B;&#x7F29;&#xFF0C;&#x51CF;&#x5C11;Bitmap&#x7684;&#x5185;&#x5B58;</strong>&#x3002;</u></p>
+<p>&#x4E0B;&#x9762;&#x5217;&#x51FA;BitmapFactory.Options&#x7684;&#x90E8;&#x5206;&#x6210;&#x5458;&#x53D8;&#x91CF;&#xFF1A;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Bitmap inBitmap;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">boolean</span> inJustDecodeBounds;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">int</span> inSampleSize;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">int</span> inDensity;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">int</span> inTargetDensity;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">int</span> inScreenDensity;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">boolean</span> inScaled;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">int</span> outWidth;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">int</span> outHeight;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> String outMimeType;</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x770B;&#x5230;&#x8FD9;&#x4E48;&#x591A;&#x6210;&#x5458;&#x53D8;&#x91CF;&#x662F;&#x4E0D;&#x662F;&#x50BB;&#x4E86;&#xFF1F;no,no,no&#xFF0C;&#x5176;&#x5B9E;&#x5F88;&#x7B80;&#x5355;&#x3002;&#x4E00;&#x53E5;&#x8BDD;&#x603B;&#x7ED3;&#xFF1A;<u><strong>in&#x5F00;&#x5934;&#x7684;&#x4EE3;&#x8868;&#x7684;&#x5C31;&#x662F;&#x8BBE;&#x7F6E;&#x67D0;&#x67D0;&#x53C2;&#x6570;;out&#x5F00;&#x5934;&#x7684;&#x4EE3;&#x8868;&#x7684;&#x5C31;&#x662F;&#x83B7;&#x53D6;&#x67D0;&#x67D0;&#x53C2;&#x6570;</strong></u>&#x3002;&#x6BD4;&#x5982;&#xFF0C;inSampleSize&#x5C31;&#x662F;&#x8BBE;&#x7F6E;Bitmap&#x7684;&#x7F29;&#x653E;&#x6BD4;&#x4F8B;&#x3001;outWidth&#x5C31;&#x662F;&#x83B7;&#x53D6;Bitmap&#x7684;&#x9AD8;&#x5EA6;&#x3002;</p>
+<h3 id="inJustDecodeBounds-&#x8BBE;&#x7F6E;&#x53EA;&#x53BB;&#x8BFB;&#x56FE;&#x7247;&#x7684;&#x9644;&#x52A0;&#x4FE1;&#x606F;-&#x5BBD;&#x9AD8;-&#x4E0D;&#x53BB;&#x89E3;&#x6790;&#x771F;&#x5B9E;&#x7684;Bitmap"><a href="#inJustDecodeBounds-&#x8BBE;&#x7F6E;&#x53EA;&#x53BB;&#x8BFB;&#x56FE;&#x7247;&#x7684;&#x9644;&#x52A0;&#x4FE1;&#x606F;-&#x5BBD;&#x9AD8;-&#x4E0D;&#x53BB;&#x89E3;&#x6790;&#x771F;&#x5B9E;&#x7684;Bitmap" class="headerlink" title="inJustDecodeBounds &#x8BBE;&#x7F6E;&#x53EA;&#x53BB;&#x8BFB;&#x56FE;&#x7247;&#x7684;&#x9644;&#x52A0;&#x4FE1;&#x606F;(&#x5BBD;&#x9AD8;),&#x4E0D;&#x53BB;&#x89E3;&#x6790;&#x771F;&#x5B9E;&#x7684;Bitmap"></a><strong>inJustDecodeBounds &#x8BBE;&#x7F6E;&#x53EA;&#x53BB;&#x8BFB;&#x56FE;&#x7247;&#x7684;&#x9644;&#x52A0;&#x4FE1;&#x606F;(&#x5BBD;&#x9AD8;),&#x4E0D;&#x53BB;&#x89E3;&#x6790;&#x771F;&#x5B9E;&#x7684;Bitmap</strong></h3><p>&#x4ECE;&#x5B57;&#x9762;&#x4E0A;&#x7406;&#x89E3;&#xFF0C;&#x5B83;&#x7684;&#x542B;&#x4E49;&#x662F;&#xFF1A;&#x201D;&#x8BBE;&#x7F6E;&#x4EC5;&#x89E3;&#x7801;Bitmap&#x7684;&#x8FB9;&#x754C;&#x201D;&#x3002;&#x90A3;&#x5B83;&#x771F;&#x6B63;&#x7684;&#x4F5C;&#x7528;&#x662F;&#x5565;&#x5462;&#xFF1F;</p>
+<p><u><strong>&#x5F53;inJustDecodeBounds&#x8BBE;&#x7F6E;&#x4E3A;true&#x7684;&#x65F6;&#x5019;&#xFF0C;BitmapFactory&#x901A;&#x8FC7;decodeResource&#x6216;&#x8005;decodeFile&#x89E3;&#x7801;&#x56FE;&#x7247;&#x65F6;&#xFF0C;&#x5C06;&#x4F1A;&#x8FD4;&#x56DE;&#x7A7A;(null)&#x7684;Bitmap&#x5BF9;&#x8C61;&#xFF0C;&#x8FD9;&#x6837;&#x53EF;&#x4EE5;&#x907F;&#x514D;Bitmap&#x7684;&#x5185;&#x5B58;&#x5206;&#x914D;&#xFF0C;&#x4F46;&#x662F;&#x5B83;&#x53EF;&#x4EE5;&#x8FD4;&#x56DE;Bitmap&#x7684;&#x5BBD;&#x5EA6;&#x3001;&#x9AD8;&#x5EA6;&#x4EE5;&#x53CA;MimeType&#x3002;</strong></u><br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// &#x5F53;inJustDecodeBounds&#x8BBE;&#x7F6E;&#x4E3A;true&#x65F6;&#xFF0C;&#x83B7;&#x53D6;Bitmap&#x7684;&#x5BBD;&#x5EA6;&#x3001;&#x9AD8;&#x5EA6;&#x4EE5;&#x53CA;MimeType</span></span><br><span class="line">BitmapFactory.Options options =  <span class="keyword">new</span> BitmapFactory.Options(); </span><br><span class="line">options.inJustDecodeBounds =  <span class="keyword">true</span> ; </span><br><span class="line">BitmapFactory.decodeResource (getResources(), R.id.myimage, options); </span><br><span class="line"><span class="keyword">int</span> imageHeight = options.outHeight ; </span><br><span class="line"><span class="keyword">int</span> imageWidth = options.outWidth ; </span><br><span class="line">String imageType = options.outMimeType ;</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x90A3;&#x4E48;&#x8FD9;&#x6837;&#x505A;&#x6709;&#x4F55;&#x610F;&#x4E49;&#x5462;&#xFF1F;&#x770B;&#x5B8C;&#x4E0B;&#x9762;&#x8FD9;&#x6BB5;&#x4EE3;&#x7801;&#xFF0C;&#x4F60;&#x5C31;&#x77E5;&#x9053;&#x8FD9;&#x6837;&#x505A;&#x6709;&#x5565;&#x610F;&#x4E49;&#x4E86;&#x3002;&#x610F;&#x4E49;&#x5C31;&#x5728;&#x4E8E;&#xFF0C;&#x53EF;&#x4EE5;&#x5148;&#x4E0D;&#x7528;&#x4EA7;&#x751F;Bitmap&#x5185;&#x5B58;&#xFF0C;&#x4ECE;&#x800C;&#x83B7;&#x5F97;&#x56FE;&#x7247;&#x7684;&#x5BBD;&#x9AD8;&#x4FE1;&#x606F;&#xFF0C;&#x5C3D;&#x53EF;&#x80FD;&#x7684;&#x505A;&#x5230;&#x8282;&#x7EA6;&#x5185;&#x5B58;&#x3002;</p>
+<h3 id="&#x901A;&#x8FC7;BitmapFactory-Options&#x6839;&#x636E;&#x624B;&#x673A;&#x5C4F;&#x5E55;&#x5C3A;&#x5BF8;&#x8BBE;&#x7F6E;&#x56FE;&#x7247;&#x7684;&#x7F29;&#x653E;&#x6BD4;&#x4F8B;"><a href="#&#x901A;&#x8FC7;BitmapFactory-Options&#x6839;&#x636E;&#x624B;&#x673A;&#x5C4F;&#x5E55;&#x5C3A;&#x5BF8;&#x8BBE;&#x7F6E;&#x56FE;&#x7247;&#x7684;&#x7F29;&#x653E;&#x6BD4;&#x4F8B;" class="headerlink" title="&#x901A;&#x8FC7;BitmapFactory.Options&#x6839;&#x636E;&#x624B;&#x673A;&#x5C4F;&#x5E55;&#x5C3A;&#x5BF8;&#x8BBE;&#x7F6E;&#x56FE;&#x7247;&#x7684;&#x7F29;&#x653E;&#x6BD4;&#x4F8B;"></a>&#x901A;&#x8FC7;BitmapFactory.Options&#x6839;&#x636E;&#x624B;&#x673A;&#x5C4F;&#x5E55;&#x5C3A;&#x5BF8;&#x8BBE;&#x7F6E;&#x56FE;&#x7247;&#x7684;&#x7F29;&#x653E;&#x6BD4;&#x4F8B;</h3><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// &#x6839;&#x636E;&#x624B;&#x673A;&#x5C4F;&#x5E55;&#x5C3A;&#x5BF8;&#x8BBE;&#x7F6E;&#x56FE;&#x7247;&#x7684;&#x7F29;&#x653E;&#x6BD4;&#x4F8B;&#x3010;&#x5C06;&#x5927;&#x56FE;&#x7F29;&#x653E;&#x3011;</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestThreadActivity3</span> <span class="keyword">extends</span> <span class="title">Activity</span> </span>{</span><br><span class="line"></span><br><span class="line"><span class="meta">@TargetApi</span>(Build.VERSION_CODES.KITKAT)</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>{</span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line"></span><br><span class="line">    setContentView(R.layout.activity_test3);</span><br><span class="line">    ImageView iv_1 = (ImageView) findViewById(R.id.iv_1);</span><br><span class="line">    ImageView iv_2 = (ImageView) findViewById(R.id.iv_2);</span><br><span class="line"></span><br><span class="line">    BitmapFactory.Options opts = <span class="keyword">new</span> BitmapFactory.Options();</span><br><span class="line"></span><br><span class="line">    opts.inJustDecodeBounds = <span class="keyword">true</span>;  <span class="comment">//&#x53EA;&#x53BB;&#x8BFB;&#x56FE;&#x7247;&#x7684;&#x5934;&#x4FE1;&#x606F;,&#x4E0D;&#x53BB;&#x89E3;&#x6790;&#x771F;&#x5B9E;&#x7684;&#x4F4D;&#x56FE;      </span></span><br><span class="line">    Bitmap bmp = BitmapFactory.decodeResource(<span class="keyword">this</span>.getResources(),</span><br><span class="line">    R.mipmap.test_pic2,opts);</span><br><span class="line"></span><br><span class="line">    WindowManager wm  = getWindowManager();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> screenWidth = wm.getDefaultDisplay().getWidth();<span class="comment">//&#x5F97;&#x5230;&#x5C4F;&#x5E55;&#x7684;&#x5BBD;&#x5EA6;</span></span><br><span class="line">    <span class="keyword">int</span> screenheight = wm.getDefaultDisplay().getHeight();<span class="comment">//&#x5F97;&#x5230;&#x5C4F;&#x5E55;&#x7684;&#x9AD8;&#x5EA6;</span></span><br><span class="line"></span><br><span class="line">    Log.e(<span class="string">&quot;&#x5C4F;&#x5E55;&#x5BBD;&#x5EA6;&#xFF1A;&quot;</span>,screenWidth+<span class="string">&quot;&quot;</span>);</span><br><span class="line">    Log.e(<span class="string">&quot;&#x5C4F;&#x5E55;&#x9AD8;&#x5EA6;&#xFF1A;&quot;</span>, screenheight + <span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> picWidth = opts.outWidth;<span class="comment">// &#x5F97;&#x5230;&#x56FE;&#x7247;&#x5BBD;&#x5EA6;</span></span><br><span class="line">    <span class="keyword">int</span> picHeight = opts.outHeight;<span class="comment">// &#x5F97;&#x5230;&#x56FE;&#x7247;&#x9AD8;&#x5EA6;</span></span><br><span class="line">    Log.e(<span class="string">&quot;&#x539F;&#x56FE;&#x7247;&#x9AD8;&#x5EA6;&#xFF1A;&quot;</span>,picHeight+<span class="string">&quot;&quot;</span>);</span><br><span class="line">    Log.e(<span class="string">&quot;&#x539F;&#x56FE;&#x7247;&#x5BBD;&#x5EA6;&#xFF1A;&quot;</span>, picWidth + <span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//&#x8BA1;&#x7B97;&#x56FE;&#x7247;&#x7F29;&#x653E;&#x6BD4;&#x4F8B;</span></span><br><span class="line">    <span class="keyword">int</span> dx = picWidth/screenWidth;</span><br><span class="line">    <span class="keyword">int</span> dy = picHeight/screenheight;</span><br><span class="line">    Log.e(<span class="string">&quot;dx,dy&quot;</span>,dx+<span class="string">&quot;,&quot;</span>+dy+<span class="string">&quot;&quot;</span>);</span><br><span class="line">    <span class="keyword">int</span> scale = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span>(dx&gt;=dy&amp;&amp;dy&gt;=<span class="number">1</span>){</span><br><span class="line">    Log.e(<span class="string">&quot;&#x6309;&#x7167;&#x6C34;&#x5E73;&#x65B9;&#x5411;&#x7F29;&#x653E;:&quot;</span> ,dx+<span class="string">&quot;&quot;</span>);</span><br><span class="line">    scale = dx;</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span>(dy&gt;dx&amp;&amp;dx&gt;=<span class="number">1</span>){</span><br><span class="line">    Log.e(<span class="string">&quot;&#x6309;&#x7167;&#x7AD6;&#x76F4;&#x65B9;&#x5411;&#x7F29;&#x653E;:&quot;</span>, dy + <span class="string">&quot;&quot;</span>);</span><br><span class="line">    scale = dy;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    opts.inSampleSize = scale;<span class="comment">//&#x8BBE;&#x7F6E;&#x7F29;&#x653E;&#x6BD4;&#x4F8B;</span></span><br><span class="line">    opts.inJustDecodeBounds = <span class="keyword">false</span>;<span class="comment">//&#x771F;&#x6B63;&#x7684;&#x53BB;&#x89E3;&#x6790;&#x4F4D;&#x56FE;</span></span><br><span class="line">    bmp = BitmapFactory.decodeResource(<span class="keyword">this</span>.getResources(), R.mipmap.test_pic2,opts);</span><br><span class="line">    <span class="keyword">int</span> picWidth2 = opts.outWidth;<span class="comment">// &#x5F97;&#x5230;&#x56FE;&#x7247;&#x5BBD;&#x5EA6;</span></span><br><span class="line">    <span class="keyword">int</span> picHeight2 = opts.outHeight;<span class="comment">// &#x5F97;&#x5230;&#x56FE;&#x7247;&#x9AD8;&#x5EA6;</span></span><br><span class="line">    Log.e(<span class="string">&quot;&#x538B;&#x7F29;&#x540E;&#x7684;&#x56FE;&#x7247;&#x5BBD;&#x5EA6;&#xFF1A;&quot;</span>,picWidth2+<span class="string">&quot;&quot;</span>);</span><br><span class="line">    Log.e(<span class="string">&quot;&#x538B;&#x7F29;&#x540E;&#x7684;&#x56FE;&#x7247;&#x9AD8;&#x5EA6;&#xFF1A;&quot;</span>, picHeight2 + <span class="string">&quot;&quot;</span>);</span><br><span class="line">    Log.e(<span class="string">&quot;&#x538B;&#x7F29;&#x540E;&#x7684;&#x56FE;&#x5360;&#x7528;&#x5185;&#x5B58;&#xFF1A;&quot;</span>,bmp.getByteCount()+<span class="string">&quot;&quot;</span>);</span><br><span class="line">    iv_2.setImageBitmap(bmp);</span><br><span class="line"> }</span><br><span class="line"></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<p>&#x6211;&#x4EEC;&#x8BFB;&#x53D6;&#x4E00;&#x5F20;3840x2400&#x7684;&#x56FE;&#x7247;&#x8FD0;&#x884C;&#x7ED3;&#x679C;&#xFF1A;<br>&#x539F;&#x56FE;&#x76F4;&#x63A5;&#x5360;&#x7528;36M&#x5185;&#x5B58;&#xFF0C;&#x5982;&#x679C;&#x76F4;&#x63A5;&#x8BBE;&#x7F6E;&#x7684;&#x8BDD;&#x5C06;&#x77AC;&#x95F4;&#x7206;&#x70B8;&#x62A5;OOM&#x3002;&#x6240;&#x4EE5;&#x6211;&#x4EEC;&#x8FD9;&#x91CC;&#x5148;&#x4E0D;&#x52A0;&#x8F7D;Bitmap&#xFF0C;&#x800C;&#x662F;&#x53EA;&#x83B7;&#x53D6;&#x5BBD;&#x548C;&#x9AD8;&#xFF0C;&#x5F85;&#x7F29;&#x653E;&#x540E;&#xFF0C;&#x518D;&#x8FDB;&#x884C;&#x771F;&#x5B9E;&#x7684;&#x52A0;&#x8F7D;Bitmap&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/533D7CAA-1943-4DFD-907F-061B44E258E7.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/533D7CAA-1943-4DFD-907F-061B44E258E7.png" alt="" class="ui centered image"></a></p>
+<h3 id="inSampleSize-&#x8BBE;&#x7F6E;&#x56FE;&#x7247;&#x7684;&#x7F29;&#x653E;&#x6BD4;&#x4F8B;-&#x5BBD;&#x548C;&#x9AD8;"><a href="#inSampleSize-&#x8BBE;&#x7F6E;&#x56FE;&#x7247;&#x7684;&#x7F29;&#x653E;&#x6BD4;&#x4F8B;-&#x5BBD;&#x548C;&#x9AD8;" class="headerlink" title="inSampleSize &#x8BBE;&#x7F6E;&#x56FE;&#x7247;&#x7684;&#x7F29;&#x653E;&#x6BD4;&#x4F8B;(&#x5BBD;&#x548C;&#x9AD8;)"></a><strong>inSampleSize &#x8BBE;&#x7F6E;&#x56FE;&#x7247;&#x7684;&#x7F29;&#x653E;&#x6BD4;&#x4F8B;(&#x5BBD;&#x548C;&#x9AD8;)</strong></h3><p>&#x5728;&#x8FD9;&#x91CC;&#x7740;&#x91CD;&#x8BB2;&#x4E00;&#x4E0B;&#x8FD9;&#x4E2A;inSampleSize&#x3002;&#x4ECE;&#x5B57;&#x9762;&#x4E0A;&#x7406;&#x89E3;&#xFF0C;&#x5B83;&#x7684;&#x542B;&#x4E49;&#x662F;&#xFF1A;&#x201D;&#x8BBE;&#x7F6E;&#x53D6;&#x6837;&#x5927;&#x5C0F;&#x201C;&#x3002;&#x5B83;&#x7684;&#x4F5C;&#x7528;&#x662F;&#xFF1A;</p>
+<blockquote>
+<p>&#x8BBE;&#x7F6E;inSampleSize&#x7684;&#x503C;(int&#x7C7B;&#x578B;)&#x540E;&#xFF0C;&#x5047;&#x5982;&#x8BBE;&#x4E3A;4&#xFF0C;&#x5219;&#x5BBD;&#x548C;&#x9AD8;&#x90FD;&#x4E3A;&#x539F;&#x6765;&#x7684;1/4&#xFF0C;&#x5BBD;&#x9AD8;&#x90FD;&#x51CF;&#x5C11;&#x4E86;&#xFF0C;&#x81EA;&#x7136;&#x5185;&#x5B58;&#x4E5F;&#x964D;&#x4F4E;&#x4E86;&#x3002;</p>
+</blockquote>
+<p>&#x5982;&#x56FE;&#x6240;&#x793A;&#xFF1A;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/android_perf_2_sacle_bitmap_insamplesize.png.jpg"><img src="http://7xijtp.com1.z0.glb.clouddn.com/android_perf_2_sacle_bitmap_insamplesize.png.jpg" alt="" class="ui centered image"></a></p>
+<p>&#x5728;&#x8FD9;&#x91CC;&#x53C2;&#x8003;Google&#x5B98;&#x65B9;&#x6587;&#x6863;&#x6765;&#x89E3;&#x91CA;&#xFF1A;<br><a href="http://developer.android.com/intl/zh-cn/training/displaying-bitmaps/load-bitmap.html#load-bitmap" target="_blank" rel="noopener">http://developer.android.com/intl/zh-cn/training/displaying-bitmaps/load-bitmap.html#load-bitmap</a></p>
+<blockquote>
+<p>&#x5982;&#x4F55;&#x7406;&#x89E3;&#x201D;&#x8BBE;&#x7F6E;&#x53D6;&#x6837;&#x5927;&#x5C0F;&#x201C;&#x5462;&#xFF1F;&#x5982;&#x679C;&#x4F60;&#x8BA4;&#x771F;&#x770B;&#x4E86;&#x4E0A;&#x9762;&#x7684;&#x5185;&#x5BB9;&#x8BDD;&#xFF0C;&#x806A;&#x660E;&#x7684;&#x4F60;&#x4E00;&#x5B9A;&#x77E5;&#x9053;&#xFF0C;&#x80AF;&#x5B9A;&#x9700;&#x8981;&#x914D;&#x5408;inJustDecodeBounds&#xFF0C;&#x5148;&#x83B7;&#x53D6;&#x56FE;&#x7247;&#x7684;&#x5BBD;&#x3001;&#x9AD8;&#x3010;&#x8FD9;&#x4E2A;&#x8FC7;&#x7A0B;&#x5C31;&#x662F;&#x53D6;&#x6837;&#x3011;&#xFF0C;&#x7136;&#x540E;&#x901A;&#x8FC7;&#x83B7;&#x53D6;&#x7684;&#x5BBD;&#x9AD8;&#xFF0C;&#x52A8;&#x6001;&#x7684;&#x8BBE;&#x7F6E;inSampleSize&#x7684;&#x503C;&#x3002;</p>
+</blockquote>
+<p>&#x3010;&#x5F53;&#x7136;&#xFF0C;&#x4F60;&#x4E5F;&#x53EF;&#x4EE5;&#x4E0D;&#x52A8;&#x6001;&#xFF0C;&#x53EF;&#x4EE5;&#x5199;&#x6B7B;inSampleSize&#x7684;&#x503C;&#x3002;&#x6BD4;&#x5982;&#x8BBE;&#x7F6E;inSampleSize = 4&#x7684;&#x8BDD;&#xFF0C;&#x4E00;&#x5F20;&#x5206;&#x8FA8;&#x7387;&#x4E3A;2048x1536px&#x7684;&#x56FE;&#x50CF;&#x5C06;&#x4F7F;&#x7528;inSampleSize&#x503C;&#x4E3A;4&#x7684;&#x8BBE;&#x7F6E;&#x6765;&#x89E3;&#x7801;&#xFF0C;&#x4EA7;&#x751F;&#x7684;Bitmap&#x5927;&#x5C0F;&#x7EA6;&#x4E3A;512*384px&#x3002;&#x76F8;&#x8F83;&#x4E8E;&#x5B8C;&#x6574;&#x56FE;&#x7247;&#x5360;&#x7528;12M&#x7684;&#x5185;&#x5B58;&#xFF0C;&#x8FD9;&#x79CD;&#x65B9;&#x5F0F;&#x53EA;&#x9700;0.75M&#x5185;&#x5B58;(&#x5047;&#x8BBE;Bitmap&#x914D;&#x7F6E;&#x4E3A;ARGB_8888)&#x3002;&#x3011;</p>
+<p>&#x8FD9;&#x91CC;&#x518D;&#x4E3E;&#x4F8B;&#x6F14;&#x793A;&#x4E00;&#x4E2A;&#x52A8;&#x6001;&#x8BBE;&#x7F6E;inSampleSize&#x7684;&#x6848;&#x4F8B;&#x4EE3;&#x7801;&#xFF0C;&#x53EF;&#x4EE5;&#x901A;&#x8FC7;&#x8BBE;&#x7F6E;&#x56FE;&#x7247;&#x5BBD;&#x9AD8;&#x6765;&#x7F29;&#x653E;&#x56FE;&#x7247;&#x5C3A;&#x5BF8;&#xFF1A;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestThreadActivity3</span> <span class="keyword">extends</span> <span class="title">Activity</span> </span>{</span><br><span class="line"></span><br><span class="line">    <span class="meta">@TargetApi</span>(Build.VERSION_CODES.KITKAT)</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>{</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line"></span><br><span class="line">        setContentView(R.layout.activity_test3);</span><br><span class="line"></span><br><span class="line">        ImageView iv_1 = (ImageView) findViewById(R.id.iv_1);</span><br><span class="line">        ImageView iv_2 = (ImageView) findViewById(R.id.iv_2);</span><br><span class="line"></span><br><span class="line">        BitmapFactory.Options opts = <span class="keyword">new</span> BitmapFactory.Options();</span><br><span class="line"></span><br><span class="line">        opts.inJustDecodeBounds = <span class="keyword">true</span>;   <span class="comment">//&#x53EA;&#x53BB;&#x8BFB;&#x56FE;&#x7247;&#x7684;&#x9644;&#x52A0;&#x4FE1;&#x606F;,&#x4E0D;&#x53BB;&#x89E3;&#x6790;&#x771F;&#x5B9E;&#x7684;&#x4F4D;&#x56FE;</span></span><br><span class="line">        Bitmap bmp = BitmapFactory.</span><br><span class="line">        decodeResource(<span class="keyword">this</span>.getResources(), R.mipmap.test_pic,opts);</span><br><span class="line"></span><br><span class="line">        Log.e(<span class="string">&quot;&#x539F;&#x56FE;&#x5360;&#x7528;&#x5185;&#x5B58;&#xFF1A;&quot;</span>, bmp.getByteCount() + <span class="string">&quot;&quot;</span>);</span><br><span class="line">        iv_1.setImageBitmap(bmp);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> picWidth = opts.outWidth;<span class="comment">// &#x5F97;&#x5230;&#x56FE;&#x7247;&#x5BBD;&#x5EA6;</span></span><br><span class="line">        <span class="keyword">int</span> picHeight = opts.outHeight;<span class="comment">// &#x5F97;&#x5230;&#x56FE;&#x7247;&#x9AD8;&#x5EA6;</span></span><br><span class="line"></span><br><span class="line">        Log.e(<span class="string">&quot;&#x539F;&#x56FE;&#x7247;&#x9AD8;&#x5EA6;&#xFF1A;&quot;</span>,picHeight+<span class="string">&quot;&quot;</span>);</span><br><span class="line">        Log.e(<span class="string">&quot;&#x539F;&#x56FE;&#x7247;&#x5BBD;&#x5EA6;&#xFF1A;&quot;</span>,picWidth+<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//&#x6839;&#x636E;100*100&#x7684;&#x5BBD;&#x9AD8;&#xFF0C;&#x8BBE;&#x7F6E;&#x7F29;&#x653E;&#x6BD4;&#x4F8B;</span></span><br><span class="line">        opts.inSampleSize = calculateInSampleSize(opts,<span class="number">100</span>,<span class="number">100</span>);</span><br><span class="line">        opts.inJustDecodeBounds = <span class="keyword">false</span>;<span class="comment">//&#x771F;&#x6B63;&#x7684;&#x53BB;&#x89E3;&#x6790;&#x4F4D;&#x56FE;</span></span><br><span class="line"></span><br><span class="line">        bmp = BitmapFactory.decodeResource(<span class="keyword">this</span>.getResources(), R.mipmap.test_pic, opts);</span><br><span class="line">        Log.e(<span class="string">&quot;&#x538B;&#x7F29;&#x540E;&#x7684;&#x56FE;&#x5360;&#x7528;&#x5185;&#x5B58;&#xFF1A;&quot;</span>,bmp.getByteCount()+<span class="string">&quot;&quot;</span>);</span><br><span class="line">        iv_2.setImageBitmap(bmp);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">calculateInSampleSize</span><span class="params">(BitmapFactory.Options options, <span class="keyword">int</span> reqWidth, <span class="keyword">int</span> reqHeight)</span> </span>{</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> height = options.outHeight;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> width = options.outWidth;</span><br><span class="line">        <span class="keyword">int</span> inSampleSize = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (height &gt; reqHeight || width &gt; reqWidth) {</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> halfHeight = height / <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> halfWidth = width / <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">while</span> ((halfHeight / inSampleSize) &gt; reqHeight</span><br><span class="line">            &amp;&amp; (halfWidth / inSampleSize) &gt; reqWidth) {</span><br><span class="line">            	inSampleSize *= <span class="number">2</span>;</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">        Log.e(<span class="string">&quot;inSampleSize&#xFF1A;&quot;</span>,inSampleSize+<span class="string">&quot;&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> inSampleSize;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x5C06;&#x56FE;&#x7247;&#x538B;&#x7F29;&#x6210;100x100px&#x5206;&#x8FA8;&#x7387;&#x7684;&#x8FD0;&#x884C;&#x7ED3;&#x679C;&#xFF1A;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/A3932AD8-C385-406E-830C-A304DB8D38CB.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/A3932AD8-C385-406E-830C-A304DB8D38CB.png" alt="" class="ui centered image"></a></p>
+<h3 id="inBitmap-&#x91CD;&#x7528;Bitmap"><a href="#inBitmap-&#x91CD;&#x7528;Bitmap" class="headerlink" title="inBitmap &#x91CD;&#x7528;Bitmap"></a><strong>inBitmap &#x91CD;&#x7528;Bitmap</strong></h3><p>inBitmap&#x7684;&#x4E3B;&#x8981;&#x4F5C;&#x7528;&#x662F;&#x590D;&#x7528;&#x4E4B;&#x524D;bitmap&#x5728;&#x5185;&#x5B58;&#x4E2D;&#x7533;&#x8BF7;&#x7684;&#x5185;&#x5B58;&#xFF0C;&#x5176;&#x5B9E;&#x8FD9;&#x662F;&#x5BF9;&#x8C61;&#x6C60;&#x7684;&#x539F;&#x7406;&#xFF0C;&#x4EE5;&#x89E3;&#x51B3;&#x5BF9;&#x8C61;&#x9891;&#x7E41;&#x521B;&#x5EFA;&#x518D;&#x56DE;&#x6536;&#x7684;&#x6548;&#x7387;&#x95EE;&#x9898;&#x3002;</p>
+<p><strong>&#x4F7F;&#x7528;inBitmap&#x524D;&#xFF0C;&#x6BCF;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;bitmap&#x9700;&#x8981;&#x72EC;&#x5360;&#x4E00;&#x5757;&#x5185;&#x5B58;</strong><br><a class="magnific-img" href="http://hukai.me/images/android_perf_2_inbitmap_old.png"><img src="http://hukai.me/images/android_perf_2_inbitmap_old.png" alt="" class="ui centered image"></a></p>
+<p><strong>&#x4F7F;&#x7528;inBitmap&#x540E;&#xFF0C;&#x591A;&#x4E2A;bitmap&#x4F1A;&#x590D;&#x7528;&#x540C;&#x4E00;&#x5757;&#x5185;&#x5B58;</strong><br><a class="magnific-img" href="http://hukai.me/images/android_perf_2_inbitmap_new.png"><img src="http://hukai.me/images/android_perf_2_inbitmap_new.png" alt="" class="ui centered image"></a></p>
+<p>&#x6240;&#x4EE5;&#x4F7F;&#x7528;inBitmap&#x80FD;&#x591F;&#x5927;&#x5927;&#x63D0;&#x9AD8;&#x5185;&#x5B58;&#x7684;&#x5229;&#x7528;&#x6548;&#x7387;&#xFF0C;&#x4F46;&#x662F;&#x5B83;&#x4E5F;&#x6709;&#x51E0;&#x4E2A;&#x9650;&#x5236;&#x6761;&#x4EF6;&#xFF1A;</p>
+<ul class="ui list">
+<li><p>inBitmap&#x53EA;&#x80FD;&#x5728;3.0&#x4EE5;&#x540E;&#x4F7F;&#x7528;&#x3002;&#x5728;2.3&#x4E0A;&#xFF0C;bitmap&#x7684;&#x6570;&#x636E;&#x662F;&#x5B58;&#x50A8;&#x5728;native C&#x7684;&#x5185;&#x5B58;&#x533A;&#x57DF;&#xFF0C;&#x5E76;&#x4E0D;&#x662F;&#x5728;java dalvik&#x7684;&#x5185;&#x5B58;&#x5806;&#x4E0A;&#x3002;</p>
+</li>
+<li><p>&#x5728;SDK 11 -&gt; 18&#x4E4B;&#x95F4;&#xFF0C;&#x91CD;&#x7528;&#x7684;bitmap&#x5927;&#x5C0F;&#x5FC5;&#x987B;&#x662F;&#x4E00;&#x81F4;&#x7684;&#xFF0C;&#x4F8B;&#x5982;&#x7ED9;inBitmap&#x8D4B;&#x503C;&#x7684;&#x56FE;&#x7247;&#x5927;&#x5C0F;&#x4E3A;100-100&#xFF0C;&#x90A3;&#x4E48;&#x65B0;&#x7533;&#x8BF7;&#x7684;bitmap&#x5FC5;&#x987B;&#x4E5F;&#x4E3A;100-100&#x624D;&#x80FD;&#x591F;&#x88AB;&#x91CD;&#x7528;&#x3002;&#x4ECE;SDK 19&#x5F00;&#x59CB;&#xFF0C;&#x65B0;&#x7533;&#x8BF7;&#x7684;bitmap&#x5927;&#x5C0F;&#x5FC5;&#x987B;&#x5C0F;&#x4E8E;&#x6216;&#x8005;&#x7B49;&#x4E8E;&#x5DF2;&#x7ECF;&#x8D4B;&#x503C;&#x8FC7;&#x7684;bitmap&#x5927;&#x5C0F;&#x3002;</p>
+</li>
+<li><p>&#x65B0;&#x7533;&#x8BF7;&#x7684;bitmap&#x4E0E;&#x65E7;&#x7684;bitmap&#x5FC5;&#x987B;&#x6709;&#x76F8;&#x540C;&#x7684;&#x89E3;&#x7801;&#x683C;&#x5F0F;&#xFF0C;&#x4F8B;&#x5982;&#x5927;&#x5BB6;&#x90FD;&#x662F;8888&#x7684;&#xFF0C;&#x5982;&#x679C;&#x524D;&#x9762;&#x7684;bitmap&#x662F;8888&#xFF0C;&#x90A3;&#x4E48;&#x5C31;&#x4E0D;&#x80FD;&#x652F;&#x6301;4444&#x4E0E;565&#x683C;&#x5F0F;&#x7684;bitmap&#x4E86;&#xFF0C;&#x4E0D;&#x8FC7;&#x53EF;&#x4EE5;&#x901A;&#x8FC7;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x5305;&#x542B;&#x591A;&#x79CD;&#x5178;&#x578B;&#x53EF;&#x91CD;&#x7528;bitmap&#x7684;&#x5BF9;&#x8C61;&#x6C60;&#xFF0C;&#x8FD9;&#x6837;&#x540E;&#x7EED;&#x7684;bitmap&#x521B;&#x5EFA;&#x90FD;&#x80FD;&#x591F;&#x627E;&#x5230;&#x5408;&#x9002;&#x7684;&#x201C;&#x6A21;&#x677F;&#x201D;&#x53BB;&#x8FDB;&#x884C;&#x91CD;&#x7528;&#x3002;</p>
+</li>
+</ul>
+<p>&#x4E0B;&#x9762;&#x662F;&#x5982;&#x4F55;&#x4F7F;&#x7528;inBitmap&#x7684;&#x4EE3;&#x7801;&#x793A;&#x4F8B;&#xFF1A;<br><a class="magnific-img" href="http://hukai.me/images/android_perf_2_inbitmap_code.png"><img src="http://hukai.me/images/android_perf_2_inbitmap_code.png" alt="" class="ui centered image"></a></p>
+<h2 id="&#x603B;&#x7ED3;&#xFF08;Bitmap&#x538B;&#x7F29;&#x7684;&#x51E0;&#x79CD;&#x65B9;&#x6CD5;&#xFF09;"><a href="#&#x603B;&#x7ED3;&#xFF08;Bitmap&#x538B;&#x7F29;&#x7684;&#x51E0;&#x79CD;&#x65B9;&#x6CD5;&#xFF09;" class="headerlink" title="&#x603B;&#x7ED3;&#xFF08;Bitmap&#x538B;&#x7F29;&#x7684;&#x51E0;&#x79CD;&#x65B9;&#x6CD5;&#xFF09;"></a>&#x603B;&#x7ED3;&#xFF08;Bitmap&#x538B;&#x7F29;&#x7684;&#x51E0;&#x79CD;&#x65B9;&#x6CD5;&#xFF09;</h2><p>1&#x3001;Bitmap&#x538B;&#x7F29;&#x7684;&#x4E24;&#x79CD;&#x5E38;&#x7528;&#x65B9;&#x6CD5;</p>
+<ul class="ui list">
+<li><strong>&#x8D28;&#x91CF;&#x538B;&#x7F29;&#x6CD5;</strong> Bitmap.compress()<br>&#x53C2;&#x8003;2.3.1&#x8282;&#x7684;&#x4EE3;&#x7801;</li>
+<li><strong>&#x53D6;&#x6837;&#x538B;&#x7F29;&#x6CD5;</strong> &#x8BBE;&#x7F6E;inSampleSize&#x7684;&#x503C;<br>&#x53C2;&#x8003;3.2.1.1 &#x548C; 3.2.2&#x7684;&#x4EE3;&#x7801;</li>
+</ul>
+<p>2&#x3001;&#x5728;&#x5B9E;&#x9645;&#x4F7F;&#x7528;&#x4E2D;&#x53EF;&#x4EE5;&#x7ED3;&#x5408;&#x8D28;&#x91CF;&#x538B;&#x7F29;&#x6CD5;&#x548C;&#x53D6;&#x6837;&#x538B;&#x7F29;&#x6CD5;&#x4E00;&#x8D77;&#x7528;&#xFF0C;&#x4EE5;&#x8FBE;&#x5230;&#x6700;&#x4F73;&#x538B;&#x7F29;&#x6548;&#x679C;&#x3002;</p>
+<p>3&#x3001;&#x770B;&#x5B8C;&#x4E86;&#x8FD9;&#x7BC7;&#x5185;&#x5BB9;&#xFF0C;&#x5176;&#x5B9E;&#x8BF4;&#x767D;&#x4E86;&#xFF0C;Bitmap&#x538B;&#x7F29;&#x90FD;&#x662F;&#x56F4;&#x7ED5;&#x8FD9;&#x4E2A;&#x6765;&#x505A;&#x6587;&#x7AE0;&#xFF1A;Bitmap&#x6240;&#x5360;&#x7528;&#x7684;&#x5185;&#x5B58; = &#x56FE;&#x7247;&#x957F;&#x5EA6; x &#x56FE;&#x7247;&#x5BBD;&#x5EA6; x &#x4E00;&#x4E2A;&#x50CF;&#x7D20;&#x70B9;&#x5360;&#x7528;&#x7684;&#x5B57;&#x8282;&#x6570;&#x3002;3&#x4E2A;&#x53C2;&#x6570;&#xFF0C;&#x4EFB;&#x610F;&#x51CF;&#x5C11;&#x4E00;&#x4E2A;&#x7684;&#x503C;&#xFF0C;&#x5C31;&#x8FBE;&#x5230;&#x4E86;&#x538B;&#x7F29;&#x7684;&#x6548;&#x679C;&#x3002;<br>&#x200B;    </p>
+</body></html>
+                        
+                    </div>
+
+                    
+                    
+                    
+
+                    <div class="description post-description">
+    <span class="post-description-item">
+        <time datetime="2015-10-15T03:21:32.000Z" itemprop="datePublished">2015-10-15</time>
+
+    </span>
+    <span class="post-description-item">
+        
+
+    <span>
+        <i class="tags icon"></i>
+    </span>
+
+    
+    <span class="ui tiny label">
+        <a href="/tags/Android/">Android</a>
+    </span>
+
+    
+    <span class="ui tiny label">
+        <a href="/tags/Bitmap图片压缩/">Bitmap图片压缩</a>
+    </span>
+
+    
+
+    </span>
+</div>
+
+                </div>
+                
+                <div id="pagination" class="nav-web ui text container pagination">
+
+    <div class="ui stackable two column divided grid container">
+        <div class="row">
+            <div class="column nav-left">
+                
+
+                <a href="/2015/10/19/bitmap2/" class="ui tiny button">
+
+                    <i class="angle left icon"></i>
+                    
+                    Android Bitmap 优化(2) - 图片缓存
+                    
+
+                </a>
+
+                
+            </div>
+            <div class="column nav-right">
+                
+
+                <a href="/2015/09/03/2015_9_3_asynctask/" class="ui tiny button">
+                    
+                    Android AsyncTask(2)-原理与源码解析
+                    
+                    <i class="angle right icon"></i></a>
+                
+            </div>
+        </div>
+    </div>
+
+</div>
+                
+            </div>
+
+            
+            <div class="three wide computer three wide tablet column">
+
+                <div class="ui sticky article-toc" id="article-toc">
+                    <!-- toc -->
+                    <ol class="ui ordered list"><li><a href="#Bitmap引发OOM的原因"><span>Bitmap引发OOM的原因</span></a></li><li><a href="#介绍Bitmap"><span>介绍Bitmap</span></a><ol><li><a href="#Bitmap-Config"><span>Bitmap.Config</span></a></li><li><a href="#配置不同Bitmap-Config在相同分辨率下的占用内存情况"><span>配置不同Bitmap.Config在相同分辨率下的占用内存情况</span></a></li><li><a href="#Bitmap-CompressFormat"><span>Bitmap.CompressFormat</span></a></li><li><a href="#Bitmap-compress-方法"><span>Bitmap.compress()方法</span></a></li><li><a href="#案例：将一个Bitmap压缩成jpeg-quality为10，代码如下："><span>案例：将一个Bitmap压缩成jpeg, quality为10，代码如下：</span></a></li></ol></li><li><a href="#介绍BitmapFactory"><span>介绍BitmapFactory</span></a><ol><li><a href="#通过BitmapFactory解码-获取-Bitmap的几种方式"><span>通过BitmapFactory解码(获取)Bitmap的几种方式</span></a></li><li><a href="#BitmapFactory-Options"><span>BitmapFactory.Options</span></a></li><li><a href="#inJustDecodeBounds-设置只去读图片的附加信息-宽高-不去解析真实的Bitmap"><span>inJustDecodeBounds 设置只去读图片的附加信息(宽高),不去解析真实的Bitmap</span></a></li><li><a href="#通过BitmapFactory-Options根据手机屏幕尺寸设置图片的缩放比例"><span>通过BitmapFactory.Options根据手机屏幕尺寸设置图片的缩放比例</span></a></li><li><a href="#inSampleSize-设置图片的缩放比例-宽和高"><span>inSampleSize 设置图片的缩放比例(宽和高)</span></a></li><li><a href="#inBitmap-重用Bitmap"><span>inBitmap 重用Bitmap</span></a></li></ol></li><li><a href="#总结（Bitmap压缩的几种方法）"><span>总结（Bitmap压缩的几种方法）</span></a></li></ol>
+                </div>
+
+            </div>
+            
+
+        </div>
+    </div>
+</div>
+
+
+<!-- disqus start -->
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+<!-- following code is copied form hexo theme Next, thanks a lot -->
+
+var disqus_shortname = 'anany';
+var disqus_identifier = '2015/10/15/bitmap1/';
+var disqus_title = 'Android Bitmap 优化(1) - 图片压缩';
+
+function run_disqus_script(disqus_script) {
+	var dsq = document.createElement('script');
+	dsq.type = 'text/javascript';
+	dsq.async = true;
+	dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+	(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}
+
+run_disqus_script('count.js');
+
+
+var disqus_config = function () {
+    this.page.url = disqus_url;
+    this.page.identifier = disqus_identifier;
+    this.page.title = disqus_title;
+};
+
+run_disqus_script('embed.js');
+
+
+
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                                
+<!-- disqus end -->
+
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        </div>
+        <div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <div class="ui inverted section divider"></div>
+        &copy; 2019 <a href="/">Anany</a>,
+        Powered by <a href="https://github.com/henryhuang/hexo-theme-aloha" target="_blank">Aloha</a> and <a href="http://hexo.io/" target="_blank">Hexo</a>.
+    </div>
+</div>
+
+    </div>
+
+
+
+
+<!-- scripts list from theme config.yml -->
+
+<script src="//cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+
+<script src="//cdn.bootcss.com/semantic-ui/2.2.4/semantic.min.js"></script>
+
+<script src="//cdn.bootcss.com/algoliasearch/3.18.1/algoliasearch.min.js"></script>
+
+<script src="//cdn.bootcss.com/algoliasearch-helper-js/2.13.0/algoliasearch.helper.min.js"></script>
+
+<script src="/js/semantic-ui-algolia.js"></script>
+
+<script src="/js/aloha-events.js"></script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,363 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head prefix="og: http://ogp.me/ns#">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta name="description" content="you&#39;re here , there&#39;s nothing i fear …">
+    <title>Docker 初体验 (1) - 环境搭建，入门操作 | Anany&#39;s blog</title>
+
+    <!-- Open Graph -->
+    <meta name="description" content="Docker 是当下非常流行的容器平台。什么是容器？我们可以这样理解：容器是一个为独立运行应用程序提供的一个沙箱环境。docker 相当于轻量级的虚拟机，把应用独立为一个沙箱，这个沙箱运行的应用包含了应用所需要的所有依赖配置环境。docker 它也是建立在一个物理机上的，区别于传统的虚拟机，虚拟机要部署 N个 web 服务器的话，需要虚拟出 N个 OS，而采用 docker 部署N个 web">
+<meta name="keywords" content="docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker 初体验 (1) - 环境搭建，入门操作">
+<meta property="og:url" content="https://zhujun2730.github.io/2017/05/20/start-docker/index.html">
+<meta property="og:site_name" content="Anany&#39;s blog">
+<meta property="og:description" content="Docker 是当下非常流行的容器平台。什么是容器？我们可以这样理解：容器是一个为独立运行应用程序提供的一个沙箱环境。docker 相当于轻量级的虚拟机，把应用独立为一个沙箱，这个沙箱运行的应用包含了应用所需要的所有依赖配置环境。docker 它也是建立在一个物理机上的，区别于传统的虚拟机，虚拟机要部署 N个 web 服务器的话，需要虚拟出 N个 OS，而采用 docker 部署N个 web">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ooo.0o0.ooo/2017/05/20/591f27e9cd5f4.png">
+<meta property="og:image" content="https://ooo.0o0.ooo/2017/05/20/591f281c95d54.png">
+<meta property="og:image" content="https://ooo.0o0.ooo/2017/05/20/591f29845fd14.png">
+<meta property="og:image" content="https://ooo.0o0.ooo/2017/05/20/591f2a8e9d359.png">
+<meta property="og:image" content="https://ooo.0o0.ooo/2017/05/20/591f302609c52.png">
+<meta property="og:image" content="https://ooo.0o0.ooo/2017/05/20/591f33220e32e.png">
+<meta property="og:image" content="https://ooo.0o0.ooo/2017/05/20/591f3b3c3b92f.png">
+<meta property="og:image" content="https://ooo.0o0.ooo/2017/05/20/591f3c0bc3a5c.png">
+<meta property="og:image" content="https://ooo.0o0.ooo/2017/05/20/591f3c956d330.png">
+<meta property="og:image" content="https://ooo.0o0.ooo/2017/05/20/591f3e8e1f02e.png">
+<meta property="og:image" content="https://ooo.0o0.ooo/2017/05/20/591ffa9694fee.png">
+<meta property="og:image" content="https://ooo.0o0.ooo/2017/05/20/591ffc46b2ee1.png">
+<meta property="og:image" content="https://ooo.0o0.ooo/2017/05/20/591ffdd075d10.png">
+<meta property="og:updated_time" content="2019-01-15T07:23:47.405Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Docker 初体验 (1) - 环境搭建，入门操作">
+<meta name="twitter:description" content="Docker 是当下非常流行的容器平台。什么是容器？我们可以这样理解：容器是一个为独立运行应用程序提供的一个沙箱环境。docker 相当于轻量级的虚拟机，把应用独立为一个沙箱，这个沙箱运行的应用包含了应用所需要的所有依赖配置环境。docker 它也是建立在一个物理机上的，区别于传统的虚拟机，虚拟机要部署 N个 web 服务器的话，需要虚拟出 N个 OS，而采用 docker 部署N个 web">
+<meta name="twitter:image" content="https://ooo.0o0.ooo/2017/05/20/591f27e9cd5f4.png">
+
+    <script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Person",
+  "email": "mailto:",
+  "image": "",
+  "name": "Anany",
+  "url": "https://zhujun2730.github.io"
+}
+</script>
+    <script>
+    var algoliaEnabled = false;
+    
+</script>
+
+    
+
+    
+    
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+    
+    
+    
+        <!-- stylesheets list from config.yml -->
+        
+        <link rel="stylesheet" href="/css/aloha.css">
+        
+        <link rel="stylesheet" href="//cdn.bootcss.com/semantic-ui/2.2.4/semantic.min.css">
+        
+        <link rel="stylesheet" href="//cdn.bootcss.com/magnific-popup.js/1.1.0/magnific-popup.min.css">
+        
+    
+
+</head>
+<body id="body" style="margin-bottom: 0;" class="pushable">
+
+    <div class="ui top fixed menu">
+        <a class="item" id="menu-icon"><i class="sidebar icon"></i></a>
+    </div>
+
+    <div id="menu-sidebar" class="ui left vertical sidebar menu">
+
+    <div id="sidebar-top">
+        <div class="content">
+            <h3>Anany&#39;s blog</h3>
+        </div>
+    </div>
+    <div class="ui container sidebar-card">
+    <div class="ui people shape content">
+        <div class="active side">
+            <div class="ui card">
+                <div class="image">
+                    <img class="ui medium bordered image" src="/images/avatar.jpg">
+                </div>
+                <div class="content">
+                    <a class="header">Anany</a>
+                    
+                        <div class="meta">
+                            水可载舟，亦可赛艇
+                        </div>
+                    
+                </div>
+                <div class="extra content">
+                    <div class="ui list">
+                        
+                        <div class="item">
+                            <i class="marker icon" style="float: left"></i>
+                            <div class="content">Shenzhen</div>
+                        </div>
+                        
+                        
+                    </div>
+
+                </div>
+                <div class="extra content">
+                    <div class="ui list">
+                        
+
+                                <a href="https://github.com/zhujun2730"><i class="large github icon" style="float: left"></i></a>
+
+                            
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+    
+    
+
+    
+
+    
+    <a href="/index.html" class="item">
+        <i class="home icon"></i>
+        首页
+    </a>
+
+    
+    
+
+    
+
+    
+    <a href="/about/index.html" class="item">
+        <i class="info icon"></i>
+        关于
+    </a>
+
+    
+
+    
+</div>
+
+    <div class="pusher body-content">
+        <div id="content" class="ui main container">
+            <!--<div class="ui one column grid">-->
+                <!--<div class="column">-->
+                    <!--<div class="ui main container">-->
+                        <div id="post-start-docker" class="ui main container article-type-post">
+
+    
+
+    <div class="ui divided grid">
+
+        <div class="two column row" id="article-content">
+
+            <div class="thirteen wide computer thirteen wide tablet sixteen wide mobile column">
+                
+
+<h1 class="ui header">
+    
+    Docker 初体验 (1) - 环境搭建，入门操作
+</h1>
+
+
+
+                <div class="article-inner">
+
+                    <div class="article-entry" itemprop="articleBody">
+                        
+                        <html><head><meta name="generator" content="Hexo 3.8.0"></head><body><p>  Docker &#x662F;&#x5F53;&#x4E0B;&#x975E;&#x5E38;&#x6D41;&#x884C;&#x7684;&#x5BB9;&#x5668;&#x5E73;&#x53F0;&#x3002;&#x4EC0;&#x4E48;&#x662F;&#x5BB9;&#x5668;&#xFF1F;&#x6211;&#x4EEC;&#x53EF;&#x4EE5;&#x8FD9;&#x6837;&#x7406;&#x89E3;&#xFF1A;&#x5BB9;&#x5668;&#x662F;&#x4E00;&#x4E2A;&#x4E3A;&#x72EC;&#x7ACB;&#x8FD0;&#x884C;&#x5E94;&#x7528;&#x7A0B;&#x5E8F;&#x63D0;&#x4F9B;&#x7684;&#x4E00;&#x4E2A;&#x6C99;&#x7BB1;&#x73AF;&#x5883;&#x3002;docker &#x76F8;&#x5F53;&#x4E8E;&#x8F7B;&#x91CF;&#x7EA7;&#x7684;&#x865A;&#x62DF;&#x673A;&#xFF0C;&#x628A;&#x5E94;&#x7528;&#x72EC;&#x7ACB;&#x4E3A;&#x4E00;&#x4E2A;&#x6C99;&#x7BB1;&#xFF0C;&#x8FD9;&#x4E2A;&#x6C99;&#x7BB1;&#x8FD0;&#x884C;&#x7684;&#x5E94;&#x7528;&#x5305;&#x542B;&#x4E86;&#x5E94;&#x7528;&#x6240;&#x9700;&#x8981;&#x7684;&#x6240;&#x6709;&#x4F9D;&#x8D56;&#x914D;&#x7F6E;&#x73AF;&#x5883;&#x3002;docker &#x5B83;&#x4E5F;&#x662F;&#x5EFA;&#x7ACB;&#x5728;&#x4E00;&#x4E2A;&#x7269;&#x7406;&#x673A;&#x4E0A;&#x7684;&#xFF0C;&#x533A;&#x522B;&#x4E8E;&#x4F20;&#x7EDF;&#x7684;&#x865A;&#x62DF;&#x673A;&#xFF0C;&#x865A;&#x62DF;&#x673A;&#x8981;&#x90E8;&#x7F72; N&#x4E2A; web &#x670D;&#x52A1;&#x5668;&#x7684;&#x8BDD;&#xFF0C;&#x9700;&#x8981;&#x865A;&#x62DF;&#x51FA; N&#x4E2A; OS&#xFF0C;&#x800C;&#x91C7;&#x7528; docker &#x90E8;&#x7F72;N&#x4E2A; web &#x670D;&#x52A1;&#x5668;&#x7684;&#x8BDD;&#xFF0C;&#x5219;&#x53EA;&#x9700;&#x8981;&#x865A;&#x62DF;&#x51FA; N &#x4E2A;&#x5BB9;&#x5668;(&#x6C99;&#x7BB1;)&#x5C31;&#x53EF;&#x4EE5;&#x4E86;&#xFF0C;&#x540C;&#x6837;&#x7684;&#x5728; docker &#x7684;&#x5BB9;&#x5668;&#x73AF;&#x5883;&#x8FD0;&#x884C;&#x7684;&#x5404;&#x4E2A;&#x5E94;&#x7528;&#xFF0C;&#x90FD;&#x662F;&#x4E92;&#x76F8;&#x9694;&#x79BB;&#x7684;&#x3002;Now&#xFF0C;&#x6211;&#x4EEC;&#x5927;&#x6982;&#x77E5;&#x9053; docker &#x7684;&#x4F18;&#x52BF;&#x5728;&#x54EA;&#x4E86;&#xFF1A;&#x5FEB;&#x901F;&#x7684;&#x5E94;&#x7528;&#x670D;&#x52A1;&#x90E8;&#x7F72;&#x3001;&#x65E0;&#x9700;&#x518D;&#x91CD;&#x590D;&#x5B89;&#x88C5;&#x914D;&#x7F6E;&#x5E94;&#x7528;&#x73AF;&#x5883;&#xFF1B;&#x76F8;&#x6BD4;&#x4E8E;&#x865A;&#x62DF;&#x673A;&#xFF0C;&#x5177;&#x5907;&#x5FEB;&#x901F;&#x7684;&#x5E94;&#x7528;&#x542F;&#x52A8;&#x80FD;&#x529B;&#x3002;</p>
+<p>  &#x5E9F;&#x8BDD;&#x4E0D;&#x591A;&#x8BF4;&#xFF0C;&#x7EB8;&#x4E0A;&#x8C08;&#x5175;&#x662F;&#x6CA1;&#x7528;&#x7684;&#xFF0C;&#x5148;&#x5B89;&#x88C5;&#x4F53;&#x9A8C;&#x73A9;&#x4E00;&#x6CE2;&#x624D;&#x4F1A;&#x66F4;&#x6DF1;&#x523B;&#x7406;&#x89E3; docker &#x7684;&#x9B45;&#x529B;&#x3002;<br><a id="more"></a></p>
+<h2 id="Homebrew-&#x5B89;&#x88C5;-docker"><a href="#Homebrew-&#x5B89;&#x88C5;-docker" class="headerlink" title="Homebrew &#x5B89;&#x88C5; docker"></a>Homebrew &#x5B89;&#x88C5; docker</h2><figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew cask install docker</span><br></pre></td></tr></tbody></table></figure>
+<p><a class="magnific-img" href="https://ooo.0o0.ooo/2017/05/20/591f27e9cd5f4.png"><img src="https://ooo.0o0.ooo/2017/05/20/591f27e9cd5f4.png" alt="" class="ui centered image"></a><br>brew cask &#x5B89;&#x88C5;&#x5B8C;&#x540E;&#xFF0C;&#x5C06;&#x4F1A;&#x81EA;&#x52A8;&#x79FB;&#x52A8;&#x5230; launcher &#x91CC;<br><a class="magnific-img" href="https://ooo.0o0.ooo/2017/05/20/591f281c95d54.png"><img src="https://ooo.0o0.ooo/2017/05/20/591f281c95d54.png" alt="" class="ui centered image"></a></p>
+<h2 id="&#x542F;&#x52A8;-docker-&#x914D;&#x7F6E;&#x955C;&#x50CF;&#x52A0;&#x901F;"><a href="#&#x542F;&#x52A8;-docker-&#x914D;&#x7F6E;&#x955C;&#x50CF;&#x52A0;&#x901F;" class="headerlink" title="&#x542F;&#x52A8; docker &#x914D;&#x7F6E;&#x955C;&#x50CF;&#x52A0;&#x901F;"></a>&#x542F;&#x52A8; docker &#x914D;&#x7F6E;&#x955C;&#x50CF;&#x52A0;&#x901F;</h2><p>&#x9996;&#x5148;&#x6211;&#x4EEC;&#x9700;&#x8981;&#x5148;&#x914D;&#x7F6E;&#x4E00;&#x4E0B;&#x963F;&#x91CC;&#x4E91;&#x7684;&#x955C;&#x50CF;&#x52A0;&#x901F;&#x670D;&#x52A1;&#xFF0C;&#x8981;&#x4E0D;&#x7136;&#x5F85;&#x4F1A;&#x4E0B;&#x8F7D;&#x955C;&#x50CF;&#x4F1A;&#x6162;&#x7684;&#x8981;&#x6B7B;&#x3002;</p>
+<p>1&#x3001;&#x5148;&#x5230;&#x963F;&#x91CC;&#x4E91;&#x7533;&#x8BF7;&#x4E00;&#x4E2A;&#x52A0;&#x901F;&#x670D;&#x52A1; <a href="https://cr.console.aliyun.com/" target="_blank" rel="noopener">https://cr.console.aliyun.com/</a><br><a class="magnific-img" href="https://ooo.0o0.ooo/2017/05/20/591f29845fd14.png"><img src="https://ooo.0o0.ooo/2017/05/20/591f29845fd14.png" alt="" class="ui centered image"></a></p>
+<p>2&#x3001;&#x6253;&#x5F00; docker &#x5E94;&#x7528;&#xFF0C;&#x9009;&#x62E9; preference &gt; Daemon&#xFF0C;&#x5728; Registry mirrors &#x4E0B;&#x9762;&#x6DFB;&#x52A0;&#x521A;&#x521A;&#x963F;&#x91CC;&#x4E91;&#x7533;&#x8BF7;&#x7684;&#x52A0;&#x901F;&#x5730;&#x5740;&#x3002;&#x7136;&#x540E; apply &amp; restart &#x5C31;&#x53EF;&#x4EE5;&#x4E86;&#x3002;<br><a class="magnific-img" href="https://ooo.0o0.ooo/2017/05/20/591f2a8e9d359.png"><img src="https://ooo.0o0.ooo/2017/05/20/591f2a8e9d359.png" alt="" class="ui centered image"></a></p>
+<h2 id="docker-&#x5C0F;&#x8BD5;&#x725B;&#x5200;"><a href="#docker-&#x5C0F;&#x8BD5;&#x725B;&#x5200;" class="headerlink" title="docker &#x5C0F;&#x8BD5;&#x725B;&#x5200;"></a>docker &#x5C0F;&#x8BD5;&#x725B;&#x5200;</h2><h3 id="&#x5E38;&#x7528;&#x547D;&#x4EE4;&#xFF1A;"><a href="#&#x5E38;&#x7528;&#x547D;&#x4EE4;&#xFF1A;" class="headerlink" title="&#x5E38;&#x7528;&#x547D;&#x4EE4;&#xFF1A;"></a>&#x5E38;&#x7528;&#x547D;&#x4EE4;&#xFF1A;</h3><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">docker --version 	<span class="comment">// &#x67E5;&#x770B; docker &#x5F53;&#x524D;&#x5B89;&#x88C5;&#x7248;&#x672C;</span></span><br><span class="line">docker info 	 	<span class="comment">// &#x67E5;&#x770B; docker &#x5F53;&#x524D;&#x72B6;&#x6001;&#x4FE1;&#x606F;</span></span><br><span class="line">docker pull 	 	<span class="comment">// &#x62C9;&#x53D6;(&#x4E0B;&#x8F7D;) docker &#x955C;&#x50CF;</span></span><br><span class="line">docker run       	<span class="comment">// &#x8FD0;&#x884C; docker &#x955C;&#x50CF;</span></span><br><span class="line">docker ps        	<span class="comment">// &#x67E5;&#x770B; Containers &#x4E2D;&#x7684;&#x5BB9;&#x5668;&#x8FD0;&#x884C;&#x4FE1;&#x606F;</span></span><br><span class="line">docker images    	<span class="comment">// &#x67E5;&#x770B;&#x672C;&#x5730;&#x4E3B;&#x673A;&#x4E0A;&#x7684;&#x6240;&#x6709;&#x955C;&#x50CF;&#x5217;&#x8868;</span></span><br><span class="line">docker stop      	<span class="comment">// &#x505C;&#x6B62; docker &#x5BB9;&#x5668;</span></span><br><span class="line">docker rm      	        <span class="comment">// &#x4ECE; Containers &#x4E2D;&#x79FB;&#x9664; docker &#x5BB9;&#x5668;</span></span><br><span class="line">docker rmi      	<span class="comment">// &#x5220;&#x9664; docker &#x955C;&#x50CF;</span></span><br></pre></td></tr></tbody></table></figure>
+<h3 id="&#x4E0B;&#x8F7D;-docker-&#x955C;&#x50CF;"><a href="#&#x4E0B;&#x8F7D;-docker-&#x955C;&#x50CF;" class="headerlink" title="&#x4E0B;&#x8F7D; docker &#x955C;&#x50CF;"></a>&#x4E0B;&#x8F7D; docker &#x955C;&#x50CF;</h3><figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull mysql/mysql-server:latest</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="&#x542F;&#x52A8;-docker-&#x955C;&#x50CF;&#xFF08;&#x521B;&#x5EFA;&#x5BB9;&#x5668;&#xFF09;"><a href="#&#x542F;&#x52A8;-docker-&#x955C;&#x50CF;&#xFF08;&#x521B;&#x5EFA;&#x5BB9;&#x5668;&#xFF09;" class="headerlink" title="&#x542F;&#x52A8; docker &#x955C;&#x50CF;&#xFF08;&#x521B;&#x5EFA;&#x5BB9;&#x5668;&#xFF09;"></a>&#x542F;&#x52A8; docker &#x955C;&#x50CF;&#xFF08;&#x521B;&#x5EFA;&#x5BB9;&#x5668;&#xFF09;</h3><p>1&#x3001;&#x542F;&#x52A8;&#x521A;&#x521A;&#x4E0B;&#x8F7D;&#x7684; mysql &#x955C;&#x50CF;<br></p><figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// &#x521B;&#x5EFA;&#x4E00;&#x4E2A; name &#x4E3A; mysql &#xFF0C;&#x672C;&#x5730;&#x7AEF;&#x53E3;&#x53F7;&#x4E3A; 3306 &#x7684;&#x5BB9;&#x5668;</span><br><span class="line">docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -d mysql/mysql-server:latest</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>2&#x3001;&#x542F;&#x52A8;&#x7684;&#x65F6;&#x5019; image &#x4E0D;&#x5B58;&#x5728;(&#x8FD8;&#x6CA1;&#x4E0B;&#x8F7D;)<br></p><figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// &#x521B;&#x5EFA;&#x4E00;&#x4E2A; name &#x4E3A; webserver &#x7684;&#x5BB9;&#x5668;</span><br><span class="line">docker run -d -p 80:80 --name webserver nginx</span><br><span class="line">// &#x4E0A;&#x9762;&#x547D;&#x4EE4;&#x7684; 80&#xFF1A;80&#xFF0C;</span><br><span class="line">// &#x5DE6;&#x8FB9;&#x8868;&#x793A;&#x672C;&#x5730;&#x5C06;&#x91C7;&#x7528;80&#x7AEF;&#x53E3;&#x8FD0;&#x884C;&#x8BE5;&#x955C;&#x50CF;&#xFF0C;&#x53F3;&#x8FB9;80&#x5219;&#x662F;&#x5BB9;&#x5668;&#x66B4;&#x9732;&#x7684;&#x7AEF;&#x53E3;&#x3002;</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x5982;&#x679C;&#x672C;&#x5730;&#x6CA1;&#x6709;&#x627E;&#x5230;&#x8BE5;&#x955C;&#x50CF;&#xFF0C;&#x5219; docker &#x4F1A;&#x4ECE;&#x955C;&#x50CF;&#x4ED3;&#x5E93;&#x4E2D; pull &#x5230;&#x672C;&#x5730;&#xFF0C;&#x7136;&#x540E;&#x8FD0;&#x884C;&#x8D77;&#x6765;&#x3002;<br><a class="magnific-img" href="https://ooo.0o0.ooo/2017/05/20/591f302609c52.png"><img src="https://ooo.0o0.ooo/2017/05/20/591f302609c52.png" alt="" class="ui centered image"></a></p>
+<p>&#x5728;&#x6D4F;&#x89C8;&#x5668;&#x4E2D;&#x76F4;&#x63A5;&#x8F93;&#x5165; localhost:80&#xFF0C;&#x5219;&#x53EF;&#x4EE5;&#x770B;&#x5230; Nginx &#x6B63;&#x5E38;&#x8FD0;&#x884C;&#x4E86;&#x3002;<br><a class="magnific-img" href="https://ooo.0o0.ooo/2017/05/20/591f33220e32e.png"><img src="https://ooo.0o0.ooo/2017/05/20/591f33220e32e.png" alt="" class="ui centered image"></a></p>
+<h3 id="&#x67E5;&#x770B;-docker-&#x5BB9;&#x5668;&#x8FD0;&#x884C;&#x60C5;&#x51B5;"><a href="#&#x67E5;&#x770B;-docker-&#x5BB9;&#x5668;&#x8FD0;&#x884C;&#x60C5;&#x51B5;" class="headerlink" title="&#x67E5;&#x770B; docker &#x5BB9;&#x5668;&#x8FD0;&#x884C;&#x60C5;&#x51B5;"></a>&#x67E5;&#x770B; docker &#x5BB9;&#x5668;&#x8FD0;&#x884C;&#x60C5;&#x51B5;</h3><figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker ps -a      // &#x67E5;&#x770B;&#x6240;&#x6709;&#x5BB9;&#x5668;&#x7684;&#x8FDB;&#x7A0B;&#x72B6;&#x6001;</span><br></pre></td></tr></tbody></table></figure>
+<p>status &#x4E2D;&#xFF0C;&#x524D;&#x4E24;&#x4E2A; UP &#x7684;&#x8868;&#x793A;&#x662F;&#x6B63;&#x5728;&#x8FD0;&#x884C;&#x7684;&#xFF0C;Exited &#x8868;&#x793A;&#x662F;&#x5DF2;&#x7ECF;&#x9000;&#x51FA;&#x7684;&#x4E86;&#x3002;<br>&#x53EF;&#x4EE5;&#x770B;&#x5230;&#xFF0C;MySQL &#x548C; Nginx &#x90FD;&#x5DF2;&#x7ECF;&#x542F;&#x52A8;&#x4E86;&#x3002;<br><a class="magnific-img" href="https://ooo.0o0.ooo/2017/05/20/591f3b3c3b92f.png"><img src="https://ooo.0o0.ooo/2017/05/20/591f3b3c3b92f.png" alt="" class="ui centered image"></a><br>&#x7531;&#x4E8E;&#x5C4F;&#x5E55;&#x622A;&#x56FE;&#xFF0C;&#x5F80;&#x53F3;&#x62C9;&#x8FD8;&#x6709;&#x4E00;&#x4E2A; names &#x7684;&#x5B57;&#x6BB5;<br><a class="magnific-img" href="https://ooo.0o0.ooo/2017/05/20/591f3c0bc3a5c.png"><img src="https://ooo.0o0.ooo/2017/05/20/591f3c0bc3a5c.png" alt="" class="ui centered image"></a></p>
+<h3 id="&#x5173;&#x95ED;-docker-&#x5BB9;&#x5668;"><a href="#&#x5173;&#x95ED;-docker-&#x5BB9;&#x5668;" class="headerlink" title="&#x5173;&#x95ED; docker &#x5BB9;&#x5668;"></a>&#x5173;&#x95ED; docker &#x5BB9;&#x5668;</h3><p>&#x53EF;&#x4EE5;&#x901A;&#x8FC7; CONTAINER ID &#x6216;&#x8005; NAMES &#x6765;&#x5173;&#x95ED;&#x5BB9;&#x5668;<br></p><figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker stop webserver         // &#x505C;&#x6B62; name &#x4E3A; webserver &#x7684;&#x5BB9;&#x5668;</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p><a class="magnific-img" href="https://ooo.0o0.ooo/2017/05/20/591f3c956d330.png"><img src="https://ooo.0o0.ooo/2017/05/20/591f3c956d330.png" alt="" class="ui centered image"></a><br></p><figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker stop 1792599a5922      // &#x505C;&#x6B62; CONTAINER ID &#x4E3A; 1792599a5922 &#x7684;&#x5BB9;&#x5668;</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p><a class="magnific-img" href="https://ooo.0o0.ooo/2017/05/20/591f3e8e1f02e.png"><img src="https://ooo.0o0.ooo/2017/05/20/591f3e8e1f02e.png" alt="" class="ui centered image"></a></p>
+<h3 id="&#x5220;&#x9664;-docker-&#x955C;&#x50CF;"><a href="#&#x5220;&#x9664;-docker-&#x955C;&#x50CF;" class="headerlink" title="&#x5220;&#x9664; docker &#x955C;&#x50CF;"></a>&#x5220;&#x9664; docker &#x955C;&#x50CF;</h3><p>1&#x3001;&#x5148;&#x4ECE; Containers &#x4E2D;&#x5220;&#x9664;&#x4E00;&#x4E2A;&#x5BB9;&#x5668;&#xFF0C;&#x901A;&#x8FC7; docker ps -a &#x53EF;&#x4EE5;&#x67E5;&#x770B;&#x5BB9;&#x5668;&#x96C6;&#x5408;&#x91CC;&#x7684;&#x6240;&#x6709;&#x5BB9;&#x5668;&#x3002;<br></p><figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rm 4f937d2c3312      // &#x5220;&#x9664; CONTAINER ID &#x4E3A; 4f937d2c3312 &#x7684;&#x5BB9;&#x5668;</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x4ECE;&#x4E0B;&#x56FE;&#x53EF;&#x4EE5;&#x770B;&#x5230;&#xFF0C;&#x5BB9;&#x5668; 8140 &#x5DF2;&#x7ECF;&#x4ECE; Containers &#x4E2D;&#x79FB;&#x9664;&#x4E86;&#x3002;<br><a class="magnific-img" href="https://ooo.0o0.ooo/2017/05/20/591ffa9694fee.png"><img src="https://ooo.0o0.ooo/2017/05/20/591ffa9694fee.png" alt="" class="ui centered image"></a><br>2&#x3001;&#x6267;&#x884C; docker images &#xFF0C;&#x67E5;&#x770B;&#x6240;&#x6709;&#x955C;&#x50CF;&#xFF0C;&#x901A;&#x8FC7; IMAGE ID &#x5220;&#x9664;&#x8BE5;&#x955C;&#x50CF;&#x3002;</p>
+<ul class="ui list">
+<li><strong>&#x786E;&#x4FDD;&#x8BE5;&#x955C;&#x50CF;&#x5DF2;&#x7ECF;&#x4ECE; Containers &#x4E2D;&#x79FB;&#x9664;&#xFF0C;&#x5426;&#x5219;&#x5C06;&#x63D0;&#x793A;&#x8BE5;&#x955C;&#x50CF;&#x8FD8;&#x5728;&#x88AB;&#x4F7F;&#x7528;&#x9519;&#x8BEF;</strong><br><img src="https://ooo.0o0.ooo/2017/05/20/591ffc46b2ee1.png" alt=""></li>
+</ul>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rmi 8140d0c64310      // &#x5220;&#x9664; IMAGE ID &#x4E3A; 8140d0c64310 &#x7684;&#x955C;&#x50CF;</span><br></pre></td></tr></tbody></table></figure>
+<p>&#x4ECE;&#x4E0B;&#x56FE;&#x53EF;&#x4EE5;&#x770B;&#x5230;&#xFF0C;&#x955C;&#x50CF; centos &#x5DF2;&#x7ECF;&#x88AB;&#x5220;&#x9664;&#x4E86;&#x3002;<br><a class="magnific-img" href="https://ooo.0o0.ooo/2017/05/20/591ffdd075d10.png"><img src="https://ooo.0o0.ooo/2017/05/20/591ffdd075d10.png" alt="" class="ui centered image"></a></p>
+<h2 id="&#x53C2;&#x8003;"><a href="#&#x53C2;&#x8003;" class="headerlink" title="&#x53C2;&#x8003;"></a>&#x53C2;&#x8003;</h2><p>&#x3010;1&#x3011;Get started with Docker for Mac <a href="https://docs.docker.com/docker-for-mac/#explore-the-application-and-run-examples" target="_blank" rel="noopener">https://docs.docker.com/docker-for-mac/#explore-the-application-and-run-examples</a><br>&#x3010;2&#x3011;docker &#x4E0B;&#x7684; Mysql &#x955C;&#x50CF;&#x7684;&#x4F7F;&#x7528;&#x65B9;&#x6CD5; <a href="http://blog.csdn.net/stemq/article/details/52934795" target="_blank" rel="noopener">http://blog.csdn.net/stemq/article/details/52934795</a><br>&#x3010;3&#x3011;&#x6DF1;&#x5165;&#x6D45;&#x51FA;Docker&#xFF08;&#x4E00;&#xFF09;&#xFF1A;Docker&#x6838;&#x5FC3;&#x6280;&#x672F;&#x9884;&#x89C8; <a href="http://www.infoq.com/cn/articles/docker-core-technology-preview" target="_blank" rel="noopener">http://www.infoq.com/cn/articles/docker-core-technology-preview</a><br>&#x3010;4&#x3011;Docker &#x2014; &#x4ECE;&#x5165;&#x95E8;&#x5230;&#x5B9E;&#x8DF5;  <a href="https://yeasy.gitbooks.io/docker_practice/content/" target="_blank" rel="noopener">https://yeasy.gitbooks.io/docker_practice/content/</a></p>
+</body></html>
+                        
+                    </div>
+
+                    
+                    
+                    
+
+                    <div class="description post-description">
+    <span class="post-description-item">
+        <time datetime="2017-05-19T16:33:11.000Z" itemprop="datePublished">2017-05-20</time>
+
+    </span>
+    <span class="post-description-item">
+        
+
+    <span>
+        <i class="tags icon"></i>
+    </span>
+
+    
+    <span class="ui tiny label">
+        <a href="/tags/docker/">docker</a>
+    </span>
+
+    
+
+    </span>
+</div>
+
+                </div>
+                
+                <div id="pagination" class="nav-web ui text container pagination">
+
+    <div class="ui stackable two column divided grid container">
+        <div class="row">
+            <div class="column nav-left">
+                
+
+                <a href="/2017/06/27/start-docker-2/" class="ui tiny button">
+
+                    <i class="angle left icon"></i>
+                    
+                    Docker 初体验 (2) - docker tomcat 部署本地 war 包项目
+                    
+
+                </a>
+
+                
+            </div>
+            <div class="column nav-right">
+                
+
+                <a href="/2017/05/13/vps-nginx-blog/" class="ui tiny button">
+                    
+                    VPS 利用 Nginx 静态代理博客并开启全站HTTPS
+                    
+                    <i class="angle right icon"></i></a>
+                
+            </div>
+        </div>
+    </div>
+
+</div>
+                
+            </div>
+
+            
+            <div class="three wide computer three wide tablet column">
+
+                <div class="ui sticky article-toc" id="article-toc">
+                    <!-- toc -->
+                    <ol class="ui ordered list"><li><a href="#Homebrew-安装-docker"><span>Homebrew 安装 docker</span></a></li><li><a href="#启动-docker-配置镜像加速"><span>启动 docker 配置镜像加速</span></a></li><li><a href="#docker-小试牛刀"><span>docker 小试牛刀</span></a><ol><li><a href="#常用命令："><span>常用命令：</span></a></li><li><a href="#下载-docker-镜像"><span>下载 docker 镜像</span></a></li><li><a href="#启动-docker-镜像（创建容器）"><span>启动 docker 镜像（创建容器）</span></a></li><li><a href="#查看-docker-容器运行情况"><span>查看 docker 容器运行情况</span></a></li><li><a href="#关闭-docker-容器"><span>关闭 docker 容器</span></a></li><li><a href="#删除-docker-镜像"><span>删除 docker 镜像</span></a></li></ol></li><li><a href="#参考"><span>参考</span></a></li></ol>
+                </div>
+
+            </div>
+            
+
+        </div>
+    </div>
+</div>
+
+
+<!-- disqus start -->
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+<!-- following code is copied form hexo theme Next, thanks a lot -->
+
+var disqus_shortname = 'anany';
+var disqus_identifier = '2017/05/20/start-docker/';
+var disqus_title = 'Docker 初体验 (1) - 环境搭建，入门操作';
+
+function run_disqus_script(disqus_script) {
+	var dsq = document.createElement('script');
+	dsq.type = 'text/javascript';
+	dsq.async = true;
+	dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+	(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}
+
+run_disqus_script('count.js');
+
+
+var disqus_config = function () {
+    this.page.url = disqus_url;
+    this.page.identifier = disqus_identifier;
+    this.page.title = disqus_title;
+};
+
+run_disqus_script('embed.js');
+
+
+
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                                
+<!-- disqus end -->
+
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        </div>
+        <div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <div class="ui inverted section divider"></div>
+        &copy; 2019 <a href="/">Anany</a>,
+        Powered by <a href="https://github.com/henryhuang/hexo-theme-aloha" target="_blank">Aloha</a> and <a href="http://hexo.io/" target="_blank">Hexo</a>.
+    </div>
+</div>
+
+    </div>
+
+
+
+
+<!-- scripts list from theme config.yml -->
+
+<script src="//cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+
+<script src="//cdn.bootcss.com/semantic-ui/2.2.4/semantic.min.js"></script>
+
+<script src="//cdn.bootcss.com/algoliasearch/3.18.1/algoliasearch.min.js"></script>
+
+<script src="//cdn.bootcss.com/algoliasearch-helper-js/2.13.0/algoliasearch.helper.min.js"></script>
+
+<script src="/js/semantic-ui-algolia.js"></script>
+
+<script src="/js/aloha-events.js"></script>
+
+
+
+</body>
+</html>

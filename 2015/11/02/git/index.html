@@ -1,0 +1,403 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head prefix="og: http://ogp.me/ns#">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta name="description" content="you&#39;re here , there&#39;s nothing i fear …">
+    <title>Git 使用大法 | Anany&#39;s blog</title>
+
+    <!-- Open Graph -->
+    <meta name="description" content="很多初学者以为git很高大上，其实不然。Git，英文意思是：傻瓜。显然，git实际上就是个傻瓜式的版本控制软件。git的使用其实很简单，下面我们开始介绍git的一些常用使用方法。">
+<meta name="keywords" content="Android,Android Studio,Git">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git 使用大法">
+<meta property="og:url" content="https://zhujun2730.github.io/2015/11/02/git/index.html">
+<meta property="og:site_name" content="Anany&#39;s blog">
+<meta property="og:description" content="很多初学者以为git很高大上，其实不然。Git，英文意思是：傻瓜。显然，git实际上就是个傻瓜式的版本控制软件。git的使用其实很简单，下面我们开始介绍git的一些常用使用方法。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://ww3.sinaimg.cn/large/ded3864ejw1f13brjvwitj21cq0yfwoe.jpg">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/A78CCB30-AACD-4D74-81C0-2D8402A9B5E7.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/95F319A7-5637-4811-B415-2273113D6019.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/11_02_1.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/11_02_2.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/tijiao.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/11_02_05.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/11_03_06.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/11_02_07.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/11_02_08.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/11_02_09.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/11_02_10.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/11_02_11.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/git_1.5.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/git_1.5_2.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/git_1.5_3.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/屏幕快照%202015-11-02%2017.30.33.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/屏幕快照%202015-11-02%2017.31.48.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/屏幕快照%202015-11-02%2017.32.20.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/11_02_13.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/屏幕快照%202015-11-02%2017.50.13.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/11_02_14.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/11_02_15.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/11_02_17.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/11_02_20.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/11_02_21.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/屏幕快照%202015-11-02%2018.24.44.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/11_02_22.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/屏幕快照%202015-11-02%2018.28.33.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/屏幕快照%202015-11-02%2018.29.46.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/11_02_31.png">
+<meta property="og:updated_time" content="2017-04-24T08:54:45.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Git 使用大法">
+<meta name="twitter:description" content="很多初学者以为git很高大上，其实不然。Git，英文意思是：傻瓜。显然，git实际上就是个傻瓜式的版本控制软件。git的使用其实很简单，下面我们开始介绍git的一些常用使用方法。">
+<meta name="twitter:image" content="http://ww3.sinaimg.cn/large/ded3864ejw1f13brjvwitj21cq0yfwoe.jpg">
+
+    <script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Person",
+  "email": "mailto:",
+  "image": "",
+  "name": "Anany",
+  "url": "https://zhujun2730.github.io"
+}
+</script>
+    <script>
+    var algoliaEnabled = false;
+    
+</script>
+
+    
+
+    
+    
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+    
+    
+    
+        <!-- stylesheets list from config.yml -->
+        
+        <link rel="stylesheet" href="/css/aloha.css">
+        
+        <link rel="stylesheet" href="//cdn.bootcss.com/semantic-ui/2.2.4/semantic.min.css">
+        
+        <link rel="stylesheet" href="//cdn.bootcss.com/magnific-popup.js/1.1.0/magnific-popup.min.css">
+        
+    
+
+</head>
+<body id="body" style="margin-bottom: 0;" class="pushable">
+
+    <div class="ui top fixed menu">
+        <a class="item" id="menu-icon"><i class="sidebar icon"></i></a>
+    </div>
+
+    <div id="menu-sidebar" class="ui left vertical sidebar menu">
+
+    <div id="sidebar-top">
+        <div class="content">
+            <h3>Anany&#39;s blog</h3>
+        </div>
+    </div>
+    <div class="ui container sidebar-card">
+    <div class="ui people shape content">
+        <div class="active side">
+            <div class="ui card">
+                <div class="image">
+                    <img class="ui medium bordered image" src="/images/avatar.jpg">
+                </div>
+                <div class="content">
+                    <a class="header">Anany</a>
+                    
+                        <div class="meta">
+                            水可载舟，亦可赛艇
+                        </div>
+                    
+                </div>
+                <div class="extra content">
+                    <div class="ui list">
+                        
+                        <div class="item">
+                            <i class="marker icon" style="float: left"></i>
+                            <div class="content">Shenzhen</div>
+                        </div>
+                        
+                        
+                    </div>
+
+                </div>
+                <div class="extra content">
+                    <div class="ui list">
+                        
+
+                                <a href="https://github.com/zhujun2730"><i class="large github icon" style="float: left"></i></a>
+
+                            
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+    
+    
+
+    
+
+    
+    <a href="/index.html" class="item">
+        <i class="home icon"></i>
+        首页
+    </a>
+
+    
+    
+
+    
+
+    
+    <a href="/about/index.html" class="item">
+        <i class="info icon"></i>
+        关于
+    </a>
+
+    
+
+    
+</div>
+
+    <div class="pusher body-content">
+        <div id="content" class="ui main container">
+            <!--<div class="ui one column grid">-->
+                <!--<div class="column">-->
+                    <!--<div class="ui main container">-->
+                        <div id="post-git" class="ui main container article-type-post">
+
+    
+
+    <div class="ui divided grid">
+
+        <div class="two column row" id="article-content">
+
+            <div class="thirteen wide computer thirteen wide tablet sixteen wide mobile column">
+                
+
+<h1 class="ui header">
+    
+    Git 使用大法
+</h1>
+
+
+
+                <div class="article-inner">
+
+                    <div class="article-entry" itemprop="articleBody">
+                        
+                        <html><head><meta name="generator" content="Hexo 3.8.0"></head><body><p>&#x5F88;&#x591A;&#x521D;&#x5B66;&#x8005;&#x4EE5;&#x4E3A;git&#x5F88;&#x9AD8;&#x5927;&#x4E0A;&#xFF0C;&#x5176;&#x5B9E;&#x4E0D;&#x7136;&#x3002;Git&#xFF0C;&#x82F1;&#x6587;&#x610F;&#x601D;&#x662F;&#xFF1A;&#x50BB;&#x74DC;&#x3002;&#x663E;&#x7136;&#xFF0C;git&#x5B9E;&#x9645;&#x4E0A;&#x5C31;&#x662F;&#x4E2A;&#x50BB;&#x74DC;&#x5F0F;&#x7684;&#x7248;&#x672C;&#x63A7;&#x5236;&#x8F6F;&#x4EF6;&#x3002;git&#x7684;&#x4F7F;&#x7528;&#x5176;&#x5B9E;&#x5F88;&#x7B80;&#x5355;&#xFF0C;&#x4E0B;&#x9762;&#x6211;&#x4EEC;&#x5F00;&#x59CB;&#x4ECB;&#x7ECD;git&#x7684;&#x4E00;&#x4E9B;&#x5E38;&#x7528;&#x4F7F;&#x7528;&#x65B9;&#x6CD5;&#x3002;<br><a id="more"></a></p>
+<h2 id="&#x4E00;&#x3001;git-&#x547D;&#x4EE4;&#x4F7F;&#x7528;&#x5927;&#x6CD5;&#xFF1A;"><a href="#&#x4E00;&#x3001;git-&#x547D;&#x4EE4;&#x4F7F;&#x7528;&#x5927;&#x6CD5;&#xFF1A;" class="headerlink" title="&#x4E00;&#x3001;git &#x547D;&#x4EE4;&#x4F7F;&#x7528;&#x5927;&#x6CD5;&#xFF1A;"></a>&#x4E00;&#x3001;git &#x547D;&#x4EE4;&#x4F7F;&#x7528;&#x5927;&#x6CD5;&#xFF1A;</h2><p>&#x5927;&#x7EB2;&#x56FE;&#x9884;&#x89C8;&#xFF1A;&#x3010;&#x6B64;&#x601D;&#x7EF4;&#x5BFC;&#x56FE;&#x6765;&#x81EA;&#x5C0F;&#x732A;&#x7FA4;&#x4E50;&#x89C6;&#x5927;&#x624B;&#x5B50;&#x9E4F;&#x795E;&#x3011;<br><a class="magnific-img" href="http://ww3.sinaimg.cn/large/ded3864ejw1f13brjvwitj21cq0yfwoe.jpg"><img src="http://ww3.sinaimg.cn/large/ded3864ejw1f13brjvwitj21cq0yfwoe.jpg" alt="" class="ui centered image"></a></p>
+<h3 id="1-1-&#x521B;&#x5EFA;git&#x672C;&#x5730;&#x4ED3;&#x5E93;"><a href="#1-1-&#x521B;&#x5EFA;git&#x672C;&#x5730;&#x4ED3;&#x5E93;" class="headerlink" title="1.1 &#x521B;&#x5EFA;git&#x672C;&#x5730;&#x4ED3;&#x5E93;"></a>1.1 &#x521B;&#x5EFA;git&#x672C;&#x5730;&#x4ED3;&#x5E93;</h3><p>cd &#x5230;&#x9700;&#x8981;&#x521B;&#x5EFA;&#x4ED3;&#x5E93;&#x7684;&#x76EE;&#x5F55;&#xFF0C;&#x7136;&#x540E;&#x8F93;&#x5165;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git init <span class="comment">//&#x5C06;&#x5F53;&#x524D;&#x76EE;&#x5F55;&#x8BBE;&#x7F6E;&#x4E3A;Git&#x672C;&#x5730;&#x4ED3;&#x5E93;</span></span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x4F8B;&#x5982;&#xFF1A;&#x628A;HostApp&#x8BBE;&#x4E3A;&#x672C;&#x5730;&#x4ED3;&#x5E93;&#xFF0C;&#x8FD9;&#x6837;&#x4FBF;&#x521B;&#x5EFA;&#x4E86;&#x4E00;&#x4E2A;&#x672C;&#x5730;&#x4ED3;&#x5E93;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/A78CCB30-AACD-4D74-81C0-2D8402A9B5E7.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/A78CCB30-AACD-4D74-81C0-2D8402A9B5E7.png" alt="" class="ui centered image"></a></p>
+<h3 id="1-2-&#x63D0;&#x4EA4;&#x6587;&#x4EF6;&#x5230;&#x672C;&#x5730;&#x4ED3;&#x5E93;"><a href="#1-2-&#x63D0;&#x4EA4;&#x6587;&#x4EF6;&#x5230;&#x672C;&#x5730;&#x4ED3;&#x5E93;" class="headerlink" title="1.2 &#x63D0;&#x4EA4;&#x6587;&#x4EF6;&#x5230;&#x672C;&#x5730;&#x4ED3;&#x5E93;"></a>1.2 &#x63D0;&#x4EA4;&#x6587;&#x4EF6;&#x5230;&#x672C;&#x5730;&#x4ED3;&#x5E93;</h3><p><strong>&#x7B2C;&#x4E00;&#x6B65;&#xFF1A;&#x5148;&#x6392;&#x9664;&#x6389;&#x4E0D;&#x60F3;&#x63D0;&#x4EA4;&#x7684;&#x6587;&#x4EF6;</strong>&#xFF08;&#x5047;&#x5982;&#x4F60;&#x6709;&#x8FD9;&#x4E2A;&#x9700;&#x6C42;&#x7684;&#x8BDD;&#xFF09;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo <span class="string">&quot;*.iml&quot;</span> &gt;.gitignore <span class="comment">// &#x8BBE;&#x7F6E;git&#x5FFD;&#x7565;&#x6587;&#x4EF6;</span></span><br></pre></td></tr></tbody></table></figure><p></p>
+<p><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/95F319A7-5637-4811-B415-2273113D6019.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/95F319A7-5637-4811-B415-2273113D6019.png" alt="" class="ui centered image"></a><br>&#x8FD9;&#x6BB5;&#x6307;&#x4EE4;&#x7684;&#x610F;&#x601D;&#x662F;: &#x521B;&#x5EFA;&#x4E00;&#x4E2A;.gitignore&#x6587;&#x4EF6;&#xFF0C;&#x91CC;&#x9762;&#x7684;&#x5185;&#x5BB9;&#x662F;*.iml&#x3002;&#x610F;&#x5473;&#x7740;&#xFF0C;git commit&#x65F6;&#x5C06;&#x4F1A;&#x6392;&#x9664;&#x4EE5;.iml&#x7ED3;&#x5C3E;&#x7684;&#x6587;&#x4EF6;&#x3002;&#x5982;&#x4E0B;&#x56FE;&#x6240;&#x793A;&#xFF0C;&#x5728;HostApp&#x76EE;&#x5F55;&#x4E0B;&#x751F;&#x6210;&#x4E86;&#x4E00;&#x4E2A;.gitignore&#x6587;&#x4EF6;&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/11_02_1.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/11_02_1.png" alt="" class="ui centered image"></a></p>
+<p><strong>&#x7B2C;&#x4E8C;&#x6B65;&#xFF1A;git add &#x3010;&#x9884;&#x5907;&#x63D0;&#x4EA4;&#x5230;&#x672C;&#x5730;&#x4ED3;&#x5E93;&#x9636;&#x6BB5;&#x3011;</strong><br>&#x53EF;&#x4EE5;&#x7406;&#x89E3;&#x4E3A;&#xFF0C;git add &#x4E86;&#x4EC0;&#x4E48;&#x6587;&#x4EF6;&#xFF0C;&#x6700;&#x540E;commit&#x5C31;&#x4F1A;&#x63D0;&#x4EA4;&#x4EC0;&#x4E48;&#x6587;&#x4EF6;&#x3002;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git add . <span class="comment">// &#x6DFB;&#x52A0;&#x5F53;&#x524D;&#x76EE;&#x5F55;&#x4E0B;&#x6240;&#x6709;&#x6587;&#x4EF6;&#x548C;&#x5B50;&#x76EE;&#x5F55;&#x5230;&#x9884;&#x63D0;&#x4EA4;&#x72B6;&#x6001;</span></span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x8FD9;&#x6BB5;&#x6307;&#x4EE4;&#x7684;&#x610F;&#x601D;&#x662F;&#xFF1A;&#x5C06;&#x6240;&#x6709;&#x6587;&#x4EF6;&#x5230;&#x9884;&#x5907;&#x63D0;&#x4EA4;&#x72B6;&#x6001;&#xFF08;&#x9664;&#x4E86;igonore&#x6392;&#x9664;&#x7684;&#x6587;&#x4EF6;&#xFF09;&#x3002;&#x7528;git status&#x547D;&#x4EE4;&#x6765;&#x67E5;&#x770B;&#x5F53;&#x524D;&#x4ED3;&#x5E93;&#x7684;&#x72B6;&#x6001;&#x3002;&#x53EF;&#x4EE5;&#x770B;&#x5230;&#x6587;&#x4EF6;&#x90FD;&#x63D0;&#x4EA4;&#x5230;&#x4E86;&#x9884;&#x5907;&#x63D0;&#x4EA4;&#x72B6;&#x6001;&#x3002;&#x3010;&#x6CE8;&#x610F;&#xFF0C;&#x6B64;&#x65F6;&#x8FD8;&#x672A;&#x63D0;&#x4EA4;&#x5230;&#x672C;&#x5730;&#x4ED3;&#x5E93;&#x3011;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/11_02_2.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/11_02_2.png" alt="" class="ui centered image"></a><br>&#x5F53;&#x7136;&#x4F60;&#x4E5F;&#x53EF;&#x4EE5;&#x6307;&#x5B9A;&#x67D0;&#x4E2A;&#x6587;&#x4EF6;&#x5230;&#x9884;&#x5907;&#x63D0;&#x4EA4;&#x72B6;&#x6001;&#x3002;&#x6BD4;&#x5982;&#xFF1A;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git add src <span class="comment">// &#x6DFB;&#x52A0;src&#x76EE;&#x5F55;&#x5230;&#x9884;&#x63D0;&#x4EA4;&#x72B6;&#x6001;</span></span><br></pre></td></tr></tbody></table></figure><p></p>
+<p><strong>&#x7B2C;&#x4E09;&#x6B65;&#xFF1A;git commit &#x3010;&#x6B63;&#x5F0F;&#x63D0;&#x4EA4;&#x6587;&#x4EF6;&#x5230;&#x672C;&#x5730;&#x4ED3;&#x5E93;&#x3011;</strong><br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git commit -m <span class="string">&quot;&#x7B2C;&#x4E00;&#x6B21;&#x63D0;&#x4EA4;&quot;</span> <span class="comment">//&#x5C06;&#x6587;&#x4EF6;&#x6DFB;&#x52A0;&#x5230;&#x4ED3;&#x5E93;&#xFF0C;&#x5E76;&#x6DFB;&#x52A0;&#x6CE8;&#x91CA;</span></span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x8FD9;&#x91CC;git&#x662F;&#x5F3A;&#x5236;&#x8981;&#x6C42;&#x6BCF;&#x6B21;commit&#x7684;&#x65F6;&#x5019;&#xFF0C;&#x90FD;&#x8981;&#x6DFB;&#x52A0;&#x6CE8;&#x91CA;&#xFF0C;&#x6240;&#x4EE5;&#x6BCF;&#x6B21;&#x63D0;&#x4EA4;&#x90FD;&#x662F;&#x8981;&#x6DFB;&#x52A0;-m&#x540E;&#x7F00;&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/tijiao.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/tijiao.png" alt="" class="ui centered image"></a><br>&#x63D0;&#x4EA4;&#x5B8C;&#x6210;&#x4E4B;&#x540E;&#xFF1A;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/11_02_05.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/11_02_05.png" alt="" class="ui centered image"></a></p>
+<h3 id="1-3-&#x63D0;&#x4EA4;&#x6587;&#x4EF6;&#x5230;github&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;"><a href="#1-3-&#x63D0;&#x4EA4;&#x6587;&#x4EF6;&#x5230;github&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;" class="headerlink" title="1.3 &#x63D0;&#x4EA4;&#x6587;&#x4EF6;&#x5230;github&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;"></a>1.3 &#x63D0;&#x4EA4;&#x6587;&#x4EF6;&#x5230;github&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;</h3><p>&#x7531;&#x4E8E;&#x672C;&#x4EBA;&#x5DF2;&#x7ECF;&#x914D;&#x7F6E;&#x597D;&#x4E86;.ssh&#xFF0C;&#x8FD9;&#x91CC;&#x5C31;&#x4E0D;&#x518D;&#x7D2F;&#x8FF0;&#x5982;&#x4F55;&#x914D;&#x7F6E;git&#x8FDC;&#x7A0B;&#x7ED1;&#x5B9A;github&#x4E86;&#x3002;&#x6709;&#x9700;&#x8981;&#x7684;&#x53EF;&#x4EE5;&#x76F4;&#x63A5;&#x67E5;&#x76F8;&#x5173;&#x8D44;&#x6599;&#x3002;<br>&#x9644;&#x4E0A;&#x4E24;&#x7BC7;&#x6559;&#x7A0B;&#x94FE;&#x63A5;&#xFF1A;<a href="https://help.github.com/articles/generating-ssh-keys/" target="_blank" rel="noopener">https://help.github.com/articles/generating-ssh-keys/</a><br><a href="http://blog.csdn.net/binyao02123202/article/details/20130891" target="_blank" rel="noopener">http://blog.csdn.net/binyao02123202/article/details/20130891</a></p>
+<p><strong>&#x7B2C;&#x4E00;&#x6B65;&#xFF1A;&#x5728;Github&#x8D26;&#x6237;&#x4E2D;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x4ED3;&#x5E93;</strong><br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/11_03_06.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/11_03_06.png" alt="" class="ui centered image"></a><br>&#x521B;&#x5EFA;&#x5B8C;&#x6210;&#x540E;&#xFF0C;&#x4F1A;&#x6709;&#x4E00;&#x4E2A;&#x6559;&#x7A0B;&#x6559;&#x4F60;&#x5982;&#x4F55;&#x5C06;&#x6587;&#x4EF6;&#x63D0;&#x4EA4;&#x5230;&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;&#x3002;&#x3010;&#x6CE8;&#x610F;&#xFF1A;&#x7EA2;&#x8272;&#x7BAD;&#x5934;&#x6307;&#x793A;&#x7684;&#x90A3;&#x4E2A;&#xFF0C;&#x4FBF;&#x662F;&#x4F60;&#x7684;&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;&#x5730;&#x5740;&#x3011;<a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/11_02_07.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/11_02_07.png" alt="" class="ui centered image"></a></p>
+<p><strong>&#x7B2C;&#x4E8C;&#x6B65;&#xFF1A;&#x5728;&#x672C;&#x5730;&#x4ED3;&#x5E93;&#x76EE;&#x5F55;&#x4E0B;&#x6DFB;&#x52A0;&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;&#x5730;&#x5740;</strong><br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote add origin https:<span class="comment">//github.com/zhujun2730/HostApp.git</span></span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>origin &#x8868;&#x793A;&#x662F;&#x4E3B;&#x673A;&#x540D;&#x3002;&#x540E;&#x9762;&#x7684;&#x5730;&#x5740;&#x8868;&#x793A;&#x7684;&#x662F;&#x7F51;&#x7EDC;&#x5730;&#x5740;<br><strong>&#x7B2C;&#x4E09;&#x6B65;&#xFF1A;&#x5C06;&#x672C;&#x5730;&#x4ED3;&#x5E93;&#x63D0;&#x4EA4;&#x7684;&#x6587;&#x4EF6;push&#x5230;&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;</strong><br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push -u origin master</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>origin &#x8868;&#x793A;&#x662F;&#x4E3B;&#x673A;&#x540D;&#x3002;master&#x8868;&#x793A;&#x7684;&#x662F;&#x4E3B;&#x5206;&#x652F;&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/11_02_08.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/11_02_08.png" alt="" class="ui centered image"></a><br>push&#x5B8C;&#x540E;&#xFF0C;&#x5728;Github&#x4ED3;&#x5E93;&#xFF0C;&#x5C31;&#x80FD;&#x770B;&#x5230;&#x521A;&#x521A;&#x63D0;&#x4EA4;&#x7684;&#x6587;&#x4EF6;&#x4E86;&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/11_02_09.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/11_02_09.png" alt="" class="ui centered image"></a></p>
+<h3 id="1-4-&#x4ECE;github&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;&#x514B;&#x9686;&#x5230;&#x672C;&#x5730;&#x4ED3;&#x5E93;"><a href="#1-4-&#x4ECE;github&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;&#x514B;&#x9686;&#x5230;&#x672C;&#x5730;&#x4ED3;&#x5E93;" class="headerlink" title="1.4 &#x4ECE;github&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;&#x514B;&#x9686;&#x5230;&#x672C;&#x5730;&#x4ED3;&#x5E93;"></a>1.4 &#x4ECE;github&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;&#x514B;&#x9686;&#x5230;&#x672C;&#x5730;&#x4ED3;&#x5E93;</h3><p>&#x6267;&#x884C;git clone xxx &#x547D;&#x4EE4;&#x540E;&#xFF0C;&#x5728;&#x4EFB;&#x610F;&#x76EE;&#x5F55;&#x4E0B;&#x4F1A;&#x751F;&#x6210;&#x4E00;&#x4E2A;&#x672C;&#x5730;Git&#x4ED3;&#x5E93;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https:<span class="comment">//github.com/zhujun2730/HostApp.git</span></span><br></pre></td></tr></tbody></table></figure><p></p>
+<p><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/11_02_10.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/11_02_10.png" alt="" class="ui centered image"></a><br>&#x6B64;&#x65F6;&#x4F1A;&#x5728;Project&#x76EE;&#x5F55;&#x4E0B;&#x751F;&#x6210;&#x4E00;&#x4E2A;&#x672C;&#x5730;&#x4ED3;&#x5E93;&#x6587;&#x4EF6;&#x5939;HostApp<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/11_02_11.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/11_02_11.png" alt="" class="ui centered image"></a></p>
+<h3 id="1-5-&#x5220;&#x9664;github&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;&#x4E2D;&#x7684;&#x6587;&#x4EF6;"><a href="#1-5-&#x5220;&#x9664;github&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;&#x4E2D;&#x7684;&#x6587;&#x4EF6;" class="headerlink" title="1.5 &#x5220;&#x9664;github&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;&#x4E2D;&#x7684;&#x6587;&#x4EF6;"></a>1.5 &#x5220;&#x9664;github&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;&#x4E2D;&#x7684;&#x6587;&#x4EF6;</h3><p>&#x6D41;&#x7A0B;&#xFF1A;<br>1.&#x9996;&#x5148;&#x9700;&#x8981;&#x628A;&#x672C;&#x5730;&#x4ED3;&#x5E93;&#x7684;&#x6587;&#x4EF6;&#x5220;&#x6389;&#xFF0C;&#x7136;&#x540E;&#x6267;&#x884C;git rm xxx &#x547D;&#x4EE4;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git rm .idea -r <span class="comment">// &#x5220;&#x9664;&#x6574;&#x4E2A;.idea&#x6587;&#x4EF6;&#x5939;</span></span><br></pre></td></tr></tbody></table></figure><p></p>
+<p><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/git_1.5.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/git_1.5.png" alt="" class="ui centered image"></a></p>
+<p>2.&#x7136;&#x540E;&#x63D0;&#x4EA4;&#x5230;&#x672C;&#x5730;&#x4ED3;&#x5E93;&#xFF0C;&#x544A;&#x8BC9;&#x672C;&#x5730;&#x4ED3;&#x5E93;&#x6211;&#x5220;&#x4E86;&#x8FD9;&#x4E2A;&#x6587;&#x4EF6;&#x5939;&#x3002;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git commit -m <span class="string">&quot;remove .idea&quot;</span></span><br></pre></td></tr></tbody></table></figure><p></p>
+<p><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/git_1.5_2.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/git_1.5_2.png" alt="" class="ui centered image"></a></p>
+<p>3.&#x6700;&#x540E;Push&#x5230;&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;&#xFF0C;&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;&#x7684;&#x6587;&#x4EF6;&#x5C31;&#x4F1A;&#x88AB;&#x5220;&#x9664;&#x4E86;&#x3002;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push -u origin master</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/git_1.5_3.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/git_1.5_3.png" alt="" class="ui centered image"></a></p>
+<h2 id="&#x4E8C;&#x3001;&#x5728;Android-Studio&#x4E2D;&#x4F7F;&#x7528;git"><a href="#&#x4E8C;&#x3001;&#x5728;Android-Studio&#x4E2D;&#x4F7F;&#x7528;git" class="headerlink" title="&#x4E8C;&#x3001;&#x5728;Android Studio&#x4E2D;&#x4F7F;&#x7528;git"></a>&#x4E8C;&#x3001;&#x5728;Android Studio&#x4E2D;&#x4F7F;&#x7528;git</h2><h3 id="2-1-&#x5728;Android-Studio&#x4E2D;&#x4E0A;&#x4F20;&#x9879;&#x76EE;&#x5230;Github"><a href="#2-1-&#x5728;Android-Studio&#x4E2D;&#x4E0A;&#x4F20;&#x9879;&#x76EE;&#x5230;Github" class="headerlink" title="2.1 &#x5728;Android Studio&#x4E2D;&#x4E0A;&#x4F20;&#x9879;&#x76EE;&#x5230;Github"></a>2.1 &#x5728;Android Studio&#x4E2D;&#x4E0A;&#x4F20;&#x9879;&#x76EE;&#x5230;Github</h3><p>&#x5728;&#x83DC;&#x5355;&#x680F;&#x4E2D;&#x9009;&#x62E9;VCS -&gt; import into Version Control -&gt; Share Project on Github<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/&#x5C4F;&#x5E55;&#x5FEB;&#x7167;%202015-11-02%2017.30.33.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/&#x5C4F;&#x5E55;&#x5FEB;&#x7167;%202015-11-02%2017.30.33.png" alt="" class="ui centered image"></a></p>
+<p>&#x4E4B;&#x540E;&#xFF0C;&#x8F93;&#x5165;github&#x7528;&#x6237;&#x540D;&#x548C;&#x5BC6;&#x7801;&#xFF0C;&#x5230;&#x8FBE;&#x8FD9;&#x4E2A;&#x754C;&#x9762;&#xFF0C;&#x5176;&#x5B9E;&#x8FD9;&#x4E2A;&#x754C;&#x9762;&#x662F;&#x5F00;&#x59CB;&#x8BA9;&#x4F60;&#x9009;&#x62E9;&#x9700;&#x8981;&#x63D0;&#x4EA4;&#x54EA;&#x4E9B;&#x6587;&#x4EF6;&#xFF0C;&#x4EE5;&#x53CA;&#x8F93;&#x5165;commit&#x6CE8;&#x91CA;&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/&#x5C4F;&#x5E55;&#x5FEB;&#x7167;%202015-11-02%2017.31.48.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/&#x5C4F;&#x5E55;&#x5FEB;&#x7167;%202015-11-02%2017.31.48.png" alt="" class="ui centered image"></a></p>
+<p>&#x70B9;&#x51FB;OK&#x540E;&#xFF0C;&#x5E95;&#x90E8;&#x8FDB;&#x5EA6;&#x6761;&#x8DD1;&#x5B8C;&#xFF0C;AS&#x7684;&#x9879;&#x76EE;&#x4FBF;&#x4E0A;&#x4F20;&#x5230;github&#x4E0A;&#x4E86;&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/&#x5C4F;&#x5E55;&#x5FEB;&#x7167;%202015-11-02%2017.32.20.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/&#x5C4F;&#x5E55;&#x5FEB;&#x7167;%202015-11-02%2017.32.20.png" alt="" class="ui centered image"></a></p>
+<h3 id="2-2-&#x4ECE;Github&#x4E0A;&#x5C06;&#x9879;&#x76EE;&#x514B;&#x9686;&#x5230;Android-studio"><a href="#2-2-&#x4ECE;Github&#x4E0A;&#x5C06;&#x9879;&#x76EE;&#x514B;&#x9686;&#x5230;Android-studio" class="headerlink" title="2.2 &#x4ECE;Github&#x4E0A;&#x5C06;&#x9879;&#x76EE;&#x514B;&#x9686;&#x5230;Android studio"></a>2.2 &#x4ECE;Github&#x4E0A;&#x5C06;&#x9879;&#x76EE;&#x514B;&#x9686;&#x5230;Android studio</h3><p>2.2.1 &#x4EE5;&#x521A;&#x521A;&#x7684;github&#x4ED3;&#x5E93;&#x5730;&#x5740;&#x4E3A;&#x4F8B;&#x3002;&#x590D;&#x5236;&#x4ED3;&#x5E93;&#x5730;&#x5740;&#xFF0C;&#x4ED3;&#x5E93;&#x5730;&#x5740;&#x5728;&#x53F3;&#x8FB9;&#x7EA2;&#x8272;&#x7BAD;&#x5934;&#x6240;&#x793A;&#x5730;&#x65B9;&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/11_02_13.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/11_02_13.png" alt="" class="ui centered image"></a></p>
+<p>2.2.2 &#x6253;&#x5F00;Android studio -&gt; Check out project from Version Control -&gt; Github<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/&#x5C4F;&#x5E55;&#x5FEB;&#x7167;%202015-11-02%2017.50.13.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/&#x5C4F;&#x5E55;&#x5FEB;&#x7167;%202015-11-02%2017.50.13.png" alt="" class="ui centered image"></a></p>
+<p>2.2.3 &#x8F93;&#x5165;Github&#x5BC6;&#x7801;&#x540E;&#x4FBF;&#x5230;&#x8FBE;&#x6B64;&#x754C;&#x9762;&#x3002;&#x590D;&#x5236;&#x4ED3;&#x5E93;&#x5730;&#x5740;&#xFF0C;&#x6307;&#x5B9A;&#x9879;&#x76EE;&#x7684;&#x76EE;&#x5F55;&#x548C;&#x6587;&#x4EF6;&#x5939;&#x540D;&#x79F0;&#xFF0C;&#x7136;&#x540E;&#x70B9;&#x51FB;clone<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/11_02_14.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/11_02_14.png" alt="" class="ui centered image"></a></p>
+<p>2.2.4 &#x6B64;&#x65F6;&#x63D0;&#x793A;&#x5DF2;&#x7ECF;&#x4ECE;Github&#x4E0A;&#x68C0;&#x51FA;&#x5B8C;&#x6210;&#x4E86;,&#x70B9;&#x51FB;open&#x9879;&#x76EE;&#x5C31;&#x5BFC;&#x5230;Android studio&#x4E2D;&#x4E86;&#x3010;&#x6CE8;&#x610F;&#xFF0C;&#x6B64;&#x65F6;&#x8FD8;&#x6CA1;&#x5B8C;&#x3011;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/11_02_15.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/11_02_15.png" alt="" class="ui centered image"></a></p>
+<p>2.2.5 &#x70B9;&#x51FB;&#x521A;&#x521A;&#x7684;Open&#x4E4B;&#x540E;&#xFF0C;AS&#x5C06;&#x6253;&#x5F00;&#x9879;&#x76EE;&#xFF0C;&#x5728;&#x7A97;&#x53E3;&#x53F3;&#x4E0A;&#x89D2;&#x4F1A;&#x5F39;&#x51FA;&#x8FD9;&#x4E2A;&#x63D0;&#x793A;&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/11_02_17.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/11_02_17.png" alt="" class="ui centered image"></a></p>
+<p>&#x8FD9;&#x4E2A;&#x63D0;&#x793A;&#x5F88;&#x91CD;&#x8981;&#xFF0C;&#x5982;&#x679C;&#x4F60;&#x5FFD;&#x7565;&#x4E86;&#xFF0C;&#x5219;&#x9ED8;&#x8BA4;&#x672C;&#x9879;&#x76EE;&#x662F;&#x4E0D;&#x4F1A;&#x5C06;git&#x548C;as&#x8FDB;&#x884C;&#x76F8;&#x5173;&#x7ED1;&#x5B9A;&#x7684;&#xFF08;&#x6B64;&#x65F6;&#x4F60;&#x53EA;&#x80FD;&#x518D;share&#x4E00;&#x6B21;&#xFF09;&#x3002;<strong>&#x6240;&#x4EE5;&#xFF0C;&#x5F53;&#x4F60;&#x70B9;&#x51FB;&#x4E86;Add root&#x4E4B;&#x540E;&#xFF0C;&#x624D;&#x4F1A;&#x5C06;&#x8FD9;&#x4E2A;&#x9879;&#x76EE;&#x548C;Github&#x8FDB;&#x884C;&#x5173;&#x8054;&#x3002;&#x8FD9;&#x6837;&#x4F60;&#x5C31;&#x53EF;&#x4EE5;&#x5728;AS&#x4E2D;&#x505A;&#x76F8;&#x5173;&#x7684;pull&#x3001;push&#x76F8;&#x5173;&#x64CD;&#x4F5C;&#x4E86;</strong></p>
+<p>2.2.6 &#x5F53;&#x70B9;&#x51FB;Add root&#x4E4B;&#x540E;&#xFF0C;AS&#x5C06;&#x4F1A;&#x81EA;&#x52A8;&#x6DFB;&#x52A0;Version Control&#x83DC;&#x5355;&#x680F;&#x3002;&#x8FD9;&#x6837;&#x4F60;&#x5C31;&#x53EF;&#x4EE5;&#x5728;AS&#x4E2D;&#x76F4;&#x63A5;&#x8FDB;&#x884C;Git&#x76F8;&#x5173;&#x64CD;&#x4F5C;&#x4E86;&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/11_02_20.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/11_02_20.png" alt="" class="ui centered image"></a></p>
+<h3 id="2-3-&#x5728;AS&#x4E2D;&#x7F16;&#x8F91;&#x4EE3;&#x7801;&#xFF0C;&#x5E76;&#x63D0;&#x4EA4;&#x5230;github"><a href="#2-3-&#x5728;AS&#x4E2D;&#x7F16;&#x8F91;&#x4EE3;&#x7801;&#xFF0C;&#x5E76;&#x63D0;&#x4EA4;&#x5230;github" class="headerlink" title="2.3 &#x5728;AS&#x4E2D;&#x7F16;&#x8F91;&#x4EE3;&#x7801;&#xFF0C;&#x5E76;&#x63D0;&#x4EA4;&#x5230;github"></a>2.3 &#x5728;AS&#x4E2D;&#x7F16;&#x8F91;&#x4EE3;&#x7801;&#xFF0C;&#x5E76;&#x63D0;&#x4EA4;&#x5230;github</h3><p>&#x5F53;&#x4F60;&#x7F16;&#x8F91;&#x4E86;&#x4E00;&#x4E2A;&#x6587;&#x4EF6;&#x4E4B;&#x540E;&#xFF0C;&#x8FD9;&#x4E2A;&#x6587;&#x4EF6;&#x4F1A;&#x53D8;&#x6210;&#x84DD;&#x8272;&#xFF0C;&#x4EE3;&#x8868;&#x8FD9;&#x4E2A;&#x6587;&#x4EF6;&#x5DF2;&#x7ECF;&#x4FEE;&#x6539;&#x8FC7;&#x4E86;&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/11_02_21.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/11_02_21.png" alt="" class="ui centered image"></a></p>
+<h4 id="2-3-1-&#x53F3;&#x952E;&#x70B9;&#x51FB;&#x6539;&#x6587;&#x4EF6;-gt-git-gt-Commit-File"><a href="#2-3-1-&#x53F3;&#x952E;&#x70B9;&#x51FB;&#x6539;&#x6587;&#x4EF6;-gt-git-gt-Commit-File" class="headerlink" title="2.3.1 &#x53F3;&#x952E;&#x70B9;&#x51FB;&#x6539;&#x6587;&#x4EF6; -&gt; git -&gt; Commit File"></a>2.3.1 &#x53F3;&#x952E;&#x70B9;&#x51FB;&#x6539;&#x6587;&#x4EF6; -&gt; git -&gt; Commit File</h4><p><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/&#x5C4F;&#x5E55;&#x5FEB;&#x7167;%202015-11-02%2018.24.44.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/&#x5C4F;&#x5E55;&#x5FEB;&#x7167;%202015-11-02%2018.24.44.png" alt="" class="ui centered image"></a><br>&#x6216;&#x8005;&#x76F4;&#x63A5;&#x70B9;&#x51FB;&#x5DE5;&#x5177;&#x680F;&#x4E0A;&#x7684;VCS&#x7EFF;&#x8272;&#x7BAD;&#x5934;&#x5411;&#x4E0A;&#x7684;&#x56FE;&#x6807;&#xFF0C;&#x6548;&#x679C;&#x90FD;&#x662F;&#x4E00;&#x6837;&#x7684;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/11_02_22.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/11_02_22.png" alt="" class="ui centered image"></a></p>
+<h4 id="2-3-2-&#x5728;&#x5F39;&#x51FA;&#x7684;&#x7A97;&#x53E3;&#x4E2D;&#xFF0C;&#x53EF;&#x4EE5;&#x770B;&#x5230;&#x4FEE;&#x6539;&#x540E;&#x548C;&#x4ED3;&#x5E93;&#x7684;&#x6587;&#x4EF6;&#x5BF9;&#x6BD4;&#xFF0C;&#x4EE5;&#x53CA;&#x8F93;&#x5165;&#x63D0;&#x4EA4;&#x7684;&#x6CE8;&#x91CA;&#x3002;&#x9009;&#x62E9;commit-and-push&#xFF0C;&#x5C06;&#x4F1A;&#x628A;&#x5B83;&#x63D0;&#x4EA4;&#x5230;github"><a href="#2-3-2-&#x5728;&#x5F39;&#x51FA;&#x7684;&#x7A97;&#x53E3;&#x4E2D;&#xFF0C;&#x53EF;&#x4EE5;&#x770B;&#x5230;&#x4FEE;&#x6539;&#x540E;&#x548C;&#x4ED3;&#x5E93;&#x7684;&#x6587;&#x4EF6;&#x5BF9;&#x6BD4;&#xFF0C;&#x4EE5;&#x53CA;&#x8F93;&#x5165;&#x63D0;&#x4EA4;&#x7684;&#x6CE8;&#x91CA;&#x3002;&#x9009;&#x62E9;commit-and-push&#xFF0C;&#x5C06;&#x4F1A;&#x628A;&#x5B83;&#x63D0;&#x4EA4;&#x5230;github" class="headerlink" title="2.3.2 &#x5728;&#x5F39;&#x51FA;&#x7684;&#x7A97;&#x53E3;&#x4E2D;&#xFF0C;&#x53EF;&#x4EE5;&#x770B;&#x5230;&#x4FEE;&#x6539;&#x540E;&#x548C;&#x4ED3;&#x5E93;&#x7684;&#x6587;&#x4EF6;&#x5BF9;&#x6BD4;&#xFF0C;&#x4EE5;&#x53CA;&#x8F93;&#x5165;&#x63D0;&#x4EA4;&#x7684;&#x6CE8;&#x91CA;&#x3002;&#x9009;&#x62E9;commit and push&#xFF0C;&#x5C06;&#x4F1A;&#x628A;&#x5B83;&#x63D0;&#x4EA4;&#x5230;github"></a>2.3.2 &#x5728;&#x5F39;&#x51FA;&#x7684;&#x7A97;&#x53E3;&#x4E2D;&#xFF0C;&#x53EF;&#x4EE5;&#x770B;&#x5230;&#x4FEE;&#x6539;&#x540E;&#x548C;&#x4ED3;&#x5E93;&#x7684;&#x6587;&#x4EF6;&#x5BF9;&#x6BD4;&#xFF0C;&#x4EE5;&#x53CA;&#x8F93;&#x5165;&#x63D0;&#x4EA4;&#x7684;&#x6CE8;&#x91CA;&#x3002;&#x9009;&#x62E9;commit and push&#xFF0C;&#x5C06;&#x4F1A;&#x628A;&#x5B83;&#x63D0;&#x4EA4;&#x5230;github</h4><p><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/&#x5C4F;&#x5E55;&#x5FEB;&#x7167;%202015-11-02%2018.28.33.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/&#x5C4F;&#x5E55;&#x5FEB;&#x7167;%202015-11-02%2018.28.33.png" alt="" class="ui centered image"></a></p>
+<p>&#x5F53;push&#x6210;&#x529F;&#x540E;&#xFF0C;&#x5E95;&#x90E8;&#x72B6;&#x6001;&#x680F;&#x4F1A;&#x6709;&#x6240;&#x63D0;&#x793A;&#xFF1A;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/&#x5C4F;&#x5E55;&#x5FEB;&#x7167;%202015-11-02%2018.29.46.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/&#x5C4F;&#x5E55;&#x5FEB;&#x7167;%202015-11-02%2018.29.46.png" alt="" class="ui centered image"></a></p>
+<p>&#x8FD9;&#x4E2A;&#x65F6;&#x5019;&#x6211;&#x4EEC;&#x5728;&#x5E95;&#x90E8;Version Control&#x83DC;&#x5355;&#x680F;&#x4E2D;&#x5C31;&#x53EF;&#x4EE5;&#x770B;&#x5230;&#x4ED3;&#x5E93;push&#x7684;&#x8BB0;&#x5F55;&#x4E86;&#x3002;&#x6B64;&#x65F6;&#xFF0C;&#x4E00;&#x4E2A;&#x4FEE;&#x6539;&#x597D;&#x7684;&#x6587;&#x4EF6;&#x5C31;push&#x5230;&#x4E86;github&#x8FDC;&#x7A0B;&#x4ED3;&#x5E93;&#x4E2D;&#x53BB;&#x4E86;&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/11_02_31.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/11_02_31.png" alt="" class="ui centered image"></a></p>
+</body></html>
+                        
+                    </div>
+
+                    
+                    
+                    
+
+                    <div class="description post-description">
+    <span class="post-description-item">
+        <time datetime="2015-11-02T03:12:32.000Z" itemprop="datePublished">2015-11-02</time>
+
+    </span>
+    <span class="post-description-item">
+        
+
+    <span>
+        <i class="tags icon"></i>
+    </span>
+
+    
+    <span class="ui tiny label">
+        <a href="/tags/Android/">Android</a>
+    </span>
+
+    
+    <span class="ui tiny label">
+        <a href="/tags/Android-Studio/">Android Studio</a>
+    </span>
+
+    
+    <span class="ui tiny label">
+        <a href="/tags/Git/">Git</a>
+    </span>
+
+    
+
+    </span>
+</div>
+
+                </div>
+                
+                <div id="pagination" class="nav-web ui text container pagination">
+
+    <div class="ui stackable two column divided grid container">
+        <div class="row">
+            <div class="column nav-left">
+                
+
+                <a href="/2015/11/06/study-res/" class="ui tiny button">
+
+                    <i class="angle left icon"></i>
+                    
+                    Android学习资源网站大全
+                    
+
+                </a>
+
+                
+            </div>
+            <div class="column nav-right">
+                
+
+                <a href="/2015/10/19/bitmap2/" class="ui tiny button">
+                    
+                    Android Bitmap 优化(2) - 图片缓存
+                    
+                    <i class="angle right icon"></i></a>
+                
+            </div>
+        </div>
+    </div>
+
+</div>
+                
+            </div>
+
+            
+            <div class="three wide computer three wide tablet column">
+
+                <div class="ui sticky article-toc" id="article-toc">
+                    <!-- toc -->
+                    <ol class="ui ordered list"><li><a href="#一、git-命令使用大法："><span>一、git 命令使用大法：</span></a><ol><li><a href="#1-1-创建git本地仓库"><span>1.1 创建git本地仓库</span></a></li><li><a href="#1-2-提交文件到本地仓库"><span>1.2 提交文件到本地仓库</span></a></li><li><a href="#1-3-提交文件到github远程仓库"><span>1.3 提交文件到github远程仓库</span></a></li><li><a href="#1-4-从github远程仓库克隆到本地仓库"><span>1.4 从github远程仓库克隆到本地仓库</span></a></li><li><a href="#1-5-删除github远程仓库中的文件"><span>1.5 删除github远程仓库中的文件</span></a></li></ol></li><li><a href="#二、在Android-Studio中使用git"><span>二、在Android Studio中使用git</span></a><ol><li><a href="#2-1-在Android-Studio中上传项目到Github"><span>2.1 在Android Studio中上传项目到Github</span></a></li><li><a href="#2-2-从Github上将项目克隆到Android-studio"><span>2.2 从Github上将项目克隆到Android studio</span></a></li><li><a href="#2-3-在AS中编辑代码，并提交到github"><span>2.3 在AS中编辑代码，并提交到github</span></a><ol><li><a href="#2-3-1-右键点击改文件-gt-git-gt-Commit-File"><span>2.3.1 右键点击改文件 -> git -> Commit File</span></a></li><li><a href="#2-3-2-在弹出的窗口中，可以看到修改后和仓库的文件对比，以及输入提交的注释。选择commit-and-push，将会把它提交到github"><span>2.3.2 在弹出的窗口中，可以看到修改后和仓库的文件对比，以及输入提交的注释。选择commit and push，将会把它提交到github</span></a></li></ol></li></ol></li></ol>
+                </div>
+
+            </div>
+            
+
+        </div>
+    </div>
+</div>
+
+
+<!-- disqus start -->
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+<!-- following code is copied form hexo theme Next, thanks a lot -->
+
+var disqus_shortname = 'anany';
+var disqus_identifier = '2015/11/02/git/';
+var disqus_title = 'Git 使用大法';
+
+function run_disqus_script(disqus_script) {
+	var dsq = document.createElement('script');
+	dsq.type = 'text/javascript';
+	dsq.async = true;
+	dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+	(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}
+
+run_disqus_script('count.js');
+
+
+var disqus_config = function () {
+    this.page.url = disqus_url;
+    this.page.identifier = disqus_identifier;
+    this.page.title = disqus_title;
+};
+
+run_disqus_script('embed.js');
+
+
+
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                                
+<!-- disqus end -->
+
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        </div>
+        <div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <div class="ui inverted section divider"></div>
+        &copy; 2019 <a href="/">Anany</a>,
+        Powered by <a href="https://github.com/henryhuang/hexo-theme-aloha" target="_blank">Aloha</a> and <a href="http://hexo.io/" target="_blank">Hexo</a>.
+    </div>
+</div>
+
+    </div>
+
+
+
+
+<!-- scripts list from theme config.yml -->
+
+<script src="//cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+
+<script src="//cdn.bootcss.com/semantic-ui/2.2.4/semantic.min.js"></script>
+
+<script src="//cdn.bootcss.com/algoliasearch/3.18.1/algoliasearch.min.js"></script>
+
+<script src="//cdn.bootcss.com/algoliasearch-helper-js/2.13.0/algoliasearch.helper.min.js"></script>
+
+<script src="/js/semantic-ui-algolia.js"></script>
+
+<script src="/js/aloha-events.js"></script>
+
+
+
+</body>
+</html>

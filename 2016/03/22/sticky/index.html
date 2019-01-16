@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head prefix="og: http://ogp.me/ns#">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta name="description" content="you&#39;re here , there&#39;s nothing i fear …">
+    <title>EventBus sticky事件 | Anany&#39;s blog</title>
+
+    <!-- Open Graph -->
+    <meta name="description" content="相信会有人遇到过这种需求：启动应用进入到首页后，会有一个或若干个网络请求，请求网络获取数据后要更新View。如果此时网络访问有延时，这个时候进入到首页后，View更新便会造成画面更新的闪动，这样用户体验不太好。所以我们一般会引入一个 SplashActivity（启动页）来解决这个问题，将数据初始化操作先放到这里。">
+<meta name="keywords" content="Android,Eventbus">
+<meta property="og:type" content="article">
+<meta property="og:title" content="EventBus sticky事件">
+<meta property="og:url" content="https://zhujun2730.github.io/2016/03/22/sticky/index.html">
+<meta property="og:site_name" content="Anany&#39;s blog">
+<meta property="og:description" content="相信会有人遇到过这种需求：启动应用进入到首页后，会有一个或若干个网络请求，请求网络获取数据后要更新View。如果此时网络访问有延时，这个时候进入到首页后，View更新便会造成画面更新的闪动，这样用户体验不太好。所以我们一般会引入一个 SplashActivity（启动页）来解决这个问题，将数据初始化操作先放到这里。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/event_01.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/event_02.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/2016-03-22%2015_51_13.gif">
+<meta property="og:updated_time" content="2017-04-23T16:17:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="EventBus sticky事件">
+<meta name="twitter:description" content="相信会有人遇到过这种需求：启动应用进入到首页后，会有一个或若干个网络请求，请求网络获取数据后要更新View。如果此时网络访问有延时，这个时候进入到首页后，View更新便会造成画面更新的闪动，这样用户体验不太好。所以我们一般会引入一个 SplashActivity（启动页）来解决这个问题，将数据初始化操作先放到这里。">
+<meta name="twitter:image" content="http://7xijtp.com1.z0.glb.clouddn.com/event_01.png">
+
+    <script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Person",
+  "email": "mailto:",
+  "image": "",
+  "name": "Anany",
+  "url": "https://zhujun2730.github.io"
+}
+</script>
+    <script>
+    var algoliaEnabled = false;
+    
+</script>
+
+    
+
+    
+    
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+    
+    
+    
+        <!-- stylesheets list from config.yml -->
+        
+        <link rel="stylesheet" href="/css/aloha.css">
+        
+        <link rel="stylesheet" href="//cdn.bootcss.com/semantic-ui/2.2.4/semantic.min.css">
+        
+        <link rel="stylesheet" href="//cdn.bootcss.com/magnific-popup.js/1.1.0/magnific-popup.min.css">
+        
+    
+
+</head>
+<body id="body" style="margin-bottom: 0;" class="pushable">
+
+    <div class="ui top fixed menu">
+        <a class="item" id="menu-icon"><i class="sidebar icon"></i></a>
+    </div>
+
+    <div id="menu-sidebar" class="ui left vertical sidebar menu">
+
+    <div id="sidebar-top">
+        <div class="content">
+            <h3>Anany&#39;s blog</h3>
+        </div>
+    </div>
+    <div class="ui container sidebar-card">
+    <div class="ui people shape content">
+        <div class="active side">
+            <div class="ui card">
+                <div class="image">
+                    <img class="ui medium bordered image" src="/images/avatar.jpg">
+                </div>
+                <div class="content">
+                    <a class="header">Anany</a>
+                    
+                        <div class="meta">
+                            水可载舟，亦可赛艇
+                        </div>
+                    
+                </div>
+                <div class="extra content">
+                    <div class="ui list">
+                        
+                        <div class="item">
+                            <i class="marker icon" style="float: left"></i>
+                            <div class="content">Shenzhen</div>
+                        </div>
+                        
+                        
+                    </div>
+
+                </div>
+                <div class="extra content">
+                    <div class="ui list">
+                        
+
+                                <a href="https://github.com/zhujun2730"><i class="large github icon" style="float: left"></i></a>
+
+                            
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+    
+    
+
+    
+
+    
+    <a href="/index.html" class="item">
+        <i class="home icon"></i>
+        首页
+    </a>
+
+    
+    
+
+    
+
+    
+    <a href="/about/index.html" class="item">
+        <i class="info icon"></i>
+        关于
+    </a>
+
+    
+
+    
+</div>
+
+    <div class="pusher body-content">
+        <div id="content" class="ui main container">
+            <!--<div class="ui one column grid">-->
+                <!--<div class="column">-->
+                    <!--<div class="ui main container">-->
+                        <div id="post-sticky" class="ui main container article-type-post">
+
+    
+
+    <div class="ui divided grid">
+
+        <div class="two column row" id="article-content">
+
+            <div class="thirteen wide computer thirteen wide tablet sixteen wide mobile column">
+                
+
+<h1 class="ui header">
+    
+    EventBus sticky事件
+</h1>
+
+
+
+                <div class="article-inner">
+
+                    <div class="article-entry" itemprop="articleBody">
+                        
+                        <html><head><meta name="generator" content="Hexo 3.8.0"></head><body><p>&#x76F8;&#x4FE1;&#x4F1A;&#x6709;&#x4EBA;&#x9047;&#x5230;&#x8FC7;&#x8FD9;&#x79CD;&#x9700;&#x6C42;&#xFF1A;&#x542F;&#x52A8;&#x5E94;&#x7528;&#x8FDB;&#x5165;&#x5230;&#x9996;&#x9875;&#x540E;&#xFF0C;&#x4F1A;&#x6709;&#x4E00;&#x4E2A;&#x6216;&#x82E5;&#x5E72;&#x4E2A;&#x7F51;&#x7EDC;&#x8BF7;&#x6C42;&#xFF0C;&#x8BF7;&#x6C42;&#x7F51;&#x7EDC;&#x83B7;&#x53D6;&#x6570;&#x636E;&#x540E;&#x8981;&#x66F4;&#x65B0;View&#x3002;&#x5982;&#x679C;&#x6B64;&#x65F6;&#x7F51;&#x7EDC;&#x8BBF;&#x95EE;&#x6709;&#x5EF6;&#x65F6;&#xFF0C;&#x8FD9;&#x4E2A;&#x65F6;&#x5019;&#x8FDB;&#x5165;&#x5230;&#x9996;&#x9875;&#x540E;&#xFF0C;View&#x66F4;&#x65B0;&#x4FBF;&#x4F1A;&#x9020;&#x6210;&#x753B;&#x9762;&#x66F4;&#x65B0;&#x7684;&#x95EA;&#x52A8;&#xFF0C;&#x8FD9;&#x6837;&#x7528;&#x6237;&#x4F53;&#x9A8C;&#x4E0D;&#x592A;&#x597D;&#x3002;&#x6240;&#x4EE5;&#x6211;&#x4EEC;&#x4E00;&#x822C;&#x4F1A;&#x5F15;&#x5165;&#x4E00;&#x4E2A; SplashActivity&#xFF08;&#x542F;&#x52A8;&#x9875;&#xFF09;&#x6765;&#x89E3;&#x51B3;&#x8FD9;&#x4E2A;&#x95EE;&#x9898;&#xFF0C;&#x5C06;&#x6570;&#x636E;&#x521D;&#x59CB;&#x5316;&#x64CD;&#x4F5C;&#x5148;&#x653E;&#x5230;&#x8FD9;&#x91CC;&#x3002;<a id="more"></a></p>
+<p>&#x90A3;&#x4E48;&#xFF0C;&#x73B0;&#x5728;&#x95EE;&#x9898;&#x6765;&#x4E86;&#xFF1A;<strong>&#x5728; SplashActivity &#x6267;&#x884C;&#x4E00;&#x4E2A;&#x540E;&#x53F0;&#x8BF7;&#x6C42;&#x7F51;&#x7EDC;&#x83B7;&#x53D6;&#x6570;&#x636E;&#x7684;&#x64CD;&#x4F5C;&#xFF0C;&#x53C8;&#x600E;&#x4E48;&#x5C06;&#x6570;&#x636E;&#x53D1;&#x9001;&#x5230;&#x9996;&#x9875; MainActivity &#x5462;&#xFF1F;</strong></p>
+<ul class="ui list">
+<li><p>1.&#x7528;&#x5E7F;&#x64AD; &#xFF1F;&#x5047;&#x5982; MainActivity &#x8FD8;&#x6CA1;&#x6709; onCreate &#xFF0C;SplashActivity &#x5C31;&#x53D1;&#x9001;&#x6570;&#x636E;&#x5230; MainActivity&#xFF0C;&#x5E7F;&#x64AD;&#x8FD8;&#x80FD;&#x6536;&#x5230;&#x6D88;&#x606F;&#x4E48; &#xFF1F;</p>
+</li>
+<li><p>2.&#x7528;Sticky Broadcast &#xFF1F;&#x55EF;&#xFF0C;&#x53EF;&#x4EE5;&#x7684;&#x3002;Sticky Broadcast&#x53EF;&#x4EE5;&#x5728;&#x5E7F;&#x64AD;&#x53D1;&#x9001;&#x7ED3;&#x675F;&#x540E;&#x4FDD;&#x5B58;&#x521A;&#x521A;&#x53D1;&#x9001;&#x7684;&#x5E7F;&#x64AD;&#xFF08;Intent&#xFF09;&#xFF0C;&#x8FD9;&#x6837;&#x5F53;&#x63A5;&#x6536;&#x8005;&#x6CE8;&#x518C;&#x5B8C;Receiver&#x540E;&#x5C31;&#x53EF;&#x4EE5;&#x63A5;&#x6536;&#x5230;&#x521A;&#x624D;&#x5DF2;&#x7ECF;&#x53D1;&#x5E03;&#x7684;&#x5E7F;&#x64AD;&#x3002;</p>
+<p>OK&#xFF0C;&#x95EE;&#x9898;&#x5DF2;&#x7ECF;&#x5DEE;&#x4E0D;&#x591A;&#x89E3;&#x51B3;&#x4E86;&#x3002;&#x4F46;&#x662F;&#xFF0C;&#x7528;&#x5E7F;&#x64AD;&#x4F1A;&#x4E0D;&#x4F1A;&#x672A;&#x514D;&#x592A;&#x91CD;&#x4E86;&#xFF1F;</p>
+</li>
+</ul>
+<p>&#x5728;&#x8FD9;&#x91CC;&#xFF0C;&#x6211;&#x65E0;&#x60C5;&#x5B89;&#x5229;&#x4E00;&#x4E2A;&#x975E;&#x5E38;&#x597D;&#x7528;&#x7684;&#x6846;&#x67B6;EventBus&#x3002;&#x5B83;&#x53EF;&#x4EE5;&#x5F88;&#x65B9;&#x4FBF;&#x7684;&#x53D1;&#x9001;&#x4E00;&#x79CD; sticky &#x4E8B;&#x4EF6;&#xFF0C;&#x5C31;&#x53EF;&#x4EE5;&#x5B9E;&#x73B0;&#x7C98;&#x6027;&#x5E7F;&#x64AD;&#x7684;&#x6548;&#x679C;&#x3002;&#x5728; SplashActivity &#x53D1;&#x9001;sticky &#x4E8B;&#x4EF6;&#x65F6;&#xFF0C;EventBus &#x4F1A;&#x5148;&#x5B58;&#x50A8;&#x8FD9;&#x4E2A; sticky &#x4E8B;&#x4EF6;&#xFF0C;&#x5F53;&#x63A5;&#x6536;&#x4E8B;&#x4EF6;&#x7AEF; MainActivity &#x52A0;&#x8F7D;&#x5B8C;&#x6210;&#x7684;&#x65F6;&#x5019;&#xFF0C;&#x4FBF;&#x4F1A;&#x54CD;&#x5E94;&#x8FD9;&#x4E2A; sticky &#x4E8B;&#x4EF6;&#x3002;</p>
+<h3 id="&#x4E8C;&#x3001;&#x4E3A;&#x4F55;&#x8981;&#x5B89;&#x5229;EventBus&#xFF1A;"><a href="#&#x4E8C;&#x3001;&#x4E3A;&#x4F55;&#x8981;&#x5B89;&#x5229;EventBus&#xFF1A;" class="headerlink" title="&#x4E8C;&#x3001;&#x4E3A;&#x4F55;&#x8981;&#x5B89;&#x5229;EventBus&#xFF1A;"></a>&#x4E8C;&#x3001;&#x4E3A;&#x4F55;&#x8981;&#x5B89;&#x5229;EventBus&#xFF1A;</h3><p>&#x5728;&#x4F7F;&#x7528;EventBus&#x65F6;&#xFF0C;&#x5B8C;&#x5168;&#x4E0D;&#x9700;&#x8981;&#x518D;&#x914D;&#x7F6E;&#x5176;&#x4ED6;&#x4E1C;&#x897F;&#xFF0C;&#x4F8B;&#x5982;&#x5728;Application&#x914D;&#x7F6E;&#x4EC0;&#x4E48;&#x3002;&#x800C;&#x4E14;&#x53D1;&#x9001;&#x4E8B;&#x4EF6;&#x7684;&#x65F6;&#x5019;&#x5B8C;&#x5168;&#x4E0D;&#x7528;&#x7BA1;&#x63A5;&#x6536;&#x4E8B;&#x4EF6;&#x7AEF;&#x662F;&#x4EC0;&#x4E48;&#xFF0C;&#x4E5F;&#x4E0D;&#x9700;&#x8981;&#x7ED1;&#x5B9A;&#x63A5;&#x6536;&#x4E8B;&#x4EF6;&#x7AEF;&#x3002;&#x9AD8;&#x5EA6;&#x89E3;&#x8026;&#xFF0C;&#x800C;&#x4E14;&#x5728;&#x67D0;&#x4E9B;&#x573A;&#x5408;&#x975E;&#x5E38;&#x4FBF;&#x5229;&#xFF1A;&#x6BD4;&#x5982;activity&#x5404;&#x79CD;&#x8DF3;&#x8F6C;&#x8FD4;&#x56DE;&#x7684;&#x5904;&#x7406;&#x3001;activity &#x548C; &#x591A;&#x7EA7;&#x5D4C;&#x5957; fragment &#x4E4B;&#x95F4;&#x7684;&#x6570;&#x636E;&#x4F20;&#x9012;&#x3002;&#x5982;&#x6B64;&#x4F18;&#x79C0;&#x7684;&#x6846;&#x67B6;&#x4FBF;&#x6210;&#x4E3A;&#x4E86;&#x6211;&#x5B89;&#x5229;&#x7684;&#x7406;&#x7531;&#x3002;</p>
+<h3 id="&#x4E09;&#x3001;EventBus-&#x7684;&#x7B80;&#x5355;&#x4ECB;&#x7ECD;"><a href="#&#x4E09;&#x3001;EventBus-&#x7684;&#x7B80;&#x5355;&#x4ECB;&#x7ECD;" class="headerlink" title="&#x4E09;&#x3001;EventBus &#x7684;&#x7B80;&#x5355;&#x4ECB;&#x7ECD;:"></a>&#x4E09;&#x3001;EventBus &#x7684;&#x7B80;&#x5355;&#x4ECB;&#x7ECD;:</h3><p>1.&#x6DFB;&#x52A0;eventbus&#x4F9D;&#x8D56;</p>
+<blockquote>
+<p>compile &#x2018;de.greenrobot:eventbus:2.4.0&#x2019;</p>
+</blockquote>
+<p>2.EventBus &#x7684;&#x4F7F;&#x7528;&#x975E;&#x5E38;&#x7B80;&#x5355;&#xFF0C;&#x4E00;&#x822C;&#x53EA;&#x9700;&#x8981;&#x7528;&#x5230;&#x8FD9;3&#x4E2A;&#x65B9;&#x6CD5;&#x3002;</p>
+<ul class="ui list">
+<li>EventBus.getDefault().post(object); // &#x53D1;&#x5E03;&#x4E8B;&#x4EF6;</li>
+<li>EventBus.getDefault().register(this); // &#x8BA2;&#x9605;&#x4E8B;&#x4EF6;</li>
+<li>EventBus.getDefault().unregister(this); // &#x53D6;&#x6D88;&#x8BA2;&#x9605;</li>
+</ul>
+<p>&#x53D1;&#x9001;&#x7AEF;&#x53EA;&#x9700;&#x8981;&#x76F4;&#x63A5;&#x53D1;&#x9001;&#x4E8B;&#x4EF6;&#x3002;<br>&#x63A5;&#x6536;&#x4E8B;&#x4EF6;&#x7AEF;&#xFF1A;<br>    1&#x3001;&#x5FC5;&#x987B;&#x8BA2;&#x9605;&#x4E8B;&#x4EF6;&#x3001;&#x53D6;&#x6D88;&#x8BA2;&#x9605;<br>    2&#x3001;&#x63D0;&#x4F9B;&#x5904;&#x7406;&#x4E8B;&#x4EF6;&#x7684;&#x65B9;&#x6CD5;&#xFF08;eventbus3.0&#x540E;&#x9700;&#x8981;&#x5728;&#x65B9;&#x6CD5;&#x540D;&#x524D;&#x52A0;&#x6CE8;&#x89E3;&#xFF09;</p>
+<p>&#x5728;&#x8FD9;&#x91CC;&#x6211;&#x7B80;&#x5355;&#x753B;&#x4E00;&#x4E2A;&#x56FE;&#x6765;&#x4ECB;&#x7ECD;&#x4F7F;&#x7528;&#x65B9;&#x6CD5;&#x5427;&#xFF1A;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/event_01.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/event_01.png" alt="" class="ui centered image"></a></p>
+<p><strong>&#x5B9E;&#x9645;&#x4E0A;&#xFF0C;EventBus&#x662F;&#x57FA;&#x4E8E;&#x4E8B;&#x4EF6;&#x603B;&#x7EBF;&#x578B;&#x7684;&#x8BBE;&#x8BA1;&#xFF0C;&#x5C06;&#x4E8B;&#x4EF6;&#x90FD;&#x7EDF;&#x4E00;&#x53D1;&#x9001;&#x5230;&#x4E86;EventBus&#x603B;&#x7EBF;&#x5904;&#xFF0C;&#x7136;&#x540E;&#x518D;&#x7531;EventBus&#x5206;&#x53D1;&#x5230;&#x4E8B;&#x4EF6;&#x63A5;&#x6536;&#x5904;&#x3002;</strong><br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/event_02.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/event_02.png" alt="" class="ui centered image"></a></p>
+<h3 id="&#x56DB;&#x3001;EventBus-&#x5B9E;&#x8DF5;-&#x3010;&#x53D1;&#x9001;sticky&#x4E8B;&#x4EF6;&#x3011;"><a href="#&#x56DB;&#x3001;EventBus-&#x5B9E;&#x8DF5;-&#x3010;&#x53D1;&#x9001;sticky&#x4E8B;&#x4EF6;&#x3011;" class="headerlink" title="&#x56DB;&#x3001;EventBus &#x5B9E;&#x8DF5; &#x3010;&#x53D1;&#x9001;sticky&#x4E8B;&#x4EF6;&#x3011;:"></a>&#x56DB;&#x3001;EventBus &#x5B9E;&#x8DF5; &#x3010;&#x53D1;&#x9001;sticky&#x4E8B;&#x4EF6;&#x3011;:</h3><p>&#x5728; SplashActivity &#x4E2D;&#x9694;3&#x79D2;&#x540E;&#x542F;&#x52A8; MainActivity&#x3002;&#x5728;&#x8FD9;&#x91CC;&#x6A21;&#x62DF;&#x4E00;&#x4E2A;&#x7EBF;&#x7A0B;&#x6D88;&#x8017;1&#x79D2;&#x949F;&#x83B7;&#x53D6;&#x5230;&#x6570;&#x636E;&#x540E;&#x53D1;&#x9001;sticky&#x4E8B;&#x4EF6;&#x51FA;&#x53BB;&#x3002;&#x3010;&#x5047;&#x5982;&#x4E0D;&#x7528;sticky&#x4E8B;&#x4EF6;&#xFF0C;&#x5219;&#x4E8B;&#x4EF6;&#x63A5;&#x6536;&#x7AEF;&#x7531;&#x4E8E;&#x8FD8;&#x6CA1;&#x6709;&#x521D;&#x59CB;&#x5316;&#xFF0C;&#x63A5;&#x6536;&#x7AEF;&#x5C06;&#x6C38;&#x8FDC;&#x6536;&#x4E0D;&#x5230;&#x6D88;&#x606F;&#x3002;&#x3011;</p>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SplashActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>{</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>{</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_splash);</span><br><span class="line">	</span><br><span class="line">        <span class="keyword">new</span> Handler().postDelayed(<span class="keyword">new</span> Runnable() {</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>{</span><br><span class="line">                startActivity(<span class="keyword">new</span> Intent(SplashActivity.<span class="keyword">this</span>,MainActivity.class));</span><br><span class="line">            }</span><br><span class="line">        },<span class="number">3000</span>);</span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">        <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() {</span><br><span class="line">	</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>{</span><br><span class="line">                SystemClock.sleep(<span class="number">1000</span>);</span><br><span class="line">                EventBus.getDefault().postSticky(<span class="keyword">new</span> String(<span class="string">&quot;hello&quot;</span>));</span><br><span class="line">            }</span><br><span class="line">	</span><br><span class="line">        }).start();</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<p>&#x5728; MainActivity &#x4E2D;&#x63A5;&#x6536;&#x4E8B;&#x4EF6;&#x3002;&#x5728;&#x8FD9;&#x91CC;&#x9700;&#x8981;&#x6CE8;&#x610F;&#x7684;&#x662F;&#xFF1A;EventBus.getDefault().registerSticky(this);&#x4E00;&#x5B9A;&#x8981;&#x653E;&#x5728;&#x63A7;&#x4EF6;&#x521D;&#x59CB;&#x5316;&#x4E4B;&#x540E;&#x3002;&#x56E0;&#x4E3A;&#xFF0C;&#x8FD9;&#x53E5;&#x8BDD;&#x6267;&#x884C;&#x7684;&#x65F6;&#x5019;&#xFF0C;&#x5C31;&#x4F1A;&#x53BB;&#x8C03;&#x7528;onEventMainThread&#x65B9;&#x6CD5;&#xFF0C;&#x5982;&#x679C;&#x5728;&#x63A7;&#x4EF6;&#x521D;&#x59CB;&#x5316;&#x4E4B;&#x524D;&#xFF0C;&#x5219;&#x4F1A;&#x62A5;&#x63A7;&#x4EF6;TextView&#x7A7A;&#x6307;&#x9488;&#x3002;</p>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>{</span><br><span class="line">	</span><br><span class="line">    <span class="keyword">private</span> TextView mTextView;</span><br><span class="line">	</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>{</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_main);</span><br><span class="line">        mTextView = (TextView) findViewById(R.id.text);</span><br><span class="line">	</span><br><span class="line">        EventBus.getDefault().registerSticky(<span class="keyword">this</span>);</span><br><span class="line">    }</span><br><span class="line">	</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onStart</span><span class="params">()</span> </span>{</span><br><span class="line">        <span class="keyword">super</span>.onStart();</span><br><span class="line">	</span><br><span class="line">    }</span><br><span class="line">	</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>{</span><br><span class="line">        <span class="keyword">super</span>.onDestroy();</span><br><span class="line">        EventBus.getDefault().unregister(<span class="keyword">this</span>);</span><br><span class="line">    }</span><br><span class="line">	</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onEventMainThread</span><span class="params">(String event)</span> </span>{</span><br><span class="line">        mTextView.setText(event);</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<p>demo&#x8FD0;&#x884C;&#x6548;&#x679C;&#x56FE;&#xFF1A;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/2016-03-22%2015_51_13.gif"><img src="http://7xijtp.com1.z0.glb.clouddn.com/2016-03-22%2015_51_13.gif" alt="" class="ui centered image"></a></p>
+</body></html>
+                        
+                    </div>
+
+                    
+                    
+                    
+
+                    <div class="description post-description">
+    <span class="post-description-item">
+        <time datetime="2016-03-22T02:07:23.000Z" itemprop="datePublished">2016-03-22</time>
+
+    </span>
+    <span class="post-description-item">
+        
+
+    <span>
+        <i class="tags icon"></i>
+    </span>
+
+    
+    <span class="ui tiny label">
+        <a href="/tags/Android/">Android</a>
+    </span>
+
+    
+    <span class="ui tiny label">
+        <a href="/tags/Eventbus/">Eventbus</a>
+    </span>
+
+    
+
+    </span>
+</div>
+
+                </div>
+                
+                <div id="pagination" class="nav-web ui text container pagination">
+
+    <div class="ui stackable two column divided grid container">
+        <div class="row">
+            <div class="column nav-left">
+                
+
+                <a href="/2016/12/06/2016-12-7-js/" class="ui tiny button">
+
+                    <i class="angle left icon"></i>
+                    
+                    Android 往 HTML 中注入JavaScript代码
+                    
+
+                </a>
+
+                
+            </div>
+            <div class="column nav-right">
+                
+
+                <a href="/2015/11/08/touchevent/" class="ui tiny button">
+                    
+                    Android ViewGroup/View 事件分发机制详解
+                    
+                    <i class="angle right icon"></i></a>
+                
+            </div>
+        </div>
+    </div>
+
+</div>
+                
+            </div>
+
+            
+            <div class="three wide computer three wide tablet column">
+
+                <div class="ui sticky article-toc" id="article-toc">
+                    <!-- toc -->
+                    <ol class="ui ordered list"><li><a href="#二、为何要安利EventBus："><span>二、为何要安利EventBus：</span></a></li><li><a href="#三、EventBus-的简单介绍"><span>三、EventBus 的简单介绍:</span></a></li><li><a href="#四、EventBus-实践-【发送sticky事件】"><span>四、EventBus 实践 【发送sticky事件】:</span></a></li></ol>
+                </div>
+
+            </div>
+            
+
+        </div>
+    </div>
+</div>
+
+
+<!-- disqus start -->
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+<!-- following code is copied form hexo theme Next, thanks a lot -->
+
+var disqus_shortname = 'anany';
+var disqus_identifier = '2016/03/22/sticky/';
+var disqus_title = 'EventBus sticky事件';
+
+function run_disqus_script(disqus_script) {
+	var dsq = document.createElement('script');
+	dsq.type = 'text/javascript';
+	dsq.async = true;
+	dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+	(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}
+
+run_disqus_script('count.js');
+
+
+var disqus_config = function () {
+    this.page.url = disqus_url;
+    this.page.identifier = disqus_identifier;
+    this.page.title = disqus_title;
+};
+
+run_disqus_script('embed.js');
+
+
+
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                                
+<!-- disqus end -->
+
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        </div>
+        <div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <div class="ui inverted section divider"></div>
+        &copy; 2019 <a href="/">Anany</a>,
+        Powered by <a href="https://github.com/henryhuang/hexo-theme-aloha" target="_blank">Aloha</a> and <a href="http://hexo.io/" target="_blank">Hexo</a>.
+    </div>
+</div>
+
+    </div>
+
+
+
+
+<!-- scripts list from theme config.yml -->
+
+<script src="//cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+
+<script src="//cdn.bootcss.com/semantic-ui/2.2.4/semantic.min.js"></script>
+
+<script src="//cdn.bootcss.com/algoliasearch/3.18.1/algoliasearch.min.js"></script>
+
+<script src="//cdn.bootcss.com/algoliasearch-helper-js/2.13.0/algoliasearch.helper.min.js"></script>
+
+<script src="/js/semantic-ui-algolia.js"></script>
+
+<script src="/js/aloha-events.js"></script>
+
+
+
+</body>
+</html>

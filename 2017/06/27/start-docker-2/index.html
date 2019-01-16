@@ -1,0 +1,337 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head prefix="og: http://ogp.me/ns#">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta name="description" content="you&#39;re here , there&#39;s nothing i fear …">
+    <title>Docker 初体验 (2) - docker tomcat 部署本地 war 包项目 | Anany&#39;s blog</title>
+
+    <!-- Open Graph -->
+    <meta name="description" content="上一节我们提到了 docker 的初步安装和运行的方法，这一节我们将实战 tomcat 部署本地打的一 个 war 包，然后并运行起来。">
+<meta name="keywords" content="docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker 初体验 (2) - docker tomcat 部署本地 war 包项目">
+<meta property="og:url" content="https://zhujun2730.github.io/2017/06/27/start-docker-2/index.html">
+<meta property="og:site_name" content="Anany&#39;s blog">
+<meta property="og:description" content="上一节我们提到了 docker 的初步安装和运行的方法，这一节我们将实战 tomcat 部署本地打的一 个 war 包，然后并运行起来。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ooo.0o0.ooo/2017/07/03/595a068e9d15c.png">
+<meta property="og:image" content="https://ooo.0o0.ooo/2017/07/03/595a0a35a4130.png">
+<meta property="og:image" content="https://ooo.0o0.ooo/2017/07/03/595a0ab22c548.png">
+<meta property="og:image" content="https://ooo.0o0.ooo/2017/07/03/595a0b8cacef5.png">
+<meta property="og:updated_time" content="2017-07-12T03:11:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Docker 初体验 (2) - docker tomcat 部署本地 war 包项目">
+<meta name="twitter:description" content="上一节我们提到了 docker 的初步安装和运行的方法，这一节我们将实战 tomcat 部署本地打的一 个 war 包，然后并运行起来。">
+<meta name="twitter:image" content="https://ooo.0o0.ooo/2017/07/03/595a068e9d15c.png">
+
+    <script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Person",
+  "email": "mailto:",
+  "image": "",
+  "name": "Anany",
+  "url": "https://zhujun2730.github.io"
+}
+</script>
+    <script>
+    var algoliaEnabled = false;
+    
+</script>
+
+    
+
+    
+    
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+    
+    
+    
+        <!-- stylesheets list from config.yml -->
+        
+        <link rel="stylesheet" href="/css/aloha.css">
+        
+        <link rel="stylesheet" href="//cdn.bootcss.com/semantic-ui/2.2.4/semantic.min.css">
+        
+        <link rel="stylesheet" href="//cdn.bootcss.com/magnific-popup.js/1.1.0/magnific-popup.min.css">
+        
+    
+
+</head>
+<body id="body" style="margin-bottom: 0;" class="pushable">
+
+    <div class="ui top fixed menu">
+        <a class="item" id="menu-icon"><i class="sidebar icon"></i></a>
+    </div>
+
+    <div id="menu-sidebar" class="ui left vertical sidebar menu">
+
+    <div id="sidebar-top">
+        <div class="content">
+            <h3>Anany&#39;s blog</h3>
+        </div>
+    </div>
+    <div class="ui container sidebar-card">
+    <div class="ui people shape content">
+        <div class="active side">
+            <div class="ui card">
+                <div class="image">
+                    <img class="ui medium bordered image" src="/images/avatar.jpg">
+                </div>
+                <div class="content">
+                    <a class="header">Anany</a>
+                    
+                        <div class="meta">
+                            水可载舟，亦可赛艇
+                        </div>
+                    
+                </div>
+                <div class="extra content">
+                    <div class="ui list">
+                        
+                        <div class="item">
+                            <i class="marker icon" style="float: left"></i>
+                            <div class="content">Shenzhen</div>
+                        </div>
+                        
+                        
+                    </div>
+
+                </div>
+                <div class="extra content">
+                    <div class="ui list">
+                        
+
+                                <a href="https://github.com/zhujun2730"><i class="large github icon" style="float: left"></i></a>
+
+                            
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+    
+    
+
+    
+
+    
+    <a href="/index.html" class="item">
+        <i class="home icon"></i>
+        首页
+    </a>
+
+    
+    
+
+    
+
+    
+    <a href="/about/index.html" class="item">
+        <i class="info icon"></i>
+        关于
+    </a>
+
+    
+
+    
+</div>
+
+    <div class="pusher body-content">
+        <div id="content" class="ui main container">
+            <!--<div class="ui one column grid">-->
+                <!--<div class="column">-->
+                    <!--<div class="ui main container">-->
+                        <div id="post-start-docker-2" class="ui main container article-type-post">
+
+    
+
+    <div class="ui divided grid">
+
+        <div class="two column row" id="article-content">
+
+            <div class="thirteen wide computer thirteen wide tablet sixteen wide mobile column">
+                
+
+<h1 class="ui header">
+    
+    Docker 初体验 (2) - docker tomcat 部署本地 war 包项目
+</h1>
+
+
+
+                <div class="article-inner">
+
+                    <div class="article-entry" itemprop="articleBody">
+                        
+                        <html><head><meta name="generator" content="Hexo 3.8.0"></head><body><p>  &#x4E0A;&#x4E00;&#x8282;&#x6211;&#x4EEC;&#x63D0;&#x5230;&#x4E86; docker &#x7684;&#x521D;&#x6B65;&#x5B89;&#x88C5;&#x548C;&#x8FD0;&#x884C;&#x7684;&#x65B9;&#x6CD5;&#xFF0C;&#x8FD9;&#x4E00;&#x8282;&#x6211;&#x4EEC;&#x5C06;&#x5B9E;&#x6218; tomcat &#x90E8;&#x7F72;&#x672C;&#x5730;&#x6253;&#x7684;&#x4E00; &#x4E2A; war &#x5305;&#xFF0C;&#x7136;&#x540E;&#x5E76;&#x8FD0;&#x884C;&#x8D77;&#x6765;&#x3002;<br><a id="more"></a></p>
+<h2 id="&#x4E0B;&#x8F7D;-tomcat-&#x955C;&#x50CF;"><a href="#&#x4E0B;&#x8F7D;-tomcat-&#x955C;&#x50CF;" class="headerlink" title="&#x4E0B;&#x8F7D; tomcat &#x955C;&#x50CF;"></a>&#x4E0B;&#x8F7D; tomcat &#x955C;&#x50CF;</h2><figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull tomcat</span><br></pre></td></tr></tbody></table></figure>
+<h2 id="&#x8FD0;&#x884C;-tomcat-&#x5BB9;&#x5668;"><a href="#&#x8FD0;&#x884C;-tomcat-&#x5BB9;&#x5668;" class="headerlink" title="&#x8FD0;&#x884C; tomcat &#x5BB9;&#x5668;"></a>&#x8FD0;&#x884C; tomcat &#x5BB9;&#x5668;</h2><figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// &#x8FD0;&#x884C;&#x4E00;&#x4E2A; name &#x4E3A; mytomcat &#x7684; tomcat &#x5BB9;&#x5668;</span></span><br><span class="line">docker run --name mytomcat -p <span class="number">8083</span>:<span class="number">8080</span> tomcat</span><br></pre></td></tr></tbody></table></figure>
+<p>// &#x6709;&#x5173; docker &#x7684;&#x7AEF;&#x53E3;&#x6620;&#x5C04;&#xFF1A;&#x5DE6;&#x8FB9; 8083 &#x662F; docker &#x66B4;&#x9732;&#x7ED9;&#x672C;&#x5730;&#x7684;&#x7AEF;&#x53E3;&#xFF0C;&#x53F3;&#x8FB9;&#x662F; docker tomcat &#x5B9E;&#x4F8B;&#x8FD0;&#x884C;&#x7684;&#x7AEF;&#x53E3;(&#x5982;&#x679C;&#x4E0D;&#x66F4;&#x6539; tomcat &#x7AEF;&#x53E3;&#x7684;&#x8BDD;&#x9ED8;&#x8BA4;&#x5FC5;&#x987B;&#x6307;&#x5B9A;&#x4E3A;8080&#xFF0C;&#x5426;&#x5219;&#x65E0;&#x6CD5;&#x8BBF;&#x95EE;)</p>
+<p>&#x7136;&#x540E;&#x5728;&#x6D4F;&#x89C8;&#x5668;&#x8F93;&#x5165; localhost:8083 &#x5C31;&#x53EF;&#x4EE5;&#x8BBF;&#x95EE;&#x5230; tomcat&#x4E86;<br><a class="magnific-img" href="https://ooo.0o0.ooo/2017/07/03/595a068e9d15c.png"><img src="https://ooo.0o0.ooo/2017/07/03/595a068e9d15c.png" alt="" class="ui centered image"></a></p>
+<h3 id="&#x6253;&#x5305;-war-&#x5305;"><a href="#&#x6253;&#x5305;-war-&#x5305;" class="headerlink" title="&#x6253;&#x5305; war &#x5305;"></a>&#x6253;&#x5305; war &#x5305;</h3><p>&#x8FD9;&#x91CC;&#x4ECB;&#x7ECD;&#x7684;&#x662F;&#x7528; Intellij idea &#x7684;&#x6253;&#x5305;&#x65B9;&#x5F0F;&#xFF1A;</p>
+<p>&#x4E00;&#x3001;maven &#x9879;&#x76EE;&#x6253;&#x5305; war&#xFF1A;<br>1.&#x5728; pom.xml &#x4E2D;&#x66F4;&#x6539;&#x6253;&#x5305;&#x65B9;&#x5F0F;&#x4E3A; war<br></p><figure class="highlight xml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">packaging</span>&gt;</span>war<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>2.&#x6267;&#x884C; mvn package &#x547D;&#x4EE4;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn <span class="keyword">package</span></span><br></pre></td></tr></tbody></table></figure><p></p>
+<h2 id="&#x4E0A;&#x4F20;-war-&#x5305;&#x5230;-docker-tomcat-&#x5BB9;&#x5668;"><a href="#&#x4E0A;&#x4F20;-war-&#x5305;&#x5230;-docker-tomcat-&#x5BB9;&#x5668;" class="headerlink" title="&#x4E0A;&#x4F20; war &#x5305;&#x5230; docker tomcat &#x5BB9;&#x5668;"></a>&#x4E0A;&#x4F20; war &#x5305;&#x5230; docker tomcat &#x5BB9;&#x5668;</h2><h3 id="&#x67E5;&#x770B;-tomcat-&#x5728;-docker-&#x4E0B;&#x7684;&#x76EE;&#x5F55;"><a href="#&#x67E5;&#x770B;-tomcat-&#x5728;-docker-&#x4E0B;&#x7684;&#x76EE;&#x5F55;" class="headerlink" title="&#x67E5;&#x770B; tomcat &#x5728; docker &#x4E0B;&#x7684;&#x76EE;&#x5F55;"></a>&#x67E5;&#x770B; tomcat &#x5728; docker &#x4E0B;&#x7684;&#x76EE;&#x5F55;</h3><figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it mytomcat /bin/bash</span><br></pre></td></tr></tbody></table></figure>
+<p><a class="magnific-img" href="https://ooo.0o0.ooo/2017/07/03/595a0a35a4130.png"><img src="https://ooo.0o0.ooo/2017/07/03/595a0a35a4130.png" alt="" class="ui centered image"></a></p>
+<p>&#x53EF;&#x4EE5;&#x770B;&#x5230;&#xFF0C;tomcat &#x7684;&#x9879;&#x76EE;&#x76EE;&#x5F55;&#x662F;&#x4F4D;&#x4E8E; /usr/local/tomcat/webapps</p>
+<h3 id="&#x590D;&#x5236;-war-&#x5305;&#x5230;-docker-tomcat-&#x76EE;&#x5F55;"><a href="#&#x590D;&#x5236;-war-&#x5305;&#x5230;-docker-tomcat-&#x76EE;&#x5F55;" class="headerlink" title="&#x590D;&#x5236; war &#x5305;&#x5230; docker tomcat &#x76EE;&#x5F55;"></a>&#x590D;&#x5236; war &#x5305;&#x5230; docker tomcat &#x76EE;&#x5F55;</h3><figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker cp /Users/anany/Project/xxx.war mytomcat:/usr/local/tomcat/webapps</span><br></pre></td></tr></tbody></table></figure>
+<p><a class="magnific-img" href="https://ooo.0o0.ooo/2017/07/03/595a0ab22c548.png"><img src="https://ooo.0o0.ooo/2017/07/03/595a0ab22c548.png" alt="" class="ui centered image"></a></p>
+<h3 id="&#x91CD;&#x542F;-tomcat-&#xFF0C;&#x4FBF;&#x4F1A;&#x81EA;&#x52A8;&#x52A0;&#x538B;-war-&#x5305;&#x5E76;&#x8FD0;&#x884C;"><a href="#&#x91CD;&#x542F;-tomcat-&#xFF0C;&#x4FBF;&#x4F1A;&#x81EA;&#x52A8;&#x52A0;&#x538B;-war-&#x5305;&#x5E76;&#x8FD0;&#x884C;" class="headerlink" title="&#x91CD;&#x542F; tomcat &#xFF0C;&#x4FBF;&#x4F1A;&#x81EA;&#x52A8;&#x52A0;&#x538B; war &#x5305;&#x5E76;&#x8FD0;&#x884C;"></a>&#x91CD;&#x542F; tomcat &#xFF0C;&#x4FBF;&#x4F1A;&#x81EA;&#x52A8;&#x52A0;&#x538B; war &#x5305;&#x5E76;&#x8FD0;&#x884C;</h3><figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker restart mytomcat</span><br></pre></td></tr></tbody></table></figure>
+<p><a class="magnific-img" href="https://ooo.0o0.ooo/2017/07/03/595a0b8cacef5.png"><img src="https://ooo.0o0.ooo/2017/07/03/595a0b8cacef5.png" alt="" class="ui centered image"></a></p>
+<h2 id="&#x53C2;&#x8003;"><a href="#&#x53C2;&#x8003;" class="headerlink" title="&#x53C2;&#x8003;"></a>&#x53C2;&#x8003;</h2><p>&#x3010;1&#x3011;docker - &#x4ECE;&#x5B89;&#x88C5;&#x5230;&#x90E8;&#x7F72;&#x4E00;&#x4E2A;web&#x5E94;&#x7528;(go&#x3001;java) <a href="http://blog.csdn.net/jinzhencs/article/details/51373852" target="_blank" rel="noopener">http://blog.csdn.net/jinzhencs/article/details/51373852</a></p>
+</body></html>
+                        
+                    </div>
+
+                    
+                    
+                    
+
+                    <div class="description post-description">
+    <span class="post-description-item">
+        <time datetime="2017-06-27T08:42:11.000Z" itemprop="datePublished">2017-06-27</time>
+
+    </span>
+    <span class="post-description-item">
+        
+
+    <span>
+        <i class="tags icon"></i>
+    </span>
+
+    
+    <span class="ui tiny label">
+        <a href="/tags/docker/">docker</a>
+    </span>
+
+    
+
+    </span>
+</div>
+
+                </div>
+                
+                <div id="pagination" class="nav-web ui text container pagination">
+
+    <div class="ui stackable two column divided grid container">
+        <div class="row">
+            <div class="column nav-left">
+                
+
+                <a class="ui tiny button disabled"><i class="angle left icon"></i>前一篇</a>
+
+                
+            </div>
+            <div class="column nav-right">
+                
+
+                <a href="/2017/05/20/start-docker/" class="ui tiny button">
+                    
+                    Docker 初体验 (1) - 环境搭建，入门操作
+                    
+                    <i class="angle right icon"></i></a>
+                
+            </div>
+        </div>
+    </div>
+
+</div>
+                
+            </div>
+
+            
+            <div class="three wide computer three wide tablet column">
+
+                <div class="ui sticky article-toc" id="article-toc">
+                    <!-- toc -->
+                    <ol class="ui ordered list"><li><a href="#下载-tomcat-镜像"><span>下载 tomcat 镜像</span></a></li><li><a href="#运行-tomcat-容器"><span>运行 tomcat 容器</span></a><ol><li><a href="#打包-war-包"><span>打包 war 包</span></a></li></ol></li><li><a href="#上传-war-包到-docker-tomcat-容器"><span>上传 war 包到 docker tomcat 容器</span></a><ol><li><a href="#查看-tomcat-在-docker-下的目录"><span>查看 tomcat 在 docker 下的目录</span></a></li><li><a href="#复制-war-包到-docker-tomcat-目录"><span>复制 war 包到 docker tomcat 目录</span></a></li><li><a href="#重启-tomcat-，便会自动加压-war-包并运行"><span>重启 tomcat ，便会自动加压 war 包并运行</span></a></li></ol></li><li><a href="#参考"><span>参考</span></a></li></ol>
+                </div>
+
+            </div>
+            
+
+        </div>
+    </div>
+</div>
+
+
+<!-- disqus start -->
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+<!-- following code is copied form hexo theme Next, thanks a lot -->
+
+var disqus_shortname = 'anany';
+var disqus_identifier = '2017/06/27/start-docker-2/';
+var disqus_title = 'Docker 初体验 (2) - docker tomcat 部署本地 war 包项目';
+
+function run_disqus_script(disqus_script) {
+	var dsq = document.createElement('script');
+	dsq.type = 'text/javascript';
+	dsq.async = true;
+	dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+	(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}
+
+run_disqus_script('count.js');
+
+
+var disqus_config = function () {
+    this.page.url = disqus_url;
+    this.page.identifier = disqus_identifier;
+    this.page.title = disqus_title;
+};
+
+run_disqus_script('embed.js');
+
+
+
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                                
+<!-- disqus end -->
+
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        </div>
+        <div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <div class="ui inverted section divider"></div>
+        &copy; 2019 <a href="/">Anany</a>,
+        Powered by <a href="https://github.com/henryhuang/hexo-theme-aloha" target="_blank">Aloha</a> and <a href="http://hexo.io/" target="_blank">Hexo</a>.
+    </div>
+</div>
+
+    </div>
+
+
+
+
+<!-- scripts list from theme config.yml -->
+
+<script src="//cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+
+<script src="//cdn.bootcss.com/semantic-ui/2.2.4/semantic.min.js"></script>
+
+<script src="//cdn.bootcss.com/algoliasearch/3.18.1/algoliasearch.min.js"></script>
+
+<script src="//cdn.bootcss.com/algoliasearch-helper-js/2.13.0/algoliasearch.helper.min.js"></script>
+
+<script src="/js/semantic-ui-algolia.js"></script>
+
+<script src="/js/aloha-events.js"></script>
+
+
+
+</body>
+</html>

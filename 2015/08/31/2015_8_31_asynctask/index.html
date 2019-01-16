@@ -1,0 +1,411 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head prefix="og: http://ogp.me/ns#">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta name="description" content="you&#39;re here , there&#39;s nothing i fear …">
+    <title>Android AsyncTask(1)-使用方法和线程池解析 | Anany&#39;s blog</title>
+
+    <!-- Open Graph -->
+    <meta name="description" content="当我们在android开发中需要开N个线程的时候，很多人的做法是直接new N 个 Thread。这样做不但不利于线程管理、而且大量的线程没有得到释放将会消耗性能，而且一般的Thread是没有返回线程执行完毕的返回值的，我们在Android开发中可以通过handler来告诉主线程线程是否执行完毕了。其实，Google工程师已经为我们设计好了一套强大的异步任务管理类 - AsyncTask。那">
+<meta name="keywords" content="Android,AsyncTask">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android AsyncTask(1)-使用方法和线程池解析">
+<meta property="og:url" content="https://zhujun2730.github.io/2015/08/31/2015_8_31_asynctask/index.html">
+<meta property="og:site_name" content="Anany&#39;s blog">
+<meta property="og:description" content="当我们在android开发中需要开N个线程的时候，很多人的做法是直接new N 个 Thread。这样做不但不利于线程管理、而且大量的线程没有得到释放将会消耗性能，而且一般的Thread是没有返回线程执行完毕的返回值的，我们在Android开发中可以通过handler来告诉主线程线程是否执行完毕了。其实，Google工程师已经为我们设计好了一套强大的异步任务管理类 - AsyncTask。那">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/15_8_31_1.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/15_8_31_4.png?">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/15_8_31_12.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/2015-09-02%2017_36_03.gif">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/15_8_31_6.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/15_8_15_5.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/1.gif">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/3.gif">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/15_8_31_8.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/2015-09-01%2023_35_29.gif">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/4.gif">
+<meta property="og:updated_time" content="2016-12-08T09:25:42.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android AsyncTask(1)-使用方法和线程池解析">
+<meta name="twitter:description" content="当我们在android开发中需要开N个线程的时候，很多人的做法是直接new N 个 Thread。这样做不但不利于线程管理、而且大量的线程没有得到释放将会消耗性能，而且一般的Thread是没有返回线程执行完毕的返回值的，我们在Android开发中可以通过handler来告诉主线程线程是否执行完毕了。其实，Google工程师已经为我们设计好了一套强大的异步任务管理类 - AsyncTask。那">
+<meta name="twitter:image" content="http://7xijtp.com1.z0.glb.clouddn.com/15_8_31_1.png">
+
+    <script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Person",
+  "email": "mailto:",
+  "image": "",
+  "name": "Anany",
+  "url": "https://zhujun2730.github.io"
+}
+</script>
+    <script>
+    var algoliaEnabled = false;
+    
+</script>
+
+    
+
+    
+    
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+    
+    
+    
+        <!-- stylesheets list from config.yml -->
+        
+        <link rel="stylesheet" href="/css/aloha.css">
+        
+        <link rel="stylesheet" href="//cdn.bootcss.com/semantic-ui/2.2.4/semantic.min.css">
+        
+        <link rel="stylesheet" href="//cdn.bootcss.com/magnific-popup.js/1.1.0/magnific-popup.min.css">
+        
+    
+
+</head>
+<body id="body" style="margin-bottom: 0;" class="pushable">
+
+    <div class="ui top fixed menu">
+        <a class="item" id="menu-icon"><i class="sidebar icon"></i></a>
+    </div>
+
+    <div id="menu-sidebar" class="ui left vertical sidebar menu">
+
+    <div id="sidebar-top">
+        <div class="content">
+            <h3>Anany&#39;s blog</h3>
+        </div>
+    </div>
+    <div class="ui container sidebar-card">
+    <div class="ui people shape content">
+        <div class="active side">
+            <div class="ui card">
+                <div class="image">
+                    <img class="ui medium bordered image" src="/images/avatar.jpg">
+                </div>
+                <div class="content">
+                    <a class="header">Anany</a>
+                    
+                        <div class="meta">
+                            水可载舟，亦可赛艇
+                        </div>
+                    
+                </div>
+                <div class="extra content">
+                    <div class="ui list">
+                        
+                        <div class="item">
+                            <i class="marker icon" style="float: left"></i>
+                            <div class="content">Shenzhen</div>
+                        </div>
+                        
+                        
+                    </div>
+
+                </div>
+                <div class="extra content">
+                    <div class="ui list">
+                        
+
+                                <a href="https://github.com/zhujun2730"><i class="large github icon" style="float: left"></i></a>
+
+                            
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+    
+    
+
+    
+
+    
+    <a href="/index.html" class="item">
+        <i class="home icon"></i>
+        首页
+    </a>
+
+    
+    
+
+    
+
+    
+    <a href="/about/index.html" class="item">
+        <i class="info icon"></i>
+        关于
+    </a>
+
+    
+
+    
+</div>
+
+    <div class="pusher body-content">
+        <div id="content" class="ui main container">
+            <!--<div class="ui one column grid">-->
+                <!--<div class="column">-->
+                    <!--<div class="ui main container">-->
+                        <div id="post-2015_8_31_asynctask" class="ui main container article-type-post">
+
+    
+
+    <div class="ui divided grid">
+
+        <div class="two column row" id="article-content">
+
+            <div class="thirteen wide computer thirteen wide tablet sixteen wide mobile column">
+                
+
+<h1 class="ui header">
+    
+    Android AsyncTask(1)-使用方法和线程池解析
+</h1>
+
+
+
+                <div class="article-inner">
+
+                    <div class="article-entry" itemprop="articleBody">
+                        
+                        <html><head><meta name="generator" content="Hexo 3.8.0"></head><body><p>   &#x5F53;&#x6211;&#x4EEC;&#x5728;android&#x5F00;&#x53D1;&#x4E2D;&#x9700;&#x8981;&#x5F00;N&#x4E2A;&#x7EBF;&#x7A0B;&#x7684;&#x65F6;&#x5019;&#xFF0C;&#x5F88;&#x591A;&#x4EBA;&#x7684;&#x505A;&#x6CD5;&#x662F;&#x76F4;&#x63A5;new N &#x4E2A; Thread&#x3002;&#x8FD9;&#x6837;&#x505A;&#x4E0D;&#x4F46;&#x4E0D;&#x5229;&#x4E8E;&#x7EBF;&#x7A0B;&#x7BA1;&#x7406;&#x3001;&#x800C;&#x4E14;&#x5927;&#x91CF;&#x7684;&#x7EBF;&#x7A0B;&#x6CA1;&#x6709;&#x5F97;&#x5230;&#x91CA;&#x653E;&#x5C06;&#x4F1A;&#x6D88;&#x8017;&#x6027;&#x80FD;&#xFF0C;&#x800C;&#x4E14;&#x4E00;&#x822C;&#x7684;Thread&#x662F;&#x6CA1;&#x6709;&#x8FD4;&#x56DE;&#x7EBF;&#x7A0B;&#x6267;&#x884C;&#x5B8C;&#x6BD5;&#x7684;&#x8FD4;&#x56DE;&#x503C;&#x7684;&#xFF0C;&#x6211;&#x4EEC;&#x5728;Android&#x5F00;&#x53D1;&#x4E2D;&#x53EF;&#x4EE5;&#x901A;&#x8FC7;handler&#x6765;&#x544A;&#x8BC9;&#x4E3B;&#x7EBF;&#x7A0B;&#x7EBF;&#x7A0B;&#x662F;&#x5426;&#x6267;&#x884C;&#x5B8C;&#x6BD5;&#x4E86;&#x3002;&#x5176;&#x5B9E;&#xFF0C;Google&#x5DE5;&#x7A0B;&#x5E08;&#x5DF2;&#x7ECF;&#x4E3A;&#x6211;&#x4EEC;&#x8BBE;&#x8BA1;&#x597D;&#x4E86;&#x4E00;&#x5957;&#x5F3A;&#x5927;&#x7684;&#x5F02;&#x6B65;&#x4EFB;&#x52A1;&#x7BA1;&#x7406;&#x7C7B; - AsyncTask&#x3002;&#x90A3;&#x4E48;&#x5B83;&#x5230;&#x5E95;&#x5F3A;&#x5927;&#x5728;&#x4F55;&#x5904;&#x5462;&#xFF1F;&#x63A5;&#x4E0B;&#x6765;&#x5C31;&#x5F00;&#x59CB;&#x6162;&#x6162;&#x8BB2;&#x89E3;&#x5B83;&#x7684;&#x5F3A;&#x5927;&#x4E4B;&#x5904;&#x3002;</p>
+<h3 id="AsyncTask&#x4F18;&#x70B9;"><a href="#AsyncTask&#x4F18;&#x70B9;" class="headerlink" title="AsyncTask&#x4F18;&#x70B9;:"></a>AsyncTask&#x4F18;&#x70B9;:</h3><ul class="ui list">
+<li>&#x5185;&#x90E8;&#x91C7;&#x7528;&#x4E86;&#x7EBF;&#x7A0B;&#x6C60;&#x673A;&#x5236;&#xFF0C;&#x53EF;&#x4EE5;&#x6709;&#x6548;&#x7684;&#x7BA1;&#x7406;&#x7EBF;&#x7A0B;&#x3002;</li>
+<li>&#x53EF;&#x4EE5;&#x81EA;&#x5B9A;&#x4E49;&#x7EBF;&#x7A0B;&#x6C60;&#xFF0C;&#x5B9E;&#x73B0;&#x591A;&#x4E2A;&#x7EBF;&#x7A0B;&#x6309;&#x987A;&#x5E8F;&#x540C;&#x6B65;&#x6267;&#x884C;&#x3001;&#x5F02;&#x6B65;&#x5E76;&#x53D1;&#x6267;&#x884C;&#x3002;</li>
+<li>&#x63D0;&#x4F9B;&#x4E86;&#x56DE;&#x8C03;&#x65B9;&#x6CD5;&#xFF0C;&#x540E;&#x53F0;&#x4EFB;&#x52A1;&#x6267;&#x884C;&#x5B8C;&#x6BD5;&#x540E;&#x4F1A;&#x8FD4;&#x56DE;&#x9700;&#x8981;&#x7684;&#x6570;&#x636E;&#xFF0C;&#x62FF;&#x5230;&#x6570;&#x636E;&#x540E;&#x53EF;&#x4EE5;&#x76F4;&#x63A5;&#x66F4;&#x65B0;UI&#x63A7;&#x4EF6;</li>
+</ul>
+<h3 id="AsyncTask&#x7528;&#x6CD5;&#x6B65;&#x9AA4;"><a href="#AsyncTask&#x7528;&#x6CD5;&#x6B65;&#x9AA4;" class="headerlink" title="AsyncTask&#x7528;&#x6CD5;&#x6B65;&#x9AA4;"></a>AsyncTask&#x7528;&#x6CD5;&#x6B65;&#x9AA4;</h3><h4 id="&#x6784;&#x5EFA;&#x81EA;&#x5B9A;&#x4E49;AsyncTask&#x7684;&#x53C2;&#x6570;"><a href="#&#x6784;&#x5EFA;&#x81EA;&#x5B9A;&#x4E49;AsyncTask&#x7684;&#x53C2;&#x6570;" class="headerlink" title="&#x6784;&#x5EFA;&#x81EA;&#x5B9A;&#x4E49;AsyncTask&#x7684;&#x53C2;&#x6570;"></a>&#x6784;&#x5EFA;&#x81EA;&#x5B9A;&#x4E49;AsyncTask&#x7684;&#x53C2;&#x6570;</h4><a id="more"></a>
+<p>AsyncTask&#x662F;&#x4E00;&#x4E2A;&#x62BD;&#x8C61;&#x7C7B;&#xFF0C;&#x901A;&#x5E38;&#x7528;&#x4E8E;&#x88AB;&#x7EE7;&#x627F;&#xFF0C;&#x7EE7;&#x627F;AsyncTask&#x9700;&#x8981;&#x6307;&#x5B9A;&#x4E09;&#x4E2A;&#x6CDB;&#x578B;&#x53C2;&#x6570;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/15_8_31_1.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/15_8_31_1.png" alt="" class="ui centered image"></a></p>
+<ol class="ui list">
+<li>Params &#xFF1A;<strong>&#x542F;&#x52A8;&#x4EFB;&#x52A1;&#x65F6;&#x8F93;&#x5165;&#x53C2;&#x6570;&#x7684;&#x7C7B;&#x578B;&#x3002;</strong><br><u>&#x3010;&#x5C31;&#x662F;&#x4F20;&#x8FDB;&#x53BB;&#x8017;&#x65F6;&#x64CD;&#x4F5C;&#x4EFB;&#x52A1;&#x9700;&#x8981;&#x7528;&#x5230;&#x7684;&#x53C2;&#x6570;&#xFF0C;&#x6BD4;&#x5982;&#x8054;&#x7F51;&#x8BF7;&#x6C42;String&#x7C7B;&#x578B;&#x7684;URL&#x3011;</u></li>
+<li>Progress&#xFF1A;<strong>&#x540E;&#x53F0;&#x4EFB;&#x52A1;&#x6267;&#x884C;&#x4E2D;&#x8FD4;&#x56DE;&#x8FDB;&#x5EA6;&#x503C;&#x7684;&#x7C7B;&#x578B;</strong><br><u>&#x3010;&#x53EF;&#x7528;&#x4E8E;&#x66F4;&#x65B0;ProgressBar&#x3011;&#x5982;&#x679C;&#x8981;&#x8BBE;&#x7F6E;&#x8FDB;&#x5EA6;&#xFF0C;&#x5219;&#x7B2C;&#x4E8C;&#x4E2A;&#x53C2;&#x6570;&#x4E00;&#x822C;&#x8BBE;&#x7F6E;&#x4E3A;Integer</u></li>
+<li>Result&#xFF1A;<strong>&#x540E;&#x53F0;&#x6267;&#x884C;&#x4EFB;&#x52A1;&#x5B8C;&#x6210;&#x4E4B;&#x540E;&#x8FD4;&#x56DE;&#x7ED3;&#x679C;&#x7684;&#x7C7B;&#x578B;</strong><br><u>&#x3010;&#x8017;&#x65F6;&#x64CD;&#x4F5C;&#x7ED3;&#x675F;&#x540E;&#x8FD4;&#x56DE;&#x7684;&#x7C7B;&#x578B;&#xFF0C;&#x6BD4;&#x5982;&#x8FD4;&#x56DE;Bitmap&#x3011;</u><br> &#xFEFF;    &#xFEFF;    &#xFEFF;&#x4F60;&#x8BBE;&#x7F6E;&#x7684;&#x7B2C;&#x4E09;&#x4E2A;&#x53C2;&#x6570;&#x7C7B;&#x578B;&#x662F;&#x4EC0;&#x4E48;&#xFF0C;doInBackGround&#x7684;&#x8FD4;&#x56DE;&#x503C;&#x5C31;&#x662F;&#x4EC0;&#x4E48;&#x7C7B;&#x578B;</li>
+</ol>
+<p>&#x4F8B;&#x5982;&#xFF1A;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/15_8_31_4.png?"><img src="http://7xijtp.com1.z0.glb.clouddn.com/15_8_31_4.png?" alt="" class="ui centered image"></a><br>doInBackground&#x8FD4;&#x56DE;&#x7684;Bitmap&#x6700;&#x7EC8;&#x4F1A;&#x4F20;&#x9012;&#x5230;onPostExecute(Bitmap bitmap)&#xFEFF;&#x4E2D;&#x4F5C;&#x4E3A;&#x53C2;&#x6570;<br><strong>&#x3010;AsyncTask&#x5E95;&#x5C42;&#x662F;&#x628A;&#x5F02;&#x6B65;&#x8017;&#x65F6;&#x4EFB;&#x52A1;&#x5F97;&#x5230;&#x7684;&#x6570;&#x636E;result&#x901A;&#x8FC7;handler&#x53D1;&#x9001;&#x5230;&#x4E86;&#x4E3B;&#x7EBF;&#x7A0B;&#x3011;</strong></p>
+<h4 id="&#x5B9E;&#x73B0;AsyncTask&#x7684;&#x62BD;&#x8C61;&#x65B9;&#x6CD5;"><a href="#&#x5B9E;&#x73B0;AsyncTask&#x7684;&#x62BD;&#x8C61;&#x65B9;&#x6CD5;" class="headerlink" title="&#x5B9E;&#x73B0;AsyncTask&#x7684;&#x62BD;&#x8C61;&#x65B9;&#x6CD5;"></a>&#x5B9E;&#x73B0;AsyncTask&#x7684;&#x62BD;&#x8C61;&#x65B9;&#x6CD5;</h4><p>&#x6267;&#x884C;&#x987A;&#x5E8F;&#x4ECE;&#x4E0A;&#x5F80;&#x4E0B;&#x3002;&#x6848;&#x4F8B;&#x4EE3;&#x7801;&#x5982;&#x4E0B;&#x9762;2.3&#x8282;&#x4EE3;&#x7801;&#x6240;&#x793A;&#xFF1A;    &#xFEFF;<br>&#xFF08;1&#xFF09;onPreExecute&#xFF1A;&#x6267;&#x884C;&#x540E;&#x53F0;&#x8017;&#x65F6;&#x64CD;&#x4F5C;&#x524D;&#x88AB;&#x8C03;&#x7528;&#xFF0C;&#x901A;&#x5E38;&#x7528;&#x4E8E;&#x5B8C;&#x6210;&#x4E00;&#x4E9B;&#x521D;&#x59CB;&#x5316;&#x64CD;&#x4F5C;<br>&#xFF08;2&#xFF09;doInBackGround&#xFF1A;<strong>[&#x5FC5;&#x987B;&#x5B9E;&#x73B0;&#x8BE5;&#x65B9;&#x6CD5;]</strong>&#xFF0C;&#x5F02;&#x6B65;&#x6267;&#x884C;&#x540E;&#x53F0;&#x7EBF;&#x7A0B;&#x5C06;&#x8981;&#x5B8C;&#x6210;&#x7684;&#x4EFB;&#x52A1;<u>&#x3010;&#x8BE5;&#x65B9;&#x6CD5;&#x5728;&#x5B50;&#x7EBF;&#x7A0B;&#x8FD0;&#x884C;&#x3011;</u><br>&#xFF08;3&#xFF09;onProgressUpdate&#xFF1A;&#x5728;doInBackGround&#x65B9;&#x6CD5;&#x4E2D;&#x8C03;&#x7528;publishProgress&#x65B9;&#x6CD5;&#xFF0C;&#x5C31;&#x53EF;&#x4EE5;&#x66F4;&#x65B0;<br>        &#x4EFB;&#x52A1;&#x7684;&#x6267;&#x884C;&#x8FDB;&#x5EA6;<br>&#xFF08;4&#xFF09;onPostExecute&#xFF1A;<strong>[&#x5FC5;&#x987B;&#x5B9E;&#x73B0;&#x8BE5;&#x65B9;&#x6CD5;]</strong>&#xFF0C;&#x5F53;doInBackGround&#x5B8C;&#x6210;&#x540E;&#xFF0C;&#x7CFB;&#x7EDF;&#x4F1A;&#x81EA;&#x52A8;&#x8C03;&#x7528;&#xFF0C;&#x5E76;&#x5C06;doInBackGround&#xFEFF;&#x65B9;&#x6CD5;&#x8FD4;&#x56DE;&#x7684;&#x503C;&#x4F20;&#x7ED9;&#x8BE5;&#x65B9;&#x6CD5;</p>
+<h4 id="AsyncTask&#x7684;&#x7528;&#x6CD5;&#x6848;&#x4F8B;"><a href="#AsyncTask&#x7684;&#x7528;&#x6CD5;&#x6848;&#x4F8B;" class="headerlink" title="AsyncTask&#x7684;&#x7528;&#x6CD5;&#x6848;&#x4F8B;"></a>AsyncTask&#x7684;&#x7528;&#x6CD5;&#x6848;&#x4F8B;</h4><p>1.&#x5B9E;&#x4F8B;&#x5316;&#x81EA;&#x5B9A;&#x4E49;AsyncTask&#x7C7B;&#xFF0C;&#x4F20;&#x5165;&#x4E00;&#x4E2A;&#x56FE;&#x7247;url&#x548C;ImagView&#xFF0C;execute&#x6267;&#x884C;&#x3002;</p>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> MyAsyncTask(url, imageView).execute();</span><br></pre></td></tr></tbody></table></figure>
+<p>2.&#x81EA;&#x5B9A;&#x4E49;AsyncTask&#x7C7B;&#x4EE3;&#x7801;&#x6848;&#x4F8B;&#xFF1A;</p>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">MyAsyncTask</span> <span class="keyword">extends</span> <span class="title">AsyncTask</span>&lt;<span class="title">Void</span>, <span class="title">Void</span>, <span class="title">Bitmap</span>&gt; </span>{</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> String mUrl;</span><br><span class="line">        <span class="keyword">private</span> ImageView mImageView;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">MyAsyncTask</span><span class="params">(String url, ImageView imageView)</span> </span>{</span><br><span class="line">            mUrl = url;</span><br><span class="line">            mImageView = imageView;</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> Bitmap <span class="title">doInBackground</span><span class="params">(Void... params)</span> </span>{</span><br><span class="line">            <span class="keyword">return</span> getBitmapFromUrl(mUrl);</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onPostExecute</span><span class="params">(Bitmap bitmap)</span> </span>{</span><br><span class="line">            <span class="keyword">super</span>.onPostExecute(bitmap);</span><br><span class="line">            <span class="keyword">if</span> (mUrl.equals(mImageView.getTag()))</span><br><span class="line">                mImageView.setImageBitmap(bitmap);</span><br><span class="line">        }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="AsyncTask&#x7EBF;&#x7A0B;&#x6C60;"><a href="#AsyncTask&#x7EBF;&#x7A0B;&#x6C60;" class="headerlink" title="AsyncTask&#x7EBF;&#x7A0B;&#x6C60;"></a>AsyncTask&#x7EBF;&#x7A0B;&#x6C60;</h3><p>AsyncTask&#x4E4B;&#x6240;&#x4EE5;&#x5982;&#x6B64;&#x5F3A;&#x5927;&#xFF0C;&#x6838;&#x5FC3;&#x529F;&#x81E3;&#x5C31;&#x662F;&#x5B83;&#x80CC;&#x540E;&#x7684;&#x7EBF;&#x7A0B;&#x6C60;&#x3002;<br>&#x5728;AsyncTask&#x4E2D;&#x63D0;&#x4F9B;&#x6709;&#x4E24;&#x79CD;&#x7EBF;&#x7A0B;&#x6C60;&#xFF0C;&#x4E00;&#x4E2A;&#x662F;THREAD_POOL_EXECUTOR&#xFF0C;&#x53E6;&#x4E00;&#x4E2A;&#x662F;SERIAL_EXECUTOR&#x3002;<br><br><u><strong>&#x4F46;&#x662F;&#xFF0C;&#x7279;&#x522B;&#x6CE8;&#x610F;&#xFF0C;&#x5176;&#x5B9E;&#x5728;AsyncTask&#x4E2D;&#x53EA;&#x6709;&#x4E00;&#x4E2A;&#x7EBF;&#x7A0B;&#x6C60;THREAD_POOL_EXECUTOR&#xFF0C;&#x53EA;&#x4E0D;&#x8FC7;SERIAL_EXECUTOR&#x5B9E;&#x73B0;&#x4E86;&#x7EBF;&#x7A0B;&#x961F;&#x5217;&#xFF0C;&#x6700;&#x7EC8;&#x8FD8;&#x662F;&#x4F7F;&#x7528;&#x7684;THREAD_POOL_EXECUTOR</strong><u></u></u></p>
+<ol class="ui list">
+<li><strong>THREAD_POOL_EXECUTOR</strong> &#x2014;&#x2014; &#x591A;&#x4E2A;&#x4EFB;&#x52A1;&#x53EF;&#x4EE5;&#x5728;&#x7EBF;&#x7A0B;&#x6C60;&#x4E2D;&#x5F02;&#x6B65;&#x5E76;&#x53D1;&#x6267;&#x884C;&#x3002;</li>
+<li><strong>SERIAL_EXECUTOR</strong> &#x2014;&#x2014; &#x628A;&#x591A;&#x4E2A;&#x7EBF;&#x7A0B;&#x6309;&#x4E32;&#x884C;&#x7684;&#x65B9;&#x5F0F;&#x6267;&#x884C;&#xFF0C;&#x6240;&#x4EE5;&#x662F;&#x540C;&#x6B65;&#x6267;&#x884C;&#x3002;&#x4E5F;&#x5C31;&#x662F;&#x8BF4;&#xFF0C;&#x53EA;&#x6709;&#x5F53;&#x4E00;&#x4E2A;&#x7EBF;&#x7A0B;&#x6267;&#x884C;&#x5B8C;&#x6BD5;&#x4E4B;&#x540E;&#xFF0C;&#x624D;&#x4F1A;&#x6267;&#x884C;&#x4E0B;&#x4E2A;&#x7EBF;&#x7A0B;&#x3002;</li>
+</ol>
+<h4 id="&#x5F02;&#x6B65;&#x3001;&#x540C;&#x6B65;&#x3001;&#x5E76;&#x884C;&#x3001;&#x4E32;&#x884C;&#x7684;&#x533A;&#x522B;"><a href="#&#x5F02;&#x6B65;&#x3001;&#x540C;&#x6B65;&#x3001;&#x5E76;&#x884C;&#x3001;&#x4E32;&#x884C;&#x7684;&#x533A;&#x522B;" class="headerlink" title="&#x5F02;&#x6B65;&#x3001;&#x540C;&#x6B65;&#x3001;&#x5E76;&#x884C;&#x3001;&#x4E32;&#x884C;&#x7684;&#x533A;&#x522B;"></a>&#x5F02;&#x6B65;&#x3001;&#x540C;&#x6B65;&#x3001;&#x5E76;&#x884C;&#x3001;&#x4E32;&#x884C;&#x7684;&#x533A;&#x522B;</h4><ul class="ui list">
+<li><strong>&#x5F02;&#x6B65;&#xFF1A;</strong><br><u>&#x53D1;&#x9001;&#x65B9;&#x53D1;&#x51FA;&#x6570;&#x636E;&#x540E;&#xFF0C;&#x4E0D;&#x7528;&#x7B49;&#x63A5;&#x6536;&#x65B9;&#x53D1;&#x56DE;&#x54CD;&#x5E94;&#xFF0C;&#x63A5;&#x7740;&#x53D1;&#x9001;&#x4E0B;&#x4E2A;&#x6570;&#x636E;&#x5305;&#x7684;&#x901A;&#x8BAF;&#x65B9;&#x5F0F;&#x3002;</u><br>&#x3010;&#x6BD4;&#x5982;&#xFF0C;&#x4E3B;main&#x51FD;&#x6570;&#x7684;&#x4EE3;&#x7801;&#x4ECE;&#x4E0A;&#x5F80;&#x4E0B;&#x6267;&#x884C;&#xFF0C;new&#x4E00;&#x4E2A;Thread&#x5E76;&#x5728;&#x5B50;&#x7EBF;&#x7A0B;&#x4E2D;&#x9014;&#x6267;&#x884C;&#x4E86;sleep 10&#x79D2;&#x949F;&#xFF0C;&#x800C;&#x4E3B;main&#x51FD;&#x6570;&#x540E;&#x9762;&#x7684;&#x4EE3;&#x7801;&#x4E0D;&#x9700;&#x8981;&#x7B49;&#x5B50;&#x7EBF;&#x7A0B;sleep&#x5B8C;10&#x79D2;&#x518D;&#x6267;&#x884C;&#xFF0C;&#x800C;&#x662F;&#x76F4;&#x63A5;&#x7EE7;&#x7EED;&#x6267;&#x884C;&#x4E0B;&#x9762;&#x7684;&#x4EE3;&#x7801;&#x3002;&#x3011;</li>
+<li><strong>&#x540C;&#x6B65;&#xFF1A;</strong><br><u>&#x53D1;&#x9001;&#x65B9;&#x53D1;&#x51FA;&#x6570;&#x636E;&#x540E;&#xFF0C;&#x9700;&#x8981;&#x7B49;&#x63A5;&#x6536;&#x65B9;&#x53D1;&#x56DE;&#x54CD;&#x5E94;&#x4EE5;&#x540E;&#x624D;&#x53D1;&#x4E0B;&#x4E00;&#x4E2A;&#x6570;&#x636E;&#x5305;&#x7684;&#x901A;&#x8BAF;&#x65B9;&#x5F0F;&#x3002;</u><br>&#x3010;&#x6BD4;&#x5982;&#xFF0C;&#x4E3B;main&#x51FD;&#x6570;&#x7684;&#x4EE3;&#x7801;&#x4ECE;&#x4E0A;&#x5F80;&#x4E0B;&#x6267;&#x884C;&#xFF0C;&#x5982;&#x679C;&#x4E2D;&#x9014;&#x6267;&#x884C;&#x4E86;sleep 10&#x79D2;&#x949F;&#xFF0C;&#x5219;&#x540E;&#x9762;&#x7684;&#x4EE3;&#x7801;&#x90FD;&#x8981;&#x7B49;10&#x79D2;&#x540E;&#x624D;&#x4F1A;&#x6267;&#x884C;&#x3002;&#x3011;</li>
+<li><strong>&#x5E76;&#x884C;&#xFF1A;</strong><br><u>&#x4E5F;&#x79F0;&#x4E3A;&#x5E76;&#x53D1;&#x3002;&#x4ECE;&#x5B8F;&#x89C2;&#x4E0A;&#x6765;&#x7406;&#x89E3;&#xFF0C;&#x5C31;&#x662F;&#x5728;&#x540C;&#x4E00;&#x65F6;&#x95F4;&#x5185;&#x540C;&#x65F6;&#x6267;&#x884C;&#x591A;&#x4E2A;&#x7EBF;&#x7A0B;&#x4EFB;&#x52A1;&#x3002;</u><br>&#x3010;&#x6BD4;&#x5982;&#xFF0C;&#x540C;&#x65F6;&#x5F00;&#x542F;10&#x5F20;&#x56FE;&#x7247;&#x4E0B;&#x8F7D;&#xFF0C;&#x5B8F;&#x89C2;&#x4E0A;&#x4ED6;&#x4EEC;&#x662F;10&#x5F20;&#x56FE;&#x540C;&#x65F6;&#x4E0B;&#x8F7D;&#x7684;&#x3002;&#x3011;</li>
+<li><strong>&#x4E32;&#x884C;&#xFF1A;</strong><br><u>&#x53EF;&#x4EE5;&#x7406;&#x89E3;&#x4E3A;&#xFF0C;&#x53EA;&#x6709;&#x5F53;&#x4E00;&#x4E2A;&#x7EBF;&#x7A0B;&#x6267;&#x884C;&#x5B8C;&#x6BD5;&#x4E4B;&#x540E;&#xFF0C;&#x624D;&#x4F1A;&#x6267;&#x884C;&#x4E0B;&#x4E2A;&#x7EBF;&#x7A0B;&#x3002;</u><br>&#x3010;&#x6BD4;&#x5982;&#xFF0C;10&#x5F20;&#x56FE;&#x7247;&#x4E0B;&#x8F7D;&#x7EBF;&#x7A0B;&#x4E32;&#x884C;&#x6267;&#x884C;&#xFF0C;&#x53EA;&#x80FD;&#x662F;&#x7B2C;&#x4E00;&#x5F20;&#x4E0B;&#x8F7D;&#x5B8C;&#x540E;&#xFF0C;&#x624D;&#x4F1A;&#x5F00;&#x59CB;&#x6267;&#x884C;&#x4E0B;&#x4E00;&#x5F20;&#x56FE;&#x7247;&#x4E0B;&#x8F7D;&#x3002;&#x3011;</li>
+</ul>
+<h4 id="THREAD-POOL-EXECUTOR-&#x2014;&#x2014;-&#x5F02;&#x6B65;&#x7EBF;&#x7A0B;&#x6C60;"><a href="#THREAD-POOL-EXECUTOR-&#x2014;&#x2014;-&#x5F02;&#x6B65;&#x7EBF;&#x7A0B;&#x6C60;" class="headerlink" title="THREAD_POOL_EXECUTOR &#x2014;&#x2014; &#x5F02;&#x6B65;&#x7EBF;&#x7A0B;&#x6C60;"></a>THREAD_POOL_EXECUTOR &#x2014;&#x2014; <strong>&#x5F02;&#x6B65;&#x7EBF;&#x7A0B;&#x6C60;</strong></h4><p>ThreadPoolExecutor&#x6784;&#x9020;&#x51FD;&#x6570;&#x9700;&#x8981;&#x4F20;&#x9012;&#x4EE5;&#x4E0B;&#x51E0;&#x4E2A;&#x53C2;&#x6570;&#xFF1A;</p>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> corePoolSize &#x7EBF;&#x7A0B;&#x6C60;&#x7684;&#x6838;&#x5FC3;&#x8FD0;&#x884C;&#x7EBF;&#x7A0B;&#x6570;&#x91CF;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> maximumPoolSize &#x7EBF;&#x7A0B;&#x6C60;&#x4E2D;&#x53EF;&#x4EE5;&#x521B;&#x5EFA;&#x7684;&#x6700;&#x5927;&#x8FD0;&#x884C;&#x7EBF;&#x7A0B;&#x6570;&#x91CF;&#x3010;&#x5305;&#x62EC;&#x6838;&#x5FC3;&#x8FD0;&#x884C;&#x7EBF;&#x7A0B;&#x3011;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> keepAliveTime &#x5F53;&#x7EBF;&#x7A0B;&#x6C60;&#x7EBF;&#x7A0B;&#x6570;&#x91CF;&#x8D85;&#x8FC7;corePoolSize&#x65F6;&#xFF0C;</span></span><br><span class="line"><span class="comment"> *    &#x591A;&#x4F59;&#x7684;&#x7A7A;&#x4F59;&#x7EBF;&#x7A0B;&#x5728;&#x7F13;&#x51B2;&#x961F;&#x5217;&#x7684;&#x5B58;&#x6D3B;&#x65F6;&#x95F4;&#xFF0C;&#x8D85;&#x65F6;&#x540E;&#x5C06;&#x4F1A;&#x88AB;&#x79FB;&#x9664;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> unit &#x7EBF;&#x7A0B;&#x6C60;&#x7EF4;&#x62A4;&#x7EBF;&#x7A0B;&#x6240;&#x5141;&#x8BB8;&#x7684;&#x7A7A;&#x95F2;&#x65F6;&#x95F4;&#x7684;&#x5355;&#x4F4D;&#xFF0C;&#x4E00;&#x822C;&#x8BBE;&#x7F6E;&#x4E3A;&#x79D2;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> workQueue &#x7EBF;&#x7A0B;&#x6C60;&#x6240;&#x4F7F;&#x7528;&#x7684;&#x7F13;&#x51B2;&#x961F;&#x5217;&#xFF0C;&#x53EF;&#x4EE5;&#x8BBE;&#x7F6E;&#x7F13;&#x51B2;&#x961F;&#x5217;&#x5BB9;&#x7EB3;&#x7684;&#x7EBF;&#x7A0B;&#x6570;&#x91CF;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> threadFactory &#x7EBF;&#x7A0B;&#x5DE5;&#x5382;&#xFF0C;&#x7528;&#x4E8E;&#x521B;&#x5EFA;&#x7EBF;&#x7A0B;&#x3002;</span></span><br><span class="line"><span class="comment"> * &#x5F53;&#x4E00;&#x4E2A;&#x5F02;&#x6B65;&#x4EFB;&#x52A1;&#x6267;&#x884C;execute&#x7684;&#x65F6;&#x5019;&#x5C06;&#x4F1A;&#x901A;&#x8FC7;&#x8BE5;&#x5DE5;&#x5382;new&#x51FA;&#x4E00;&#x4E2A;thread</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ThreadPoolExecutor</span><span class="params">(<span class="keyword">int</span> corePoolSize,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">int</span> maximumPoolSize,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">long</span> keepAliveTime,</span></span></span><br><span class="line"><span class="function"><span class="params">        TimeUnit unit,</span></span></span><br><span class="line"><span class="function"><span class="params">        BlockingQueue&lt;Runnable&gt; workQueue,</span></span></span><br><span class="line"><span class="function"><span class="params">        ThreadFactory threadFactory)</span></span>{</span><br><span class="line">        <span class="keyword">this</span>(corePoolSize,maximumPoolSize,keepAliveTime,unit,workQueue,</span><br><span class="line">        threadFactory,defaultHandler);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<p>&#x90A3;&#x4E48;&#x6211;&#x4EEC;&#x8BE5;&#x5982;&#x4F55;&#x7406;&#x89E3;&#x8FD9;&#x51E0;&#x4E2A;&#x53C2;&#x6570;&#x7684;&#x610F;&#x601D;&#x5462;&#xFF1F;<br>&#x9996;&#x5148;&#x6211;&#x4EEC;&#x4F20;&#x5165;&#x7EBF;&#x7A0B;&#x6C60;&#x53C2;&#x6570;&#xFF1A;</p>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Executor executor = <span class="keyword">new</span> ThreadPoolExecutor(<span class="number">3</span>,<span class="number">5</span>,<span class="number">10</span>,</span><br><span class="line">	                TimeUnit.SECONDS,<span class="keyword">new</span> LinkedBlockingDeque&lt;Runnable&gt;(<span class="number">5</span>));</span><br></pre></td></tr></tbody></table></figure>
+<p>&#x7136;&#x540E;&#xFF0C;&#x540C;&#x65F6;execute&#x6267;&#x884C;10&#x4E2A;&#x4EFB;&#x52A1;<br>&#x770B;&#x56FE;&#x793A;&#x89E3;&#x6790;&#xFF1A;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/15_8_31_12.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/15_8_31_12.png" alt="" class="ui centered image"></a></p>
+<ul class="ui list">
+<li>&#x7B2C;&#x4E00;&#x4E2A;&#x53C2;&#x6570;&#x4F20;&#x5165;&#x662F;3&#xFF0C;&#x8868;&#x793A;&#x521D;&#x59CB;&#x5316;&#x6838;&#x5FC3;&#x5E76;&#x53D1;&#x8FD0;&#x884C;&#x7684;&#x6709;&#x4E09;&#x4E2A;&#x7EBF;&#x7A0B;&#xFF0C;&#x5F53;execute&#x4EFB;&#x52A1;&#x5927;&#x4E8E;3&#x65F6;&#xFF0C;&#x5C06;&#x4F1A;&#x653E;&#x5165;&#x7F13;&#x51B2;&#x961F;&#x5217;&#x4E2D;</li>
+<li>&#x5F53;&#x7F13;&#x51B2;&#x961F;&#x5217;&#x6EE1;&#x4E86;&#x4E4B;&#x540E;&#xFF0C;&#x3010;&#x7F13;&#x51B2;&#x961F;&#x5217;&#x6700;&#x591A;&#x5B58;5&#x4E2A;&#x7EBF;&#x7A0B;&#x3011;&#xFF0C;&#x6B64;&#x65F6;&#x5DF2;&#x7ECF;&#x52A0;&#x5165;&#x8FDB;&#x6765;&#x4E86;8&#x4E2A;&#x8FDB;&#x7A0B;&#x3002;</li>
+<li>&#x4F46;&#x662F;&#xFF0C;&#x8FD9;&#x8FD8;&#x5E76;&#x6CA1;&#x6709;&#x7ED3;&#x675F;&#xFF0C;&#x6211;&#x4EEC;&#x8BBE;&#x7F6E;&#x4E86;&#x7B2C;&#x4E8C;&#x4E2A;&#x53C2;&#x6570;&#x4E3A;5&#xFF0C;&#x5C31;&#x610F;&#x5473;&#x7740;&#xFF0C;&#x5728;&#x7EBF;&#x7A0B;&#x6C60;&#x4E2D;&#x53EF;&#x4EE5;&#x521B;&#x5EFA;&#x7684;&#x6700;&#x5927;&#x8FD0;&#x884C;&#x7EBF;&#x7A0B;&#x6570;&#x91CF;&#x4E3A;5&#x4E2A;&#x3002;&#x73B0;&#x5728;&#x5DF2;&#x7ECF;&#x6709;3&#x4E2A;&#x6838;&#x5FC3;&#x7EBF;&#x7A0B;&#x521B;&#x5EFA;&#x4E86;&#xFF0C;<br>&#x6240;&#x4EE5;&#x8FD8;&#x53EF;&#x4EE5;&#x518D;&#x521B;&#x5EFA;&#x4E24;&#x4E2A;&#x7EBF;&#x7A0B;&#x3002;<strong>&#x6574;&#x4E2A;&#x7EBF;&#x7A0B;&#x6C60;&#x6700;&#x5927;&#x652F;&#x6301;&#x5BB9;&#x7EB3;10&#x4E2A;&#x7EBF;&#x7A0B;</strong>&#x3002;</li>
+<li>&#x91CD;&#x70B9;&#x6765;&#x4E86;&#xFF1A;&#x8FD9;&#x4E2A;&#x65F6;&#x5019;&#xFF0C;&#x5C06;&#x4F1A;&#x5E76;&#x53D1;&#x6267;&#x884C;5&#x4E2A;&#x6838;&#x5FC3;&#x7EBF;&#x7A0B;&#xFF0C;&#x662F;&#x54EA;5&#x4E2A;&#x5462;&#xFF1F;&#x7B54;&#x6848;&#x662F;&#xFF1A;1,2,3,9,10&#x3002;&#x56E0;&#x4E3A;&#x65B0;&#x521B;&#x5EFA;&#x7684;&#x4E24;&#x4E2A;&#x8FD0;&#x884C;&#x7EBF;&#x7A0B;&#x4E5F;&#x4F1A;&#x5F00;&#x59CB;&#x5DE5;&#x4F5C;&#x3002;<br>&#xA0; &#xA0;&#xA0; &#xA0;&#x3010;1,2,3&#x7EBF;&#x7A0B;&#x662F;&#x6838;&#x5FC3;&#x8FD0;&#x884C;&#x7EBF;&#x7A0B;&#xFF0C;4,5,6,7,8&#x5728;&#x7F13;&#x51B2;&#x961F;&#x5217;&#xFF0C;9,10&#x5728;&#x8FD0;&#x884C;&#x7EBF;&#x7A0B;&#x6C60;&#x4E2D;&#x3002;&#x3011;</li>
+<li>&#x90A3;&#x4E48;5&#x4E2A;&#x7EBF;&#x7A0B;&#x7ED3;&#x675F;&#x4E4B;&#x540E;&#xFF1F;&#x662F;&#x7EE7;&#x7EED;&#x5E76;&#x53D1;&#x6267;&#x884C;3&#x4E2A;&#xFF0C;&#x8FD8;&#x662F;5&#x4E2A;&#x5462;&#xFF1F;&#x7B54;&#x6848;&#x662F;5&#x4E2A;&#xFF0C;&#x56E0;&#x4E3A;&#x8FD0;&#x884C;&#x7EBF;&#x7A0B;&#x5DF2;&#x7ECF;&#x521B;&#x5EFA;&#x4E3A;5&#x4E2A;&#x4E86;&#x3002;</li>
+<li>&#x7279;&#x522B;&#x6CE8;&#x610F;&#xFF1A;&#x3010;<strong>&#x53EA;&#x6709;&#x5F53;&#x7F13;&#x51B2;&#x961F;&#x5217;&#x6EE1;&#x7684;&#x65F6;&#x5019;&#xFF0C;&#x624D;&#x4F1A;&#x521B;&#x5EFA;&#x65B0;&#x7684;&#x8FD0;&#x884C;&#x7EBF;&#x7A0B;</strong>&#xFF0C;&#x5426;&#x5219;&#x9ED8;&#x8BA4;&#x53EA;&#x6309;corePoolSize&#x7684;&#x6570;&#x91CF;&#x6267;&#x884C;&#x3002;&#x76F4;&#x5230;&#x8D85;&#x51FA;maximumPoolSize&#x5927;&#x5C0F;&#xFF0C;&#x629B;&#x51FA;&#x5F02;&#x5E38;&#x3011;</li>
+<li>&#x5F53;&#x518D;&#x52A0;&#x4E00;&#x4E2A;&#x7EBF;&#x7A0B;&#x8FDB;&#x6765;&#x65F6;&#xFF0C;AsyncTask&#x4E2D;&#x6709;&#x4E00;&#x4E2A;&#x62D2;&#x7EDD;&#x7B56;&#x7565;&#x7684;handler&#x629B;&#x51FA;&#x5F02;&#x5E38;&#xFF0C;&#x6B64;&#x65F6;&#x7EBF;&#x7A0B;&#x6C60;&#x5DF2;&#x7ECF;&#x65E0;&#x6CD5;&#x518D;&#x5BB9;&#x7EB3;&#x66F4;&#x591A;&#x7EBF;&#x7A0B;&#x4EFB;&#x52A1;&#x4E86;&#x3002;<br>&#xA0; &#xA0;&#xA0; &#xA0;&#xA0; &#xA0;&#xA0; &#xA0;&#x4E0D;&#x591A;&#x8BF4;&#xFF0C;&#x4E0A;&#x6F14;&#x793A;&#x56FE;&#xFF1A;<br><img src="http://7xijtp.com1.z0.glb.clouddn.com/2015-09-02%2017_36_03.gif" alt=""></li>
+</ul>
+<p>&#x4ECE;AsyncTask&#x9ED8;&#x8BA4;&#x6784;&#x9020;&#x7684;THREAD_POOL_EXECUTOR&#x53EF;&#x4EE5;&#x770B;&#x51FA;&#xFF0C;AsyncTask&#x6700;&#x5927;&#x652F;&#x6301;&#x7684;&#x7F13;&#x51B2;&#x4EFB;&#x52A1;&#x961F;&#x5217;&#x662F;128&#x4E2A;&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/15_8_31_6.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/15_8_31_6.png" alt="" class="ui centered image"></a></p>
+<h4 id="SERIAL-EXECUTOR-&#x4E32;&#x884C;&#x7EBF;&#x7A0B;&#x6C60;"><a href="#SERIAL-EXECUTOR-&#x4E32;&#x884C;&#x7EBF;&#x7A0B;&#x6C60;" class="headerlink" title="SERIAL_EXECUTOR &#x4E32;&#x884C;&#x7EBF;&#x7A0B;&#x6C60;"></a>SERIAL_EXECUTOR <strong>&#x4E32;&#x884C;&#x7EBF;&#x7A0B;&#x6C60;</strong></h4><p>&#x5728;ActivityThread&#x4E2D;&#x7684;&#x6709;&#x4E00;&#x6BB5;&#x4EE3;&#x7801;&#xFF0C;&#x8BBE;&#x7F6E;&#x4E86;&#x5F53;Android &#x7248;&#x672C;api &#x5C0F;&#x4E8E;12,&#x4E5F;&#x5C31;&#x662F;&#x7248;&#x672C;&#x5C0F;&#x4E8E;3.1&#x65F6;&#xFF0C;&#x9ED8;&#x8BA4;&#x662F;&#x4F7F;&#x7528;AsyncTask&#x9ED8;&#x8BA4;&#x7684;&#x5F02;&#x6B65;&#x7EBF;&#x7A0B;&#x6C60;THREAD_POOL_EXECUTOR<br>Android 3.1 &#x4E4B;&#x540E;&#x4F7F;&#x7528;&#x7684;&#x662F; <strong>SERIAL_EXECUTOR</strong><br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/15_8_15_5.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/15_8_15_5.png" alt="" class="ui centered image"></a></p>
+<h3 id="&#x6267;&#x884C;AsyncTask&#x7684;&#x4E24;&#x4E2A;&#x65B9;&#x6CD5;&#xFF1A;"><a href="#&#x6267;&#x884C;AsyncTask&#x7684;&#x4E24;&#x4E2A;&#x65B9;&#x6CD5;&#xFF1A;" class="headerlink" title="&#x6267;&#x884C;AsyncTask&#x7684;&#x4E24;&#x4E2A;&#x65B9;&#x6CD5;&#xFF1A;"></a>&#x6267;&#x884C;AsyncTask&#x7684;&#x4E24;&#x4E2A;&#x65B9;&#x6CD5;&#xFF1A;</h3><ol class="ui list">
+<li><strong>execute</strong> &#x2014;&#x2014; &#x4F7F;&#x7528;&#x7684;&#x662F;AsyncTask&#x9ED8;&#x8BA4;&#x7684;&#x7EBF;&#x7A0B;&#x6C60;</li>
+<li><strong>executeOnExecutor</strong> &#x2014;&#x2014; &#x9700;&#x8981;&#x4F20;&#x9012;&#x8FDB;&#x53BB;&#x4E00;&#x4E2A;Executor&#xFF0C;&#x53EF;&#x4EE5;&#x5B9E;&#x73B0;&#x81EA;&#x5B9A;&#x4E49;&#x7EBF;&#x7A0B;&#x6C60;</li>
+</ol>
+<h4 id="execute-&#x3010;&#x9ED8;&#x8BA4;&#x7EBF;&#x7A0B;&#x6C60;&#x6267;&#x884C;&#x3011;"><a href="#execute-&#x3010;&#x9ED8;&#x8BA4;&#x7EBF;&#x7A0B;&#x6C60;&#x6267;&#x884C;&#x3011;" class="headerlink" title="execute &#x3010;&#x9ED8;&#x8BA4;&#x7EBF;&#x7A0B;&#x6C60;&#x6267;&#x884C;&#x3011;"></a>execute &#x3010;&#x9ED8;&#x8BA4;&#x7EBF;&#x7A0B;&#x6C60;&#x6267;&#x884C;&#x3011;</h4><p>&#x521A;&#x521A;&#x63D0;&#x5230;&#x4E86;&#xFF0C;AsyncTask&#x5728;3.1&#x7248;&#x672C;&#x4E4B;&#x524D;&#x9ED8;&#x8BA4;&#x4F7F;&#x7528;THREAD_POOL_EXECUTOR&#x7EBF;&#x7A0B;&#x6C60;&#xFF0C;&#x4E5F;&#x5C31;&#x662F;&#x8BF4;&#xFF0C;3.1&#x7248;&#x672C;&#x4E4B;&#x524D;&#x7684;&#x4F7F;&#x7528;AsynTask&#xFF0C;&#x5C06;&#x4F1A;&#x662F;<strong>&#x5F02;&#x6B65;&#x5E76;&#x53D1;&#x6267;&#x884C;</strong>&#x3002;</p>
+<h5 id="api8&#x7CFB;&#x7EDF;&#x6267;&#x884C;execute"><a href="#api8&#x7CFB;&#x7EDF;&#x6267;&#x884C;execute" class="headerlink" title="api8&#x7CFB;&#x7EDF;&#x6267;&#x884C;execute"></a>api8&#x7CFB;&#x7EDF;&#x6267;&#x884C;execute</h5><p>&#x6211;&#x4EEC;&#x6765;&#x770B;2.3&#x7CFB;&#x7EDF;&#x540C;&#x65F6;execute&#x6267;&#x884C;10&#x4E2A;&#x5F02;&#x6B65;&#x4EFB;&#x52A1;&#xFF0C;&#x5F97;&#x5230;&#x7684;&#x7ED3;&#x679C;&#xFF1A;<br>3.1&#x7248;&#x672C;&#x4E4B;&#x524D;&#x7684;&#x7CFB;&#x7EDF;&#x9ED8;&#x8BA4;&#x6700;&#x5927;&#x5E76;&#x53D1;&#x6267;&#x884C;5&#x4E2A;&#x7EBF;&#x7A0B;&#xFF0C;&#x7F13;&#x51B2;&#x7EBF;&#x7A0B;&#x961F;&#x5217;&#x6700;&#x5927;128&#x4E2A;&#x3002;&#x867D;&#x7136;&#x5F00;&#x4E86;10&#x4E2A;&#x5F02;&#x6B65;&#x4EFB;&#x52A1;&#xFF0C;&#x4F46;&#x662F;&#x53EA;&#x80FD;&#x540C;&#x65F6;&#x5E76;&#x53D1;&#x6267;&#x884C;5&#x4E2A;&#xFF0C;&#x5176;&#x4ED6;&#x7684;&#x4EFB;&#x52A1;&#x90FD;&#x5F97;&#x7B49;&#x524D;&#x9762;5&#x4E2A;&#x6267;&#x884C;&#x5B8C;&#x540E;&#x624D;&#x7EE7;&#x7EED;&#x6267;&#x884C;&#xFF0C;&#x63A5;&#x7740;&#x4E5F;&#x662F;5&#x6B21;&#x5E76;&#x53D1;&#x6267;&#x884C;&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/1.gif"><img src="http://7xijtp.com1.z0.glb.clouddn.com/1.gif" alt="" class="ui centered image"></a></p>
+<h5 id="Api11&#x4EE5;&#x4E0A;&#x7CFB;&#x7EDF;&#x6267;&#x884C;execute"><a href="#Api11&#x4EE5;&#x4E0A;&#x7CFB;&#x7EDF;&#x6267;&#x884C;execute" class="headerlink" title="Api11&#x4EE5;&#x4E0A;&#x7CFB;&#x7EDF;&#x6267;&#x884C;execute"></a>Api11&#x4EE5;&#x4E0A;&#x7CFB;&#x7EDF;&#x6267;&#x884C;execute</h5><p>&#x90A3;&#x4E48;&#xFF0C;3.1&#x7248;&#x672C;&#x4E4B;&#x540E;&#x7CFB;&#x7EDF;&#xFF0C;&#x9ED8;&#x8BA4;&#x662F;&#x4F7F;&#x7528;SERIAL_EXECUTOR&#x4E32;&#x884C;&#x4EFB;&#x52A1;&#x6267;&#x884C;&#xFF0C;&#x53EF;&#x4EE5;&#x9884;&#x6599;&#x5230;&#x5F02;&#x6B65;&#x4EFB;&#x52A1;&#x5C06;&#x4F1A;&#x662F;&#x4E00;&#x4E2A;&#x4E2A;&#x987A;&#x5E8F;&#x6267;&#x884C;&#x3002;</p>
+<p>&#x679C;&#x4E0D;&#x5176;&#x7136;&#xFF0C;5.0&#x7CFB;&#x7EDF;&#x540C;&#x65F6;execute&#x6267;&#x884C;10&#x4E2A;&#x5F02;&#x6B65;&#x4EFB;&#x52A1;&#xFF0C;&#x662F;&#x4E00;&#x4E2A;&#x4E2A;&#x7EBF;&#x7A0B;&#x6309;&#x52A0;&#x5165;&#x987A;&#x5E8F;&#x540C;&#x6B65;&#x6267;&#x884C;&#x7684;&#x3002;&#x4E5F;&#x5C31;&#x662F;&#x8BF4;&#xFF0C;&#x7EBF;&#x7A0B;&#x6C60;&#x4E2D;&#x53EA;&#x6709;&#x4E00;&#x4E2A;&#x6838;&#x5FC3;&#x7EBF;&#x7A0B;&#x5728;&#x5DE5;&#x4F5C;&#xFF0C;&#x5176;&#x4ED6;&#x7EBF;&#x7A0B;&#x90FD;&#x8981;&#x7B49;&#x4E4B;&#x524D;&#x7684;&#x7EBF;&#x7A0B;&#x6267;&#x884C;&#x5B8C;&#x624D;&#x80FD;&#x6267;&#x884C;&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/3.gif"><img src="http://7xijtp.com1.z0.glb.clouddn.com/3.gif" alt="" class="ui centered image"></a></p>
+<h4 id="executeOnExecutor-&#x3010;&#x81EA;&#x5B9A;&#x4E49;&#x7EBF;&#x7A0B;&#x6C60;&#x6267;&#x884C;&#xFF0C;&#x4EC5;&#x652F;&#x6301;3-1&#x4EE5;&#x4E0A;&#x7CFB;&#x7EDF;&#x3011;"><a href="#executeOnExecutor-&#x3010;&#x81EA;&#x5B9A;&#x4E49;&#x7EBF;&#x7A0B;&#x6C60;&#x6267;&#x884C;&#xFF0C;&#x4EC5;&#x652F;&#x6301;3-1&#x4EE5;&#x4E0A;&#x7CFB;&#x7EDF;&#x3011;" class="headerlink" title="executeOnExecutor &#x3010;&#x81EA;&#x5B9A;&#x4E49;&#x7EBF;&#x7A0B;&#x6C60;&#x6267;&#x884C;&#xFF0C;&#x4EC5;&#x652F;&#x6301;3.1&#x4EE5;&#x4E0A;&#x7CFB;&#x7EDF;&#x3011;"></a>executeOnExecutor &#x3010;&#x81EA;&#x5B9A;&#x4E49;&#x7EBF;&#x7A0B;&#x6C60;&#x6267;&#x884C;&#xFF0C;&#x4EC5;&#x652F;&#x6301;3.1&#x4EE5;&#x4E0A;&#x7CFB;&#x7EDF;&#x3011;</h4><p>&#x5F88;&#x663E;&#x7136;&#xFF0C;AsyncTask&#x7684;&#x9ED8;&#x8BA4;&#x7EBF;&#x7A0B;&#x6C60;&#x5B8C;&#x5168;&#x4E0D;&#x80FD;&#x6EE1;&#x8DB3;&#x6211;&#x4EEC;&#x7684;&#x9700;&#x6C42;&#xFF0C;&#x8FD9;&#x4E2A;&#x65F6;&#x5019;&#x5C31;&#x9700;&#x8981;&#x7528;&#x5230;executeOnExecutor&#x81EA;&#x5B9A;&#x4E49;&#x7EBF;&#x7A0B;&#x6C60;&#x4E86;&#x3002;</p>
+<p>&#x4F46;&#x662F;&#xFF0C;&#x73B0;&#x5728;&#x95EE;&#x9898;&#x6765;&#x4E86;&#xFF0C;3.1&#x7248;&#x672C;&#x4EE5;&#x4E0B;&#x7684;&#x7CFB;&#x7EDF;&#x662F;&#x4E0D;&#x652F;&#x6301;&#x81EA;&#x5B9A;&#x4E49;&#x7EBF;&#x7A0B;&#x6C60;&#x6267;&#x884C;&#x7684;&#xFF01;&#x6240;&#x4EE5;3.1&#x7248;&#x672C;&#x4EE5;&#x4E0B;&#x7684;&#x7CFB;&#x7EDF;&#x9700;&#x8981;&#x5B9E;&#x73B0;&#x540C;&#x6B65;&#x6267;&#x884C;&#x5F02;&#x6B65;&#x4EFB;&#x52A1;&#xFF0C;&#x53EA;&#x80FD;&#x7528;Thread&#x81EA;&#x5DF1;&#x5B9A;&#x4E49;&#x7EBF;&#x7A0B;&#x6C60;&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/15_8_31_8.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/15_8_31_8.png" alt="" class="ui centered image"></a></p>
+<h4 id="&#x4F7F;&#x7528;&#x9ED8;&#x8BA4;&#x63D0;&#x4F9B;&#x7684;AsyncTask-THREAD-POOL-EXECUTOR&#x7EBF;&#x7A0B;&#x6C60;"><a href="#&#x4F7F;&#x7528;&#x9ED8;&#x8BA4;&#x63D0;&#x4F9B;&#x7684;AsyncTask-THREAD-POOL-EXECUTOR&#x7EBF;&#x7A0B;&#x6C60;" class="headerlink" title="&#x4F7F;&#x7528;&#x9ED8;&#x8BA4;&#x63D0;&#x4F9B;&#x7684;AsyncTask.THREAD_POOL_EXECUTOR&#x7EBF;&#x7A0B;&#x6C60;"></a>&#x4F7F;&#x7528;&#x9ED8;&#x8BA4;&#x63D0;&#x4F9B;&#x7684;AsyncTask.THREAD_POOL_EXECUTOR&#x7EBF;&#x7A0B;&#x6C60;</h4><p>AsyncTask.THREAD_POOL_EXECUTOR&#xFF0C;&#x4EE3;&#x7801;&#x5982;&#x4E0B;&#xFF1A;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> MyAsyncTask(progressBar).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x8FD9;&#x6837;&#xFF0C;3.1&#x7248;&#x672C;&#x4EE5;&#x4E0A;&#x7684;&#x7CFB;&#x7EDF;&#x4FBF;&#x53EF;&#x4EE5;&#x5B9E;&#x73B0;&#x5F02;&#x6B65;&#x5E76;&#x53D1;&#x6267;&#x884C;&#x4EFB;&#x52A1;&#x4E86;&#x3002;&#x6211;&#x4EEC;&#x53EF;&#x4EE5;&#x770B;&#x5230;&#xFF0C;&#x548C;3.1&#x7248;&#x672C;&#x4E4B;&#x524D;&#x6267;&#x884C;&#x9ED8;&#x8BA4;execute&#x4E00;&#x6837;&#xFF0C;&#x91C7;&#x7528;&#x4E86;AsyncTask&#x9ED8;&#x8BA4;&#x7684;&#x7EBF;&#x7A0B;&#x6C60;&#xFF0C;&#x6700;&#x5927;&#x5E76;&#x53D1;&#x6267;&#x884C;5&#x4E2A;&#x7EBF;&#x7A0B;&#xFF0C;&#x540E;&#x9762;&#x7684;&#x7EBF;&#x7A0B;&#x90FD;&#x53EA;&#x80FD;&#x7B49;&#x4E4B;&#x524D;5&#x4E2A;&#x7ED3;&#x675F;&#x4E4B;&#x540E;&#x518D;&#x6267;&#x884C;&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/2015-09-01%2023_35_29.gif"><img src="http://7xijtp.com1.z0.glb.clouddn.com/2015-09-01%2023_35_29.gif" alt="" class="ui centered image"></a></p>
+<h4 id="&#x81EA;&#x5B9A;&#x4E49;&#x7EBF;&#x7A0B;&#x6C60;"><a href="#&#x81EA;&#x5B9A;&#x4E49;&#x7EBF;&#x7A0B;&#x6C60;" class="headerlink" title="&#x81EA;&#x5B9A;&#x4E49;&#x7EBF;&#x7A0B;&#x6C60;"></a>&#x81EA;&#x5B9A;&#x4E49;&#x7EBF;&#x7A0B;&#x6C60;</h4><p>&#x91CD;&#x78C5;&#x70B8;&#x5F39;&#x6765;&#x4E86;&#xFF0C;&#x6211;&#x4EEC;&#x53EF;&#x4EE5;&#x81EA;&#x5DF1;&#x5B9A;&#x4E49;&#x7EBF;&#x7A0B;&#x6C60;&#x6765;&#x6267;&#x884C;&#x5F02;&#x6B65;&#x5E76;&#x53D1;&#xFF0C;&#x8FD9;&#x6837;&#x6211;&#x4EEC;&#x5C31;&#x53EF;&#x4EE5;&#x81EA;&#x7531;&#x63A7;&#x5236;&#x7EBF;&#x7A0B;&#x6C60;&#x4E86;&#x3002;<br>&#x4E0B;&#x9762;&#x4EE3;&#x7801;&#x53EF;&#x4EE5;&#x5B9E;&#x73B0;10&#x4E2A;&#x6838;&#x5FC3;&#x4EFB;&#x52A1;&#x5E76;&#x53D1;&#x6267;&#x884C;&#xFF0C;&#x800C;&#x4E14;&#x7F13;&#x5B58;&#x961F;&#x5217;&#x6700;&#x591A;&#x80FD;&#x591F;&#x5B58;&#x50A8;100&#x4E2A;&#x4EFB;&#x52A1;&#xFF0C;&#x5F53;&#x961F;&#x5217;&#x6EE1;&#x4E86;&#x4E4B;&#x540E;&#x8FD8;&#x53EF;&#x4EE5;&#x521B;&#x5EFA;40&#x4E2A;&#x8FD0;&#x884C;&#x7EBF;&#x7A0B;&#xFF0C;&#x77AC;&#x95F4;&#x7206;&#x70B8;&#x3002;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Executor executor = <span class="keyword">new</span> ThreadPoolExecutor(<span class="number">10</span>,<span class="number">50</span>,<span class="number">10</span>,</span><br><span class="line">	                TimeUnit.SECONDS,<span class="keyword">new</span> LinkedBlockingDeque&lt;Runnable&gt;(<span class="number">100</span>));</span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> MyAsyncTask(progressBar).executeOnExecutor(executor);</span><br><span class="line"><span class="keyword">new</span> MyAsyncTask(progressBar2).executeOnExecutor(executor);</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x5982;&#x56FE;&#x6240;&#x793A;&#xFF1A;10&#x4E2A;&#x7EBF;&#x7A0B;&#x5E76;&#x53D1;&#x6267;&#x884C;&#x4E86;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/4.gif"><img src="http://7xijtp.com1.z0.glb.clouddn.com/4.gif" alt="" class="ui centered image"></a></p>
+<h3 id="&#x603B;&#x7ED3;"><a href="#&#x603B;&#x7ED3;" class="headerlink" title="&#x603B;&#x7ED3;"></a>&#x603B;&#x7ED3;</h3><p>&#x524D;&#x9762;&#x5DF2;&#x7ECF;&#x63D0;&#x5230;&#x8FC7;&#x4E86;AsyncTask&#x7684;&#x4F18;&#x70B9;&#xFF0C;&#x6211;&#x4EEC;&#x5728;&#x5F00;&#x53D1;&#x4E2D;&#x5982;&#x679C;&#x5408;&#x7406;&#x8FD0;&#x7528;AsyncTask&#xFF0C;&#x5C06;&#x4F1A;&#x6BD4;&#x81EA;&#x5DF1;new Thread&#x597D;&#x5F88;&#x591A;&#x3002;&#x90A3;&#x4E48;&#xFF0C;&#x5C31;&#x6765;&#x603B;&#x7ED3;&#x4E00;&#x4E0B;AsyncTask&#x7684;&#x6700;&#x4F73;&#x9002;&#x7528;&#x573A;&#x666F;&#xFF1A;</p>
+<ul class="ui list">
+<li>AsyncTask&#x6BD4;&#x8F83;&#x9002;&#x5408;&#x6709;&#x5927;&#x91CF;&#x7EBF;&#x7A0B;&#x6267;&#x884C;&#x7684;&#x60C5;&#x51B5;&#xFF0C;&#x8BA9;&#x7EBF;&#x7A0B;&#x6C60;&#x53BB;&#x7BA1;&#x7406;&#x4F1A;&#x66F4;&#x52A0;&#x9AD8;&#x6548;&#x3002;</li>
+<li>&#x5047;&#x5982;&#x60F3;&#x8BA9;&#x51E0;&#x4E2A;&#x7EBF;&#x7A0B;&#x6309;&#x987A;&#x5E8F;&#x6267;&#x884C;&#x65F6;&#xFF0C;&#x53EF;&#x4EE5;&#x4F7F;&#x7528;AsyncTask&#x3002;(&#x524D;&#x63D0;&#x662F;&#x7CFB;&#x7EDF;&#x7248;&#x672C;&#x4E0D;&#x80FD;&#x5C0F;&#x4E8E;11)</li>
+<li>&#x5C3D;&#x91CF;&#x4F7F;&#x7528;&#x81EA;&#x5B9A;&#x4E49;&#x7EBF;&#x7A0B;&#x6C60;&#xFF0C;&#x6309;&#x9700;&#x8C03;&#x8282;&#x7EBF;&#x7A0B;&#x6C60;&#x53C2;&#x6570;&#x3002;</li>
+</ul>
+<h4 id="AsyncTask&#x7F3A;&#x70B9;"><a href="#AsyncTask&#x7F3A;&#x70B9;" class="headerlink" title="AsyncTask&#x7F3A;&#x70B9;"></a>AsyncTask&#x7F3A;&#x70B9;</h4><ul class="ui list">
+<li>&#x4E4B;&#x524D;&#x5DF2;&#x7ECF;&#x89E3;&#x6790;&#x8FC7;&#x4E86;&#xFF0C;AsyncTask&#x5728;3.1&#x7CFB;&#x7EDF;&#x4EE5;&#x4E0B;&#x9ED8;&#x8BA4;&#x4F7F;&#x7528;AsyncTask&#x7684;&#x7EBF;&#x7A0B;&#x6C60;&#xFF0C;&#x4E0D;&#x53EF;&#x4EE5;&#x81EA;&#x5B9A;&#x4E49;&#x7EBF;&#x7A0B;&#xFF0C;&#x5047;&#x5982;&#x5728;&#x7EBF;&#x7A0B;&#x4E0D;&#x591A;&#x7684;&#x60C5;&#x51B5;&#x4E0B;&#xFF0C;&#x662F;&#x5F88;&#x8017;&#x6027;&#x80FD;&#x7684;&#x3002;&#x56E0;&#x4E3A;&#x5047;&#x5982;&#x4F60;&#x53EA;&#x6709;&#x4E00;&#x4E2A;&#x5F02;&#x6B65;&#x4EFB;&#x52A1;&#xFF0C;<br>&#x8FD8;&#x662F;&#x4F1A;&#x521B;&#x5EFA;&#x53E6;&#x5916;4&#x4E2A;&#x6838;&#x5FC3;&#x7EBF;&#x7A0B;&#x3002;</li>
+</ul>
+<hr>
+<p>&#x7EBF;&#x7A0B;&#x592A;&#x591A;&#x6709;&#x98CE;&#x9669;&#xFF0C;&#x5F00;&#x7684;&#x65F6;&#x5019;&#x9700;&#x8C28;&#x614E;&#x5450;&#xFF01;&#x4E0B;&#x4E00;&#x8282;&#xFF0C;&#x5C06;&#x5E26;&#x6765;AsyncTask&#x7684;&#x6E90;&#x7801;&#x89E3;&#x6790;&#x90E8;&#x5206;&#x3002;</p>
+</body></html>
+                        
+                    </div>
+
+                    
+                    
+                    
+
+                    <div class="description post-description">
+    <span class="post-description-item">
+        <time datetime="2015-08-31T07:07:23.000Z" itemprop="datePublished">2015-08-31</time>
+
+    </span>
+    <span class="post-description-item">
+        
+
+    <span>
+        <i class="tags icon"></i>
+    </span>
+
+    
+    <span class="ui tiny label">
+        <a href="/tags/Android/">Android</a>
+    </span>
+
+    
+    <span class="ui tiny label">
+        <a href="/tags/AsyncTask/">AsyncTask</a>
+    </span>
+
+    
+
+    </span>
+</div>
+
+                </div>
+                
+                <div id="pagination" class="nav-web ui text container pagination">
+
+    <div class="ui stackable two column divided grid container">
+        <div class="row">
+            <div class="column nav-left">
+                
+
+                <a href="/2015/09/03/2015_9_3_asynctask/" class="ui tiny button">
+
+                    <i class="angle left icon"></i>
+                    
+                    Android AsyncTask(2)-原理与源码解析
+                    
+
+                </a>
+
+                
+            </div>
+            <div class="column nav-right">
+                
+
+                <a href="/2015/04/12/handler/" class="ui tiny button">
+                    
+                    Android Handler消息机制的理解
+                    
+                    <i class="angle right icon"></i></a>
+                
+            </div>
+        </div>
+    </div>
+
+</div>
+                
+            </div>
+
+            
+            <div class="three wide computer three wide tablet column">
+
+                <div class="ui sticky article-toc" id="article-toc">
+                    <!-- toc -->
+                    <ol class="ui ordered list"><li><a href="#AsyncTask优点"><span>AsyncTask优点:</span></a></li><li><a href="#AsyncTask用法步骤"><span>AsyncTask用法步骤</span></a><ol><li><a href="#构建自定义AsyncTask的参数"><span>构建自定义AsyncTask的参数</span></a></li><li><a href="#实现AsyncTask的抽象方法"><span>实现AsyncTask的抽象方法</span></a></li><li><a href="#AsyncTask的用法案例"><span>AsyncTask的用法案例</span></a></li></ol></li><li><a href="#AsyncTask线程池"><span>AsyncTask线程池</span></a><ol><li><a href="#异步、同步、并行、串行的区别"><span>异步、同步、并行、串行的区别</span></a></li><li><a href="#THREAD-POOL-EXECUTOR-——-异步线程池"><span>THREAD_POOL_EXECUTOR —— 异步线程池</span></a></li><li><a href="#SERIAL-EXECUTOR-串行线程池"><span>SERIAL_EXECUTOR 串行线程池</span></a></li></ol></li><li><a href="#执行AsyncTask的两个方法："><span>执行AsyncTask的两个方法：</span></a><ol><li><a href="#execute-【默认线程池执行】"><span>execute 【默认线程池执行】</span></a><ol><li><a href="#api8系统执行execute"><span>api8系统执行execute</span></a></li><li><a href="#Api11以上系统执行execute"><span>Api11以上系统执行execute</span></a></li></ol></li><li><a href="#executeOnExecutor-【自定义线程池执行，仅支持3-1以上系统】"><span>executeOnExecutor 【自定义线程池执行，仅支持3.1以上系统】</span></a></li><li><a href="#使用默认提供的AsyncTask-THREAD-POOL-EXECUTOR线程池"><span>使用默认提供的AsyncTask.THREAD_POOL_EXECUTOR线程池</span></a></li><li><a href="#自定义线程池"><span>自定义线程池</span></a></li></ol></li><li><a href="#总结"><span>总结</span></a><ol><li><a href="#AsyncTask缺点"><span>AsyncTask缺点</span></a></li></ol></li></ol>
+                </div>
+
+            </div>
+            
+
+        </div>
+    </div>
+</div>
+
+
+<!-- disqus start -->
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+<!-- following code is copied form hexo theme Next, thanks a lot -->
+
+var disqus_shortname = 'anany';
+var disqus_identifier = '2015/08/31/2015_8_31_asynctask/';
+var disqus_title = 'Android AsyncTask(1)-使用方法和线程池解析';
+
+function run_disqus_script(disqus_script) {
+	var dsq = document.createElement('script');
+	dsq.type = 'text/javascript';
+	dsq.async = true;
+	dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+	(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}
+
+run_disqus_script('count.js');
+
+
+var disqus_config = function () {
+    this.page.url = disqus_url;
+    this.page.identifier = disqus_identifier;
+    this.page.title = disqus_title;
+};
+
+run_disqus_script('embed.js');
+
+
+
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                                
+<!-- disqus end -->
+
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        </div>
+        <div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <div class="ui inverted section divider"></div>
+        &copy; 2019 <a href="/">Anany</a>,
+        Powered by <a href="https://github.com/henryhuang/hexo-theme-aloha" target="_blank">Aloha</a> and <a href="http://hexo.io/" target="_blank">Hexo</a>.
+    </div>
+</div>
+
+    </div>
+
+
+
+
+<!-- scripts list from theme config.yml -->
+
+<script src="//cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+
+<script src="//cdn.bootcss.com/semantic-ui/2.2.4/semantic.min.js"></script>
+
+<script src="//cdn.bootcss.com/algoliasearch/3.18.1/algoliasearch.min.js"></script>
+
+<script src="//cdn.bootcss.com/algoliasearch-helper-js/2.13.0/algoliasearch.helper.min.js"></script>
+
+<script src="/js/semantic-ui-algolia.js"></script>
+
+<script src="/js/aloha-events.js"></script>
+
+
+
+</body>
+</html>

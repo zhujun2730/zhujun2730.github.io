@@ -1,0 +1,350 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head prefix="og: http://ogp.me/ns#">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta name="description" content="you&#39;re here , there&#39;s nothing i fear …">
+    <title>Android - 解决第三方重复 compile 的问题 | Anany&#39;s blog</title>
+
+    <!-- Open Graph -->
+    <meta name="description" content="怎么查看第三方库依赖了其他什么库呢？很简单，打开终端，在project根目录下执行下面的命令：1./gradlew :app:dependencies --configuration compile">
+<meta name="keywords" content="Android,Gradle">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android - 解决第三方重复 compile 的问题">
+<meta property="og:url" content="https://zhujun2730.github.io/2017/04/28/2017-4-28-gradle-fix-compile/index.html">
+<meta property="og:site_name" content="Anany&#39;s blog">
+<meta property="og:description" content="怎么查看第三方库依赖了其他什么库呢？很简单，打开终端，在project根目录下执行下面的命令：1./gradlew :app:dependencies --configuration compile">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://i2.muimg.com/567571/6e2607efff4fa5af.png">
+<meta property="og:image" content="http://i4.buimg.com/567571/9ee07b8fd48237bd.png">
+<meta property="og:image" content="http://i2.muimg.com/567571/9a9c380328b7d3dd.png">
+<meta property="og:image" content="http://i1.piimg.com/567571/488e0bdab6930175.png">
+<meta property="og:image" content="http://i4.buimg.com/567571/4d003c172dad9d41.png">
+<meta property="og:image" content="http://i4.buimg.com/567571/1240755b9370a1e1.png">
+<meta property="og:image" content="http://i4.buimg.com/567571/7983e6421196b22a.png">
+<meta property="og:updated_time" content="2017-04-28T09:14:21.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android - 解决第三方重复 compile 的问题">
+<meta name="twitter:description" content="怎么查看第三方库依赖了其他什么库呢？很简单，打开终端，在project根目录下执行下面的命令：1./gradlew :app:dependencies --configuration compile">
+<meta name="twitter:image" content="http://i2.muimg.com/567571/6e2607efff4fa5af.png">
+
+    <script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Person",
+  "email": "mailto:",
+  "image": "",
+  "name": "Anany",
+  "url": "https://zhujun2730.github.io"
+}
+</script>
+    <script>
+    var algoliaEnabled = false;
+    
+</script>
+
+    
+
+    
+    
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+    
+    
+    
+        <!-- stylesheets list from config.yml -->
+        
+        <link rel="stylesheet" href="/css/aloha.css">
+        
+        <link rel="stylesheet" href="//cdn.bootcss.com/semantic-ui/2.2.4/semantic.min.css">
+        
+        <link rel="stylesheet" href="//cdn.bootcss.com/magnific-popup.js/1.1.0/magnific-popup.min.css">
+        
+    
+
+</head>
+<body id="body" style="margin-bottom: 0;" class="pushable">
+
+    <div class="ui top fixed menu">
+        <a class="item" id="menu-icon"><i class="sidebar icon"></i></a>
+    </div>
+
+    <div id="menu-sidebar" class="ui left vertical sidebar menu">
+
+    <div id="sidebar-top">
+        <div class="content">
+            <h3>Anany&#39;s blog</h3>
+        </div>
+    </div>
+    <div class="ui container sidebar-card">
+    <div class="ui people shape content">
+        <div class="active side">
+            <div class="ui card">
+                <div class="image">
+                    <img class="ui medium bordered image" src="/images/avatar.jpg">
+                </div>
+                <div class="content">
+                    <a class="header">Anany</a>
+                    
+                        <div class="meta">
+                            水可载舟，亦可赛艇
+                        </div>
+                    
+                </div>
+                <div class="extra content">
+                    <div class="ui list">
+                        
+                        <div class="item">
+                            <i class="marker icon" style="float: left"></i>
+                            <div class="content">Shenzhen</div>
+                        </div>
+                        
+                        
+                    </div>
+
+                </div>
+                <div class="extra content">
+                    <div class="ui list">
+                        
+
+                                <a href="https://github.com/zhujun2730"><i class="large github icon" style="float: left"></i></a>
+
+                            
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+    
+    
+
+    
+
+    
+    <a href="/index.html" class="item">
+        <i class="home icon"></i>
+        首页
+    </a>
+
+    
+    
+
+    
+
+    
+    <a href="/about/index.html" class="item">
+        <i class="info icon"></i>
+        关于
+    </a>
+
+    
+
+    
+</div>
+
+    <div class="pusher body-content">
+        <div id="content" class="ui main container">
+            <!--<div class="ui one column grid">-->
+                <!--<div class="column">-->
+                    <!--<div class="ui main container">-->
+                        <div id="post-2017-4-28-gradle-fix-compile" class="ui main container article-type-post">
+
+    
+
+    <div class="ui divided grid">
+
+        <div class="two column row" id="article-content">
+
+            <div class="thirteen wide computer thirteen wide tablet sixteen wide mobile column">
+                
+
+<h1 class="ui header">
+    
+    Android - 解决第三方重复 compile 的问题
+</h1>
+
+
+
+                <div class="article-inner">
+
+                    <div class="article-entry" itemprop="articleBody">
+                        
+                        <html><head><meta name="generator" content="Hexo 3.8.0"></head><body><p>&#x600E;&#x4E48;&#x67E5;&#x770B;&#x7B2C;&#x4E09;&#x65B9;&#x5E93;&#x4F9D;&#x8D56;&#x4E86;&#x5176;&#x4ED6;&#x4EC0;&#x4E48;&#x5E93;&#x5462;&#xFF1F;&#x5F88;&#x7B80;&#x5355;&#xFF0C;&#x6253;&#x5F00;&#x7EC8;&#x7AEF;&#xFF0C;&#x5728;project&#x6839;&#x76EE;&#x5F55;&#x4E0B;&#x6267;&#x884C;&#x4E0B;&#x9762;&#x7684;&#x547D;&#x4EE4;&#xFF1A;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./gradlew :app:dependencies --configuration compile</span><br></pre></td></tr></tbody></table></figure><p></p>
+<a id="more"></a>
+<p>&#x6267;&#x884C;&#x540E;&#x7684;&#x6837;&#x5B50;&#x5C31;&#x662F;&#x9171;&#x7D2B;&#x4E86;&#xFF1A;<br><a class="magnific-img" href="http://i2.muimg.com/567571/6e2607efff4fa5af.png"><img src="http://i2.muimg.com/567571/6e2607efff4fa5af.png" alt="" class="ui centered image"></a></p>
+<p>&#x5982;&#x4E0A;&#x56FE;&#x6240;&#x793A;&#xFF0C;&#x6211;&#x4EEC;&#x53EF;&#x4EE5;&#x770B;&#x5230; support-appcompat-v7 &#x5305;&#x4E0B;&#x9762;&#xFF0C;&#x662F;&#x7531;&#x4EE5;&#x4E0B;&#x51E0;&#x4E2A;&#x5B50;&#x5305;&#x6784;&#x6210;&#x7684;&#xFF1A;support-annotations&#x3001;support-v4&#x3001;support-vector-drawable&#x3001;animated-vector-drawable</p>
+<p>&#x7136;&#x540E; support-v4 &#x5305;&#x4E0B;&#x9762;&#x53C8;&#x6709; support-compat&#x3001;support-media-compat&#x3001;support-core-utils&#x3001;support-core-ui&#x3001;support-fragment&#x6784;&#x6210;&#x3002;</p>
+<p>&#x73B0;&#x5728;&#x6211;&#x4EEC;&#x6765;&#x770B;&#x5E93;&#x91CD;&#x590D;&#x4F9D;&#x8D56;&#x7684;&#x662F;&#x4EC0;&#x4E48;&#x6837;&#x5B50;&#x5462;&#xFF1F;<br><a class="magnific-img" href="http://i4.buimg.com/567571/9ee07b8fd48237bd.png"><img src="http://i4.buimg.com/567571/9ee07b8fd48237bd.png" alt="" class="ui centered image"></a></p>
+<p>&#x5982;&#x7BAD;&#x5934;&#x6240;&#x6307;&#x7684;&#xFF0C;&#x6211;&#x4EEC;&#x5E38;&#x7528;&#x7684;&#x9EC4;&#x6CB9;&#x5200; ButterKnife 8.5.1 &#x7248;&#x672C;&#x5B83;&#x5C31;&#x4F9D;&#x8D56;&#x4E86;support 25.1.0&#xFF0C;&#x7136;&#x800C;&#x6211;&#x4EEC;&#x9879;&#x76EE;&#x7528;&#x7684;&#x5374;&#x4F9D;&#x8D56;&#x4E86;&#x6700;&#x65B0;&#x7684; 25.3.0 &#x7248;&#x672C;&#x7684; support&#xFF0C;&#x8FD9;&#x4E2A;&#x65F6;&#x5019;&#x8BE5;&#x5982;&#x4F55;&#x89E3;&#x51B3;&#x5462;&#xFF1F;</p>
+<p><strong>&#x5F53;&#x7136;&#x662F;&#x9009;&#x62E9;&#x6392;&#x9664;&#x6389; ButterKnife &#x7684; supprot &#x800C;&#x7528;&#x6211;&#x4EEC;&#x81EA;&#x5DF1;&#x4F9D;&#x8D56;&#x7684;&#x6700;&#x65B0; support &#x554A;&#xFF01;</strong></p>
+<h3 id="&#x76F4;&#x63A5;&#x6392;&#x9664;&#x6574;&#x4E2A;group&#xFF1A;"><a href="#&#x76F4;&#x63A5;&#x6392;&#x9664;&#x6574;&#x4E2A;group&#xFF1A;" class="headerlink" title="&#x76F4;&#x63A5;&#x6392;&#x9664;&#x6574;&#x4E2A;group&#xFF1A;"></a>&#x76F4;&#x63A5;&#x6392;&#x9664;&#x6574;&#x4E2A;group&#xFF1A;</h3><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">compile (<span class="string">&apos;com.jakewharton:butterknife:8.5.1&apos;</span>) {</span><br><span class="line">        exclude group: <span class="string">&apos;com.android.support&apos;</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<p>&#x7136;&#x540E;&#x6211;&#x4EEC;&#x770B;&#x89E3;&#x51B3;&#x540E;&#x7684;&#x6837;&#x5B50;&#xFF1A;<br><a class="magnific-img" href="http://i2.muimg.com/567571/9a9c380328b7d3dd.png"><img src="http://i2.muimg.com/567571/9a9c380328b7d3dd.png" alt="" class="ui centered image"></a></p>
+<h3 id="&#x6392;&#x9664;group&#x91CC;&#x9762;&#x7684;&#x4E00;&#x4E2A;module&#xFF1A;"><a href="#&#x6392;&#x9664;group&#x91CC;&#x9762;&#x7684;&#x4E00;&#x4E2A;module&#xFF1A;" class="headerlink" title="&#x6392;&#x9664;group&#x91CC;&#x9762;&#x7684;&#x4E00;&#x4E2A;module&#xFF1A;"></a>&#x6392;&#x9664;group&#x91CC;&#x9762;&#x7684;&#x4E00;&#x4E2A;module&#xFF1A;</h3><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">compile (<span class="string">&apos;com.github.hotchemi:permissionsdispatcher:2.1.3&apos;</span>) {</span><br><span class="line">        exclude group: <span class="string">&apos;com.android.support&apos;</span>, <span class="keyword">module</span>:<span class="string">&apos;support-v4&apos;</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<p>&#x89E3;&#x51B3;&#x524D;&#xFF1A;<br><a class="magnific-img" href="http://i1.piimg.com/567571/488e0bdab6930175.png"><img src="http://i1.piimg.com/567571/488e0bdab6930175.png" alt="" class="ui centered image"></a><br>&#x89E3;&#x51B3;&#x540E;&#xFF1A;<br><a class="magnific-img" href="http://i4.buimg.com/567571/4d003c172dad9d41.png"><img src="http://i4.buimg.com/567571/4d003c172dad9d41.png" alt="" class="ui centered image"></a></p>
+<h3 id="&#x76F4;&#x63A5;&#x6392;&#x9664;&#x4E00;&#x4E2A;module"><a href="#&#x76F4;&#x63A5;&#x6392;&#x9664;&#x4E00;&#x4E2A;module" class="headerlink" title="&#x76F4;&#x63A5;&#x6392;&#x9664;&#x4E00;&#x4E2A;module :"></a>&#x76F4;&#x63A5;&#x6392;&#x9664;&#x4E00;&#x4E2A;module :</h3><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">compile (<span class="string">&apos;com.orhanobut:hawk:2.0.1&apos;</span>){</span><br><span class="line">        exclude <span class="keyword">module</span>: <span class="string">&apos;gson&apos;</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<p>&#x89E3;&#x51B3;&#x524D;&#xFF1A;<br><a class="magnific-img" href="http://i4.buimg.com/567571/1240755b9370a1e1.png"><img src="http://i4.buimg.com/567571/1240755b9370a1e1.png" alt="" class="ui centered image"></a><br>&#x89E3;&#x51B3;&#x540E;&#xFF1A;<br><a class="magnific-img" href="http://i4.buimg.com/567571/7983e6421196b22a.png"><img src="http://i4.buimg.com/567571/7983e6421196b22a.png" alt="" class="ui centered image"></a></p>
+</body></html>
+                        
+                    </div>
+
+                    
+                    
+                    
+
+                    <div class="description post-description">
+    <span class="post-description-item">
+        <time datetime="2017-04-28T05:52:12.000Z" itemprop="datePublished">2017-04-28</time>
+
+    </span>
+    <span class="post-description-item">
+        
+
+    <span>
+        <i class="tags icon"></i>
+    </span>
+
+    
+    <span class="ui tiny label">
+        <a href="/tags/Android/">Android</a>
+    </span>
+
+    
+    <span class="ui tiny label">
+        <a href="/tags/Gradle/">Gradle</a>
+    </span>
+
+    
+
+    </span>
+</div>
+
+                </div>
+                
+                <div id="pagination" class="nav-web ui text container pagination">
+
+    <div class="ui stackable two column divided grid container">
+        <div class="row">
+            <div class="column nav-left">
+                
+
+                <a href="/2017/05/12/use-proxifier-for-mac-global-proxy/" class="ui tiny button">
+
+                    <i class="angle left icon"></i>
+                    
+                    外面的世界很精彩(1) - SS为Mac/Win设置系统全局代理
+                    
+
+                </a>
+
+                
+            </div>
+            <div class="column nav-right">
+                
+
+                <a href="/2017/04/27/2017-4-27-SpringMVC-Property/" class="ui tiny button">
+                    
+                    SpringMVC 加载配置文件
+                    
+                    <i class="angle right icon"></i></a>
+                
+            </div>
+        </div>
+    </div>
+
+</div>
+                
+            </div>
+
+            
+            <div class="three wide computer three wide tablet column">
+
+                <div class="ui sticky article-toc" id="article-toc">
+                    <!-- toc -->
+                    <ol class="ui ordered list"><li><a href="#直接排除整个group："><span>直接排除整个group：</span></a></li><li><a href="#排除group里面的一个module："><span>排除group里面的一个module：</span></a></li><li><a href="#直接排除一个module"><span>直接排除一个module :</span></a></li></ol>
+                </div>
+
+            </div>
+            
+
+        </div>
+    </div>
+</div>
+
+
+<!-- disqus start -->
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+<!-- following code is copied form hexo theme Next, thanks a lot -->
+
+var disqus_shortname = 'anany';
+var disqus_identifier = '2017/04/28/2017-4-28-gradle-fix-compile/';
+var disqus_title = 'Android - 解决第三方重复 compile 的问题';
+
+function run_disqus_script(disqus_script) {
+	var dsq = document.createElement('script');
+	dsq.type = 'text/javascript';
+	dsq.async = true;
+	dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+	(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}
+
+run_disqus_script('count.js');
+
+
+var disqus_config = function () {
+    this.page.url = disqus_url;
+    this.page.identifier = disqus_identifier;
+    this.page.title = disqus_title;
+};
+
+run_disqus_script('embed.js');
+
+
+
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                                
+<!-- disqus end -->
+
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        </div>
+        <div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <div class="ui inverted section divider"></div>
+        &copy; 2019 <a href="/">Anany</a>,
+        Powered by <a href="https://github.com/henryhuang/hexo-theme-aloha" target="_blank">Aloha</a> and <a href="http://hexo.io/" target="_blank">Hexo</a>.
+    </div>
+</div>
+
+    </div>
+
+
+
+
+<!-- scripts list from theme config.yml -->
+
+<script src="//cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+
+<script src="//cdn.bootcss.com/semantic-ui/2.2.4/semantic.min.js"></script>
+
+<script src="//cdn.bootcss.com/algoliasearch/3.18.1/algoliasearch.min.js"></script>
+
+<script src="//cdn.bootcss.com/algoliasearch-helper-js/2.13.0/algoliasearch.helper.min.js"></script>
+
+<script src="/js/semantic-ui-algolia.js"></script>
+
+<script src="/js/aloha-events.js"></script>
+
+
+
+</body>
+</html>

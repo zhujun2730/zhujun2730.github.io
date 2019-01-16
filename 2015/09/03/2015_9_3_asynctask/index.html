@@ -1,0 +1,359 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head prefix="og: http://ogp.me/ns#">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta name="description" content="you&#39;re here , there&#39;s nothing i fear …">
+    <title>Android AsyncTask(2)-原理与源码解析 | Anany&#39;s blog</title>
+
+    <!-- Open Graph -->
+    <meta name="description" content="上一节我们知道，想要启动一个AsyncTask，首先需要创建一个AsyncTask对象然后调用execute方法。例如：">
+<meta name="keywords" content="Android,AsyncTask">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android AsyncTask(2)-原理与源码解析">
+<meta property="og:url" content="https://zhujun2730.github.io/2015/09/03/2015_9_3_asynctask/index.html">
+<meta property="og:site_name" content="Anany&#39;s blog">
+<meta property="og:description" content="上一节我们知道，想要启动一个AsyncTask，首先需要创建一个AsyncTask对象然后调用execute方法。例如：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/15_9_3_04.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/15_9_03_5.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/15_9_3_06.png">
+<meta property="og:image" content="http://7xijtp.com1.z0.glb.clouddn.com/15-9-3-07.png">
+<meta property="og:updated_time" content="2017-04-23T16:18:04.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android AsyncTask(2)-原理与源码解析">
+<meta name="twitter:description" content="上一节我们知道，想要启动一个AsyncTask，首先需要创建一个AsyncTask对象然后调用execute方法。例如：">
+<meta name="twitter:image" content="http://7xijtp.com1.z0.glb.clouddn.com/15_9_3_04.png">
+
+    <script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Person",
+  "email": "mailto:",
+  "image": "",
+  "name": "Anany",
+  "url": "https://zhujun2730.github.io"
+}
+</script>
+    <script>
+    var algoliaEnabled = false;
+    
+</script>
+
+    
+
+    
+    
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+    
+    
+    
+        <!-- stylesheets list from config.yml -->
+        
+        <link rel="stylesheet" href="/css/aloha.css">
+        
+        <link rel="stylesheet" href="//cdn.bootcss.com/semantic-ui/2.2.4/semantic.min.css">
+        
+        <link rel="stylesheet" href="//cdn.bootcss.com/magnific-popup.js/1.1.0/magnific-popup.min.css">
+        
+    
+
+</head>
+<body id="body" style="margin-bottom: 0;" class="pushable">
+
+    <div class="ui top fixed menu">
+        <a class="item" id="menu-icon"><i class="sidebar icon"></i></a>
+    </div>
+
+    <div id="menu-sidebar" class="ui left vertical sidebar menu">
+
+    <div id="sidebar-top">
+        <div class="content">
+            <h3>Anany&#39;s blog</h3>
+        </div>
+    </div>
+    <div class="ui container sidebar-card">
+    <div class="ui people shape content">
+        <div class="active side">
+            <div class="ui card">
+                <div class="image">
+                    <img class="ui medium bordered image" src="/images/avatar.jpg">
+                </div>
+                <div class="content">
+                    <a class="header">Anany</a>
+                    
+                        <div class="meta">
+                            水可载舟，亦可赛艇
+                        </div>
+                    
+                </div>
+                <div class="extra content">
+                    <div class="ui list">
+                        
+                        <div class="item">
+                            <i class="marker icon" style="float: left"></i>
+                            <div class="content">Shenzhen</div>
+                        </div>
+                        
+                        
+                    </div>
+
+                </div>
+                <div class="extra content">
+                    <div class="ui list">
+                        
+
+                                <a href="https://github.com/zhujun2730"><i class="large github icon" style="float: left"></i></a>
+
+                            
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+    
+    
+
+    
+
+    
+    <a href="/index.html" class="item">
+        <i class="home icon"></i>
+        首页
+    </a>
+
+    
+    
+
+    
+
+    
+    <a href="/about/index.html" class="item">
+        <i class="info icon"></i>
+        关于
+    </a>
+
+    
+
+    
+</div>
+
+    <div class="pusher body-content">
+        <div id="content" class="ui main container">
+            <!--<div class="ui one column grid">-->
+                <!--<div class="column">-->
+                    <!--<div class="ui main container">-->
+                        <div id="post-2015_9_3_asynctask" class="ui main container article-type-post">
+
+    
+
+    <div class="ui divided grid">
+
+        <div class="two column row" id="article-content">
+
+            <div class="thirteen wide computer thirteen wide tablet sixteen wide mobile column">
+                
+
+<h1 class="ui header">
+    
+    Android AsyncTask(2)-原理与源码解析
+</h1>
+
+
+
+                <div class="article-inner">
+
+                    <div class="article-entry" itemprop="articleBody">
+                        
+                        <html><head><meta name="generator" content="Hexo 3.8.0"></head><body><p>&#x4E0A;&#x4E00;&#x8282;&#x6211;&#x4EEC;&#x77E5;&#x9053;&#xFF0C;&#x60F3;&#x8981;&#x542F;&#x52A8;&#x4E00;&#x4E2A;AsyncTask&#xFF0C;&#x9996;&#x5148;&#x9700;&#x8981;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;AsyncTask&#x5BF9;&#x8C61;&#x7136;&#x540E;&#x8C03;&#x7528;execute&#x65B9;&#x6CD5;&#x3002;&#x4F8B;&#x5982;&#xFF1A;<a id="more"></a><br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> DownloadFilesTask().execute();</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>DownloadFilesTask&#x7EE7;&#x627F;&#x81EA;AsyncTask&#x9700;&#x8981;&#x6307;&#x5B9A;3&#x4E2A;&#x6CDB;&#x578B;&#x53C2;&#x6570;&#xFF1A;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">DownloadFilesTask</span> <span class="keyword">extends</span> <span class="title">AsyncTask</span>&lt;<span class="title">URL</span>, <span class="title">Integer</span>, <span class="title">Long</span>&gt; </span>{</span><br><span class="line">  </span><br><span class="line">      <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onPreExecute</span><span class="params">()</span> </span>{</span><br><span class="line">        <span class="keyword">super</span>.onPreExecute();</span><br><span class="line">      }</span><br><span class="line">        </span><br><span class="line">      <span class="function"><span class="keyword">protected</span> Long <span class="title">doInBackground</span><span class="params">(URL... urls)</span> </span>{</span><br><span class="line">          <span class="keyword">int</span> count = urls.length;</span><br><span class="line">          <span class="keyword">long</span> totalSize = <span class="number">0</span>;</span><br><span class="line">          <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; count; i++) {</span><br><span class="line">              totalSize += Downloader.downloadFile(urls[i]);</span><br><span class="line">              publishProgress((<span class="keyword">int</span>) ((i / (<span class="keyword">float</span>) count) * <span class="number">100</span>));</span><br><span class="line">              <span class="comment">// Escape early if cancel() is called</span></span><br><span class="line">              <span class="keyword">if</span> (isCancelled()) <span class="keyword">break</span>;</span><br><span class="line">          }</span><br><span class="line">          <span class="keyword">return</span> totalSize;</span><br><span class="line">      }</span><br><span class="line"></span><br><span class="line">      <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onProgressUpdate</span><span class="params">(Integer... progress)</span> </span>{</span><br><span class="line">          setProgressPercent(progress[<span class="number">0</span>]);</span><br><span class="line">      }</span><br><span class="line"></span><br><span class="line">      <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onPostExecute</span><span class="params">(Long result)</span> </span>{</span><br><span class="line">          showDialog(<span class="string">&quot;Downloaded &quot;</span> + result + <span class="string">&quot; bytes&quot;</span>);</span><br><span class="line">      }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><p></p>
+<h2 id="AsyncTask&#x6784;&#x9020;&#x51FD;&#x6570;"><a href="#AsyncTask&#x6784;&#x9020;&#x51FD;&#x6570;" class="headerlink" title="AsyncTask&#x6784;&#x9020;&#x51FD;&#x6570;"></a>AsyncTask&#x6784;&#x9020;&#x51FD;&#x6570;</h2><p>&#x9996;&#x5148;&#x5148;&#x4ECE;AsyncTask&#x7684;&#x6784;&#x9020;&#x51FD;&#x6570;&#x8BF4;&#x8D77;&#xFF1A;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * AsyncTask&#x7684;&#x6784;&#x9020;&#x51FD;&#x6570;&#x6E90;&#x7801;&#x7247;&#x6BB5;</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">AsyncTask</span><span class="params">()</span> </span>{</span><br><span class="line"></span><br><span class="line">    mWorker = <span class="keyword">new</span> WorkerRunnable&lt;Params, Result&gt;() {</span><br><span class="line">        <span class="function"><span class="keyword">public</span> Result <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>{</span><br><span class="line"></span><br><span class="line">            mTaskInvoked.set(<span class="keyword">true</span>);</span><br><span class="line">            Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);</span><br><span class="line"></span><br><span class="line">            Result result = doInBackground(mParams);</span><br><span class="line">            Binder.flushPendingCommands();</span><br><span class="line">            <span class="keyword">return</span> postResult(result);</span><br><span class="line">        }</span><br><span class="line">    };</span><br><span class="line"></span><br><span class="line">    mFuture = <span class="keyword">new</span> FutureTask&lt;Result&gt;(mWorker) {</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">done</span><span class="params">()</span> </span>{</span><br><span class="line">            <span class="keyword">try</span> {</span><br><span class="line">                postResultIfNotInvoked(get());</span><br><span class="line">            } <span class="keyword">catch</span> (InterruptedException e) {</span><br><span class="line">                android.util.Log.w(LOG_TAG, e);</span><br><span class="line">            } <span class="keyword">catch</span> (ExecutionException e) {</span><br><span class="line">               ...</span><br><span class="line">                e.getCause());</span><br><span class="line">            } <span class="keyword">catch</span> (CancellationException e) {</span><br><span class="line">                postResultIfNotInvoked(<span class="keyword">null</span>);</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">    };</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x5728;AsyncTask&#x6784;&#x9020;&#x51FD;&#x6570;&#x4E2D;&#x521D;&#x59CB;&#x5316;&#x4E86;&#x4E24;&#x4E2A;&#x5BF9;&#x8C61;&#xFF1A;WorkerRunnable&#x548C;FutureTask&#xFF0C;&#x5206;&#x522B;&#x8D4B;&#x503C;&#x4E3A;mWorker&#x3001;mFuture&#x3002;&#x8FD9;&#x4E24;&#x4E2A;&#x5BF9;&#x8C61;&#x521D;&#x59CB;&#x5316;&#x90FD;&#x5B9E;&#x73B0;&#x4E86;&#x4E24;&#x4E2A;&#x56DE;&#x8C03;&#x65B9;&#x6CD5;&#xFF0C;&#x5F53;&#x7528;&#x6237;&#x6267;&#x884C;&#x4E86;execute&#x65B9;&#x6CD5;&#x7684;&#x65F6;&#x5019;&#x5728;&#x7279;&#x5B9A;&#x60C5;&#x51B5;&#x4E0B;&#x4F1A;&#x89E6;&#x53D1;&#x8FD9;&#x4E24;&#x4E2A;&#x5BF9;&#x8C61;&#x7684;&#x56DE;&#x8C03;&#x65B9;&#x6CD5;&#xFF0C;&#x4E0B;&#x9762;&#x6211;&#x4EEC;&#x5C31;&#x5F00;&#x59CB;&#x8BE6;&#x7EC6;&#x5206;&#x6790;&#x8FD9;&#x4E24;&#x4E2A;&#x5BF9;&#x8C61;&#x3002;</p>
+<h4 id="&#x7ED3;&#x8BBA;&#xFF1A;doInBackground&#x662F;&#x5728;WorkerRunnable&#x7684;call&#x65B9;&#x6CD5;&#x4E2D;&#x88AB;&#x56DE;&#x8C03;&#x6267;&#x884C;&#x7684;-&#xFF08;&#x89C1;&#x4EE3;&#x7801;12&#x884C;&#xFF09;"><a href="#&#x7ED3;&#x8BBA;&#xFF1A;doInBackground&#x662F;&#x5728;WorkerRunnable&#x7684;call&#x65B9;&#x6CD5;&#x4E2D;&#x88AB;&#x56DE;&#x8C03;&#x6267;&#x884C;&#x7684;-&#xFF08;&#x89C1;&#x4EE3;&#x7801;12&#x884C;&#xFF09;" class="headerlink" title="&#x7ED3;&#x8BBA;&#xFF1A;doInBackground&#x662F;&#x5728;WorkerRunnable&#x7684;call&#x65B9;&#x6CD5;&#x4E2D;&#x88AB;&#x56DE;&#x8C03;&#x6267;&#x884C;&#x7684; &#xFF08;&#x89C1;&#x4EE3;&#x7801;12&#x884C;&#xFF09;"></a>&#x7ED3;&#x8BBA;&#xFF1A;doInBackground&#x662F;&#x5728;WorkerRunnable&#x7684;call&#x65B9;&#x6CD5;&#x4E2D;&#x88AB;&#x56DE;&#x8C03;&#x6267;&#x884C;&#x7684; &#xFF08;&#x89C1;&#x4EE3;&#x7801;12&#x884C;&#xFF09;</h4><h3 id="WorkerRunnable&#x3010;mWorker&#x3011;"><a href="#WorkerRunnable&#x3010;mWorker&#x3011;" class="headerlink" title="WorkerRunnable&#x3010;mWorker&#x3011;"></a>WorkerRunnable&#x3010;mWorker&#x3011;</h3><p>&#x7531;&#x4E8E;WorkerRunnable&#x5B9E;&#x73B0;&#x4E86;Callable&#x63A5;&#x53E3;&#xFF0C;&#x6240;&#x4EE5;&#x5728;AsyncTask&#x7684;&#x6784;&#x9020;&#x51FD;&#x6570;&#x4E2D;&#x5B9E;&#x4F8B;&#x5316;WorkerRunnable&#x65F6;&#xFF0C;&#x5FC5;&#x987B;&#x5B9E;&#x73B0;call()&#x65B9;&#x6CD5;&#x3002;&#x5176;&#x4E2D;&#x8FD8;&#x9700;&#x8981;&#x6307;&#x5B9A;&#x6CDB;&#x578B;&#x53C2;&#x6570;Params&#x548C;Result&#x3002;&#x8FD9;&#x6837;&#x5728;&#x56DE;&#x8C03;&#x4E86;call&#x65B9;&#x6CD5;&#x4E4B;&#x540E;&#xFF0C;&#x5C31;&#x80FD;&#x8FD4;&#x56DE;Result&#x3002;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** WorkerRunable&#x7C7B;**/</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> abstrat <span class="class"><span class="keyword">class</span> <span class="title">WorkerRunable</span>&lt;<span class="title">Params</span>, <span class="title">Result</span>&gt; <span class="keyword">implements</span> <span class="title">Callable</span>&lt;<span class="title">Result</span>&gt; </span>{</span><br><span class="line">	Params[] mParams;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">/** Callable&#x63A5;&#x53E3;**/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Callable</span>&lt;<span class="title">V</span>&gt; </span>{</span><br><span class="line">	<span class="function">V <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x73B0;&#x5728;&#x6211;&#x4EEC;&#x6682;&#x65F6;&#x53EA;&#x9700;&#x8981;&#x77E5;&#x9053;&#x5F53;&#x6267;&#x884C;execute&#x7684;&#x65F6;&#x5019;&#x4F1A;&#x56DE;&#x8C03;WorkerRunnable&#x7684;call&#x65B9;&#x6CD5;&#x3002;</p>
+<h3 id="FutureTask&#x3010;mFuture&#x3011;"><a href="#FutureTask&#x3010;mFuture&#x3011;" class="headerlink" title="FutureTask&#x3010;mFuture&#x3011;"></a>FutureTask&#x3010;mFuture&#x3011;</h3><p>&#x4ECE;&#x4E0A;&#x9762;&#x7684;AsyncTask&#x7684;&#x6784;&#x9020;&#x51FD;&#x6570;&#x6E90;&#x7801;&#x4E2D;&#x53EF;&#x4EE5;&#x770B;&#x5230;&#xFF0C;&#x5728;&#x6784;&#x9020;FutureTask&#x5BF9;&#x8C61;&#x521D;&#x59CB;&#x5316;&#x65F6;&#xFF0C;mWorker&#x662F;&#x4F5C;&#x4E3A;&#x53C2;&#x6570;&#x4F20;&#x9012;&#x8FDB;&#x6765;&#x7684;&#x3002;&#x4ECE;FutureTask&#x7684;&#x6784;&#x9020;&#x51FD;&#x6570;&#x4E5F;&#x770B;&#x51FA;&#x6765;&#x4E86;FutureTask&#x9700;&#x8981;&#x4E00;&#x4E2A;Callable&#x5BF9;&#x8C61;&#x3002;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** FutureTask&#x7684;&#x6784;&#x9020;&#x51FD;&#x6570;**/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">FutureTask</span><span class="params">(Callable&lt;V&gt; callable)</span> </span>{</span><br><span class="line">    <span class="keyword">if</span> (callable == <span class="keyword">null</span>)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">    <span class="keyword">this</span>.callable = callable;</span><br><span class="line">    <span class="keyword">this</span>.state = NEW;       <span class="comment">// ensure visibility of callable</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x3010;&#x5728;&#x8FD9;&#x91CC;&#x4E0D;&#x7981;&#x53EF;&#x4EE5;&#x63D0;&#x524D;&#x731C;&#x6D4B;&#x51FA;&#x4E00;&#x4E2A;&#x4FE1;&#x606F;&#x4E86;&#xFF0C;&#x65E2;&#x7136;FutureTask&#x628A;WorkerRunnable&#x4F20;&#x9012;&#x8FDB;&#x6765;&#x4E86;&#xFF0C;&#x90A3;WorkerRunnable&#x7684;&#x56DE;&#x8C03;&#x65B9;&#x6CD5;call&#x80AF;&#x5B9A;&#x662F;&#x5728;FutureTask&#x4E2D;&#x8C03;&#x7528;&#x7684;&#x3011;</p>
+<p>&#x6765;&#x770B;&#x770B;FutureTask&#x8FD9;&#x4E2A;&#x7C7B;&#xFF1A;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/15_9_3_04.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/15_9_3_04.png" alt="" class="ui centered image"></a><br>&#x53EF;&#x4EE5;&#x770B;&#x51FA;&#xFF0C;FutureTask&#x662F;&#x5B9E;&#x73B0;&#x4E86;RunnableFuture&#x63A5;&#x53E3;&#xFF0C;&#x800C;&#x8FD9;&#x4E2A;&#x63A5;&#x53E3;&#x7EE7;&#x627F;&#x4E86;Runnable&#x3001;&#x4EE5;&#x53CA;Future&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/15_9_03_5.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/15_9_03_5.png" alt="" class="ui centered image"></a></p>
+<p><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/15_9_3_06.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/15_9_3_06.png" alt="" class="ui centered image"></a>&#x901A;&#x8FC7;&#x4E0A;&#x9762;&#x4E24;&#x4E2A;&#x7C7B;&#xFF0C;&#x53D1;&#x73B0;&#x5176;&#x5B9E;FutureTask&#x4E2D;&#x7684;get&#x65B9;&#x6CD5;&#x5B9E;&#x73B0;&#x4E86;Runnable&#x7684;&#x963B;&#x585E;&#x548C;&#x8FD4;&#x56DE;&#x6267;&#x884C;&#x5B8C;&#x6BD5;&#x7684;&#x6570;&#x636E;(&#x6CDB;&#x578B;V)&#x3002;</p>
+<p>&#x6211;&#x4EEC;&#x518D;&#x6765;&#x770B;FutureTask&#x7684;run&#x65B9;&#x6CD5;&#xFF0C;&#x8C41;&#x7136;&#x5F00;&#x6717;&#xFF0C;&#x539F;&#x6765;WorkerRunnable&#x4E2D;&#x7684;&#x56DE;&#x8C03;&#x65B9;&#x6CD5;call&#x679C;&#x7136;&#x662F;&#x5728;&#x8FD9;&#x91CC;&#x8C03;&#x7528;&#x7684;&#x3002;<br><a class="magnific-img" href="http://7xijtp.com1.z0.glb.clouddn.com/15-9-3-07.png"><img src="http://7xijtp.com1.z0.glb.clouddn.com/15-9-3-07.png" alt="" class="ui centered image"></a><br>**&#x7ED3;&#x8BBA;&#xFF1A;WorkerRunnable&#x4E2D;&#x7684;&#x56DE;&#x8C03;&#x65B9;&#x6CD5;call()&#x662F;&#x5728;&#x6267;&#x884C;FutureTask&#x7684;run&#x65B9;&#x6CD5;&#x540E;&#x56DE;&#x8C03;&#x7684;&#x3002;&#x5F53;WorkerRunnable&#x7684;call&#x65B9;&#x6CD5;&#x6267;&#x884C;&#x5B8C;&#x6BD5;&#x540E;&#x5C06;&#x8FD4;&#x56DE;&#x6570;&#x636E;&#x7ED9;FutureTask&#x3002;<br>&#x7591;&#x95EE;&#xFF1A;&#x90A3;&#x4E48;&#xFF0C;FutureTask&#x7684;run&#x65B9;&#x6CD5;&#x53C8;&#x662F;&#x88AB;&#x8C01;&#x8C03;&#x7528;&#x7684;&#x5462;&#xFF1F;</p>
+<hr>
+<h3 id="execute&#x65B9;&#x6CD5;"><a href="#execute&#x65B9;&#x6CD5;" class="headerlink" title="execute&#x65B9;&#x6CD5;"></a>execute&#x65B9;&#x6CD5;</h3><p>&#x5F88;&#x663E;&#x7136;&#xFF0C;FutureTask&#x7684;run&#x65B9;&#x6CD5;&#x80AF;&#x5B9A;&#x9700;&#x8981;AsyncTask&#x6267;&#x884C;execute&#x65B9;&#x6CD5;&#x540E;&#x624D;&#x4F1A;&#x6267;&#x884C;&#x3002;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">volatile</span> Executor sDefaultExecutor = SERIAL_EXECUTOR;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Executor SERIAL_EXECUTOR = <span class="keyword">new</span> SerialExecutor();</span><br><span class="line"></span><br><span class="line"><span class="comment">/** AsyncTask&#x7C7B;&#x7684;execute&#x65B9;&#x6CD5;**/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> AsyncTask&lt;Params, Progress, Result&gt; <span class="title">execute</span><span class="params">(Params... params)</span> </span>{</span><br><span class="line">    <span class="keyword">return</span> executeOnExecutor(sDefaultExecutor, params);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x5F53;&#x6267;&#x884C;execute&#x65B9;&#x6CD5;&#x65F6;&#xFF0C;&#x5176;&#x5B9E;&#x662F;&#x8C03;&#x7528;&#x7684;executeOnExecutor&#x65B9;&#x6CD5;&#x3002;&#x8FD9;&#x91CC;&#x4F20;&#x9012;&#x4E86;&#x4E24;&#x4E2A;&#x53C2;&#x6570;&#xFF0C;&#x4E00;&#x4E2A;&#x662F;sDefaultExecutor&#xFF0C;&#x4E00;&#x4E2A;&#x662F;params&#x3002;&#x4ECE;&#x4E0A;&#x9762;&#x7684;&#x6E90;&#x7801;&#x53EF;&#x4EE5;&#x770B;&#x51FA;&#xFF0C;sDefaultExecutor&#x5176;&#x5B9E;&#x662F;&#x4E00;&#x4E2A;SerialExecutor&#x5BF9;&#x8C61;&#x3002;params&#x5176;&#x5B9E;&#x6700;&#x7EC8;&#x4F1A;&#x8D4B;&#x7ED9;doInBackground&#x65B9;&#x6CD5;&#xFF0C;&#x5C31;&#x662F;&#x7528;&#x6237;&#x5B9E;&#x73B0;&#x56DE;&#x8C03;&#x7684;&#x65B9;&#x6CD5;&#xFF0C;&#x8FD9;&#x4E2A;&#x540E;&#x9762;&#x4F1A;&#x770B;&#x5230;&#x3002;</p>
+<h3 id="executeOnExecutor&#x65B9;&#x6CD5;"><a href="#executeOnExecutor&#x65B9;&#x6CD5;" class="headerlink" title="executeOnExecutor&#x65B9;&#x6CD5;"></a>executeOnExecutor&#x65B9;&#x6CD5;</h3><p>&#x6211;&#x4EEC;&#x73B0;&#x5728;&#x5148;&#x6765;&#x770B;executeOnExecutor&#x65B9;&#x6CD5;&#x3002;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** AsyncTask&#x7C7B;&#x7684;executeOnExecutor&#x65B9;&#x6CD5;**/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> AsyncTask&lt;Params, Progress, Result&gt; <span class="title">executeOnExecutor</span><span class="params">(Executor exec,</span></span></span><br><span class="line"><span class="function"><span class="params">        Params... params)</span> </span>{ </span><br><span class="line">    ...</span><br><span class="line">    mStatus = Status.RUNNING;</span><br><span class="line"></span><br><span class="line">    onPreExecute();</span><br><span class="line"></span><br><span class="line">    mWorker.mParams = params;</span><br><span class="line">    exec.execute(mFuture);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x770B;&#x5230;&#x6728;&#x6709;&#xFF1F;&#x5728;&#x8FD9;&#x4E2A;&#x65B9;&#x6CD5;&#x4E2D;&#xFF0C;&#x6700;&#x5148;&#x5148;&#x6267;&#x884C;&#x4E86;onPreExecute()&#x65B9;&#x6CD5;&#xFF0C;&#x6B64;&#x65F6;&#x4FBF;&#x4F1A;&#x56DE;&#x8C03;&#x5230;&#x7528;&#x6237;&#x81EA;&#x5B9A;&#x4E49;AsyncTask&#x7684;&#x5B9E;&#x73B0;&#x65B9;&#x6CD5;onPreExecute&#x3010;&#x770B;&#x672C;&#x6587;&#x6700;&#x9876;&#x90E8;&#x7B2C;&#x4E00;&#x4E2A;&#x4F8B;&#x5B50;&#x7684;&#x4EE3;&#x7801;&#x3011;&#x3002;<strong>onPreExecute&#x53EF;&#x4EE5;&#x7528;&#x6765;&#x505A;&#x4E00;&#x4E9B;&#x540E;&#x53F0;&#x4EFB;&#x52A1;&#x6267;&#x884C;&#x4E4B;&#x524D;&#x7684;&#x51C6;&#x5907;&#x5DE5;&#x4F5C;&#x3002;</strong><br><br>&#x901A;&#x8FC7;&#x4E0A;&#x9762;&#x7684;&#x4EE3;&#x7801;&#x53EF;&#x4EE5;&#x770B;&#x51FA;&#xFF0C;&#x6267;&#x884C;&#x5230;exec.execute(mFuture)&#x8FD9;&#x91CC;&#x65F6;&#x4F20;&#x9012;&#x8FDB;&#x53BB;&#x4E86;&#x4E00;&#x4E2A;mFuture&#xFF0C;&#x8FD9;&#x4E2A;mFuture&#x5C31;&#x662F;&#x4E4B;&#x524D;AsyncTask&#x6784;&#x9020;&#x521D;&#x59CB;&#x5316;&#x8D4B;&#x503C;&#x7684;FutureTask&#x3002;exec&#x5176;&#x5B9E;&#x5C31;&#x662F;&#x4E4B;&#x524D;&#x6267;&#x884C;AsyncTask.execute()&#x65B9;&#x6CD5;&#x65F6;&#x4F20;&#x9012;&#x8FDB;&#x6765;&#x7684;&#x53C2;&#x6570;sDefaultExecutor&#xFF0C;&#x521A;&#x521A;&#x4E5F;&#x8BF4;&#x4E86;&#x8FD9;&#x4E2A;sDefaultExecutor&#x5176;&#x5B9E;&#x5C31;&#x662F;SerialExecutor&#x5BF9;&#x8C61;&#x3002;&#x55EF;&#xFF0C;exec&#x5C31;&#x662F;SerialExecutor&#x5BF9;&#x8C61;&#x3002;</p>
+<h3 id="SerialExecutor"><a href="#SerialExecutor" class="headerlink" title="SerialExecutor"></a>SerialExecutor</h3><p>&#x6211;&#x4EEC;&#x53EF;&#x4EE5;&#x770B;&#x5230;&#xFF0C;&#x4E4B;&#x524D;exec.execute(mFuture)&#x6267;&#x884C;&#x65F6;&#xFF0C;SerialExecutor&#x5C06;FutureTask&#x4F5C;&#x4E3A;&#x53C2;&#x6570;&#x6267;&#x884C;execute&#x65B9;&#x6CD5;&#x3002;&#x5728;SerialExecutor&#x7684;execute&#x65B9;&#x6CD5;&#x4E2D;&#xFF0C;&#x8FD9;&#x91CC;&#x901A;&#x8FC7;&#x4E00;&#x4E2A;&#x4EFB;&#x52A1;&#x961F;&#x5217;mTasks&#x628A;FutureTask&#x63D2;&#x5165;&#x8FDB;&#x4E86;&#x961F;&#x5217;&#x4E2D;&#xFF0C;&#x6267;&#x884C;r.run&#xFF0C;&#x5176;&#x5B9E;&#x5C31;&#x662F;&#x6267;&#x884C;FutureTask&#x7684;run&#x65B9;&#x6CD5;&#xFF0C;&#x56E0;&#x4E3A;&#x4F20;&#x9012;&#x8FDB;&#x6765;&#x7684;r&#x53C2;&#x6570;&#x5C31;&#x662F;mFuture&#x3002;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** AsyncTask&#x5BF9;&#x8C61;&#x4E2D;&#x7684;SerialExecutor&#x6210;&#x5458;&#x53D8;&#x91CF;&#x3010;&#x5185;&#x90E8;&#x7C7B;&#x3011; **/</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">SerialExecutor</span> <span class="keyword">implements</span> <span class="title">Executor</span> </span>{</span><br><span class="line">    <span class="keyword">final</span> ArrayDeque&lt;Runnable&gt; mTasks = <span class="keyword">new</span> ArrayDeque&lt;Runnable&gt;();</span><br><span class="line">    Runnable mActive;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(<span class="keyword">final</span> Runnable r)</span> </span>{</span><br><span class="line">        mTasks.offer(<span class="keyword">new</span> Runnable() {</span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>{</span><br><span class="line">                <span class="keyword">try</span> {</span><br><span class="line">                    r.run();</span><br><span class="line">                } <span class="keyword">finally</span> {</span><br><span class="line">                    scheduleNext();</span><br><span class="line">                }</span><br><span class="line">            }</span><br><span class="line">        });</span><br><span class="line">        <span class="keyword">if</span> (mActive == <span class="keyword">null</span>) {</span><br><span class="line">            scheduleNext();</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">scheduleNext</span><span class="params">()</span> </span>{</span><br><span class="line">        <span class="keyword">if</span> ((mActive = mTasks.poll()) != <span class="keyword">null</span>) {</span><br><span class="line">            THREAD_POOL_EXECUTOR.execute(mActive);</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><p></p>
+<h4 id="&#x7ED3;&#x8BBA;&#xFF1A;FutureTask&#x7684;run&#x65B9;&#x6CD5;&#x662F;&#x5728;SerialExecutor&#x7684;execute&#x65B9;&#x6CD5;&#x4E2D;&#x6267;&#x884C;&#x7684;&#x3002;"><a href="#&#x7ED3;&#x8BBA;&#xFF1A;FutureTask&#x7684;run&#x65B9;&#x6CD5;&#x662F;&#x5728;SerialExecutor&#x7684;execute&#x65B9;&#x6CD5;&#x4E2D;&#x6267;&#x884C;&#x7684;&#x3002;" class="headerlink" title="&#x7ED3;&#x8BBA;&#xFF1A;FutureTask&#x7684;run&#x65B9;&#x6CD5;&#x662F;&#x5728;SerialExecutor&#x7684;execute&#x65B9;&#x6CD5;&#x4E2D;&#x6267;&#x884C;&#x7684;&#x3002;"></a>&#x7ED3;&#x8BBA;&#xFF1A;FutureTask&#x7684;run&#x65B9;&#x6CD5;&#x662F;&#x5728;SerialExecutor&#x7684;execute&#x65B9;&#x6CD5;&#x4E2D;&#x6267;&#x884C;&#x7684;&#x3002;</h4><p>&#x5176;&#x5B9E;&#x5728;&#x8FD9;&#x91CC;&#xFF0C;SerialExecutor&#x5B9E;&#x73B0;&#x4E86;&#x4E00;&#x4E2A;&#x4EFB;&#x52A1;&#x7684;&#x6392;&#x961F;&#x7B97;&#x6CD5;&#x3002;&#x5F53;&#x4E00;&#x4E2A;AsyncTask&#x4EFB;&#x52A1;&#x5F00;&#x59CB;execute&#x65F6;&#xFF0C;&#x9996;&#x5148;&#x6267;&#x884C;FutureTask&#x7684;run&#x65B9;&#x6CD5;&#xFF0C;&#x7136;&#x540E;finally&#x6267;&#x884C;scheduleNext&#x65B9;&#x6CD5;&#xFF0C;&#x7136;&#x540E;&#x6267;&#x884C;THREAD_POOL_EXECUTOR&#x7684;execute&#x65B9;&#x6CD5;&#x3002;&#x7EE7;&#x7EED;&#x5F80;&#x4E0B;&#xFF0C;&#x5982;&#x679C;mActive&#x4E3A;&#x7A7A;&#xFF0C;&#x5C31;&#x4F1A;&#x7EE7;&#x7EED;&#x8C03;&#x7528;scheduleNext&#x65B9;&#x6CD5;&#x6267;&#x884C;&#x4E0B;&#x4E00;&#x4E2A;AsyncTask&#x4EFB;&#x52A1;&#xFF0C;&#x8BF4;&#x767D;&#x4E86;&#x5C31;&#x662F;&#x5F53;mActive&#x8FD9;&#x4E2A;Runnable&#x6267;&#x884C;&#x5B8C;&#x6BD5;&#x4E4B;&#x540E;&#xFF0C;&#x624D;&#x4F1A;&#x7EE7;&#x7EED;&#x8C03;&#x7528; THREAD_POOL_EXECUTOR.execute(mActive)&#x3002;&#x8FD9;&#x6837;SerialExecutor&#x4FBF;&#x5B9E;&#x73B0;&#x4E86;&#x4E32;&#x884C;&#x7684;&#x4EFB;&#x52A1;&#x961F;&#x5217;&#x3002;</p>
+<h4 id="&#x7ED3;&#x8BBA;&#xFF1A;SerialExecutor&#x53EA;&#x662F;&#x5B9E;&#x73B0;&#x4EFB;&#x52A1;&#x961F;&#x5217;&#xFF0C;&#x771F;&#x6B63;&#x6267;&#x884C;&#x7EBF;&#x7A0B;&#x6C60;&#x7684;&#x662F;THREAD-POOL-EXECUTOR&#x3002;"><a href="#&#x7ED3;&#x8BBA;&#xFF1A;SerialExecutor&#x53EA;&#x662F;&#x5B9E;&#x73B0;&#x4EFB;&#x52A1;&#x961F;&#x5217;&#xFF0C;&#x771F;&#x6B63;&#x6267;&#x884C;&#x7EBF;&#x7A0B;&#x6C60;&#x7684;&#x662F;THREAD-POOL-EXECUTOR&#x3002;" class="headerlink" title="&#x7ED3;&#x8BBA;&#xFF1A;SerialExecutor&#x53EA;&#x662F;&#x5B9E;&#x73B0;&#x4EFB;&#x52A1;&#x961F;&#x5217;&#xFF0C;&#x771F;&#x6B63;&#x6267;&#x884C;&#x7EBF;&#x7A0B;&#x6C60;&#x7684;&#x662F;THREAD_POOL_EXECUTOR&#x3002;"></a>&#x7ED3;&#x8BBA;&#xFF1A;SerialExecutor&#x53EA;&#x662F;&#x5B9E;&#x73B0;&#x4EFB;&#x52A1;&#x961F;&#x5217;&#xFF0C;&#x771F;&#x6B63;&#x6267;&#x884C;&#x7EBF;&#x7A0B;&#x6C60;&#x7684;&#x662F;THREAD_POOL_EXECUTOR&#x3002;</h4><p>&#x4ECE;&#x4E0A;&#x9762;&#x7684;&#x4EE3;&#x7801;&#x5757;&#x6211;&#x4EEC;&#x5DF2;&#x7ECF;&#x77E5;&#x9053;&#xFF0C;FutureTask&#x7684;run&#x65B9;&#x6CD5;&#x5728;SerialExecutor&#x7684;execute&#x65B9;&#x6CD5;&#x4E2D;&#x6267;&#x884C;&#x4E86;&#xFF0C;&#x7136;&#x540E;&#x7531; mTasks.offer &#x5C01;&#x88C5;&#x6210;&#x4E00;&#x4E2A;Runnable(mActive)&#x7ED9;THREAD_POOL_EXECUTOR&#x3002;<br><br>&#x5230;&#x8FD9;&#x91CC;&#xFF0C;FutureTask&#x7684;run&#x65B9;&#x6CD5;&#x5C31;&#x8981;&#x5F00;&#x59CB;&#x56DE;&#x8C03;WorkerRunable&#x7684;call&#x65B9;&#x6CD5;&#x4E86;&#x3002;&#x662F;&#x4E0D;&#x662F;&#x5DF2;&#x7ECF;&#x5F00;&#x59CB;&#x6655;&#x4E86;&#xFF0C;2333&#x3002;&#x6491;&#x4F4F; !!!! <br></p>
+<p>&#x63A5;&#x4E0B;&#x6765;&#x6211;&#x4EEC;&#x8FD8;&#x8981;&#x770B;WorkerRunable&#x7684;&#x56DE;&#x8C03;call&#x65B9;&#x6CD5;&#xFF1A;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mWorker = <span class="keyword">new</span> WorkerRunnable&lt;Params, Result&gt;() {</span><br><span class="line">        <span class="function"><span class="keyword">public</span> Result <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>{</span><br><span class="line">            mTaskInvoked.set(<span class="keyword">true</span>);    Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);</span><br><span class="line">        Result result = doInBackground(mParams);</span><br><span class="line">        Binder.flushPendingCommands();</span><br><span class="line">        <span class="keyword">return</span> postResult(result);</span><br><span class="line">    }</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>oh my god ! &#x770B;&#x7B2C;4&#x884C;&#xFF0C;&#x7EC8;&#x4E8E;&#x5F00;&#x59CB;&#x56DE;&#x8C03;doInBackground&#x65B9;&#x6CD5;&#x4E86;&#x3002;&#x7ED3;&#x5408;&#x4E0A;&#x9762;&#x4E24;&#x6BB5;&#x4EE3;&#x7801;&#xFF0C;&#x73B0;&#x5728;&#x5DF2;&#x7ECF;&#x5F88;&#x660E;&#x767D;&#x4E86;&#xFF0C;<strong>doInBackground&#x7684;&#x6267;&#x884C;&#x4E0D;&#x662F;&#x5728;&#x4E3B;&#x7EBF;&#x7A0B;&#x4E2D;&#xFF0C;&#x800C;&#x662F;&#x5728;Runnable&#x7684;run&#x65B9;&#x6CD5;&#x91CC;&#x9762;&#x6267;&#x884C;&#x7684;&#x3002;</strong><br></p>
+<p>doInBackground(mParams)&#x6267;&#x884C;&#x5B8C;&#x540E;&#x8FD4;&#x56DE;result&#xFF0C;&#x63A5;&#x7740;&#x518D;&#x7EE7;&#x7EED;&#x6267;&#x884C;postResult&#x65B9;&#x6CD5;&#xFF0C;&#x5E76;&#x5C06;&#x8FD4;&#x56DE;&#x7684;result&#x4F5C;&#x4E3A;&#x53C2;&#x6570;&#x4F20;&#x9012;&#x8FDB;&#x53BB;&#x3002;&#x73B0;&#x5728;&#x6211;&#x4EEC;&#x6765;&#x770B;postResult&#x65B9;&#x6CD5;&#xFF0C;&#x5F53;&#x5F53;&#x5F53;&#x5F53;&#xFF0C;Handler&#x5F00;&#x59CB;&#x767B;&#x573A;&#x4E86;&#x3002;&#x8FD9;&#x91CC;&#x5728;&#x6267;&#x884C;&#x5B8C;doInBackground&#x540E;&#x76F4;&#x63A5;&#x53D1;&#x9001;&#x4E86;&#x4E00;&#x4E2A;&#x6D88;&#x606F;&#x7ED9;Handler&#xFF0C;&#x90A3;&#x4E48;&#x8FD9;&#x4E2A;Handler&#x53C8;&#x662F;&#x54EA;&#x4E2A;&#x5462;&#xFF1F;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Result <span class="title">postResult</span><span class="params">(Result result)</span> </span>{</span><br><span class="line">	</span><br><span class="line">	Message message = getHandler().obtainMessage(MESSAGE_POST_RESULT,<span class="keyword">new</span> AsyncTaskResult&lt;Result&gt;(<span class="keyword">this</span>, result));</span><br><span class="line">	message.sendToTarget();</span><br><span class="line">	<span class="keyword">return</span> result;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x7EE7;&#x7EED;&#x770B;getHandler&#x65B9;&#x6CD5;&#xFF1A;<br></p><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> Handler <span class="title">getHandler</span><span class="params">()</span> </span>{</span><br><span class="line">    <span class="keyword">synchronized</span> (AsyncTask.class) {</span><br><span class="line">        <span class="keyword">if</span> (sHandler == <span class="keyword">null</span>) {</span><br><span class="line">            sHandler = <span class="keyword">new</span> InternalHandler();</span><br><span class="line">        }</span><br><span class="line">        <span class="keyword">return</span> sHandler;</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line">    </span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">InternalHandler</span> <span class="keyword">extends</span> <span class="title">Handler</span> </span>{</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">InternalHandler</span><span class="params">()</span> </span>{</span><br><span class="line">        <span class="keyword">super</span>(Looper.getMainLooper());</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>{</span><br><span class="line">        AsyncTaskResult&lt;?&gt; result = (AsyncTaskResult&lt;?&gt;) msg.obj;</span><br><span class="line">        <span class="keyword">switch</span> (msg.what) {</span><br><span class="line">            <span class="keyword">case</span> MESSAGE_POST_RESULT:</span><br><span class="line">                <span class="comment">// There is only one result</span></span><br><span class="line">                result.mTask.finish(result.mData[<span class="number">0</span>]);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MESSAGE_POST_PROGRESS:</span><br><span class="line">                result.mTask.onProgressUpdate(result.mData);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>&#x4E4B;&#x524D;&#x6267;&#x884C;postResult&#x7684;&#x65F6;&#x5019;&#xFF0C;obtainMessage&#x4F20;&#x9012;&#x7684;&#x53C2;&#x6570;&#x662F;&#xFF1A;MESSAGE_POST_RESULT&#x548C;AsyncTaskResult<result>(this, result))&#xFF0C;&#x7136;&#x540E;message.sendToTarget()&#x5F00;&#x59CB;&#x53D1;&#x6D88;&#x606F;&#xFF0C;&#x5E76;&#x5728;InternalHandler&#x7684;handleMessage&#x4E2D;&#x5F00;&#x59CB;&#x5904;&#x7406;&#x6D88;&#x606F;&#x3002;</result></p>
+<h4 id="&#x7ED3;&#x8BBA;&#xFF1A;doInBackground&#x6267;&#x884C;&#x5B8C;&#x540E;&#x7ACB;&#x5373;&#x53D1;&#x9001;&#x4E86;&#x4E00;&#x4E2A;&#x6D88;&#x606F;&#x7ED9;InternalHandler"><a href="#&#x7ED3;&#x8BBA;&#xFF1A;doInBackground&#x6267;&#x884C;&#x5B8C;&#x540E;&#x7ACB;&#x5373;&#x53D1;&#x9001;&#x4E86;&#x4E00;&#x4E2A;&#x6D88;&#x606F;&#x7ED9;InternalHandler" class="headerlink" title="&#x7ED3;&#x8BBA;&#xFF1A;doInBackground&#x6267;&#x884C;&#x5B8C;&#x540E;&#x7ACB;&#x5373;&#x53D1;&#x9001;&#x4E86;&#x4E00;&#x4E2A;&#x6D88;&#x606F;&#x7ED9;InternalHandler"></a>&#x7ED3;&#x8BBA;&#xFF1A;doInBackground&#x6267;&#x884C;&#x5B8C;&#x540E;&#x7ACB;&#x5373;&#x53D1;&#x9001;&#x4E86;&#x4E00;&#x4E2A;&#x6D88;&#x606F;&#x7ED9;InternalHandler</h4><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">finish</span><span class="params">(Result result)</span> </span>{</span><br><span class="line">    <span class="keyword">if</span> (isCancelled()) {</span><br><span class="line">        onCancelled(result);</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        onPostExecute(result);</span><br><span class="line">    }</span><br><span class="line">    mStatus = Status.FINISHED;</span><br><span class="line">}</span><br><span class="line">	</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">AsyncTaskResult</span>&lt;<span class="title">Data</span>&gt; </span>{</span><br><span class="line">    <span class="keyword">final</span> AsyncTask mTask;</span><br><span class="line">    <span class="keyword">final</span> Data[] mData;</span><br><span class="line"></span><br><span class="line">    AsyncTaskResult(AsyncTask task, Data... data) {</span><br><span class="line">        mTask = task;</span><br><span class="line">        mData = data;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<p>&#x7531;&#x4E8E;&#x4F20;&#x9012;&#x7684;&#x662F;MESSAGE_POST_RESULT&#xFF0C;&#x6240;&#x4EE5;&#x6267;&#x884C;mTask.finish&#x65B9;&#x6CD5;&#x3002;&#x8FD9;&#x4E2A;&#x65F6;&#x5019;doInBackground&#x5DF2;&#x7ECF;&#x6267;&#x884C;&#x5B8C;&#x4E86;&#x5E76;&#x8FD4;&#x56DE;&#x4E86;result&#xFF0C;<strong>&#x4FBF;&#x5F00;&#x59CB;&#x6267;&#x884C;onPostExecute&#x65B9;&#x6CD5;</strong>&#xFF0C;&#x5E76;&#x5C06;result&#x4F20;&#x9012;&#x8FDB;&#x53BB;&#x3002;&#x56E0;&#x4E3A;InternalHandler&#x662F;&#x901A;&#x8FC7;Looper.getMainLooper()&#x83B7;&#x5F97;&#x7684;&#xFF0C;&#x6240;&#x4EE5;&#x662F;&#x5728;&#x4E3B;&#x7EBF;&#x7A0B;&#xFF0C;&#x6240;&#x4EE5;&#x6700;&#x540E;onPostExecute&#x65B9;&#x6CD5;&#x4FBF;&#x53C8;&#x56DE;&#x5230;&#x4E86;&#x4E3B;&#x7EBF;&#x7A0B;&#x6267;&#x884C;&#x3002;&#x8FD9;&#x4E2A;&#x65F6;&#x5019;onPostExecute&#x5C31;&#x53EF;&#x4EE5;&#x62FF;&#x5230;doInBackground&#x5F02;&#x6B65;&#x6267;&#x884C;&#x8FD4;&#x56DE;&#x7684;result&#xFF0C;&#x76F4;&#x63A5;&#x66F4;&#x65B0;UI&#x3002;</p>
+<h4 id="&#x7ED3;&#x8BBA;&#xFF1A;InternalHandler&#x83B7;&#x5F97;&#x6D88;&#x606F;&#x540E;&#x6267;&#x884C;onPostExecute&#x56DE;&#x8C03;&#x65B9;&#x6CD5;&#xFF0C;&#x4E00;&#x4E2A;AsyncTask&#x4EFB;&#x52A1;&#x4FBF;&#x5230;&#x6B64;&#x7ED3;&#x675F;&#x4E86;"><a href="#&#x7ED3;&#x8BBA;&#xFF1A;InternalHandler&#x83B7;&#x5F97;&#x6D88;&#x606F;&#x540E;&#x6267;&#x884C;onPostExecute&#x56DE;&#x8C03;&#x65B9;&#x6CD5;&#xFF0C;&#x4E00;&#x4E2A;AsyncTask&#x4EFB;&#x52A1;&#x4FBF;&#x5230;&#x6B64;&#x7ED3;&#x675F;&#x4E86;" class="headerlink" title="&#x7ED3;&#x8BBA;&#xFF1A;InternalHandler&#x83B7;&#x5F97;&#x6D88;&#x606F;&#x540E;&#x6267;&#x884C;onPostExecute&#x56DE;&#x8C03;&#x65B9;&#x6CD5;&#xFF0C;&#x4E00;&#x4E2A;AsyncTask&#x4EFB;&#x52A1;&#x4FBF;&#x5230;&#x6B64;&#x7ED3;&#x675F;&#x4E86;"></a>&#x7ED3;&#x8BBA;&#xFF1A;InternalHandler&#x83B7;&#x5F97;&#x6D88;&#x606F;&#x540E;&#x6267;&#x884C;onPostExecute&#x56DE;&#x8C03;&#x65B9;&#x6CD5;&#xFF0C;&#x4E00;&#x4E2A;AsyncTask&#x4EFB;&#x52A1;&#x4FBF;&#x5230;&#x6B64;&#x7ED3;&#x675F;&#x4E86;</h4></body></html>
+                        
+                    </div>
+
+                    
+                    
+                    
+
+                    <div class="description post-description">
+    <span class="post-description-item">
+        <time datetime="2015-09-03T03:21:32.000Z" itemprop="datePublished">2015-09-03</time>
+
+    </span>
+    <span class="post-description-item">
+        
+
+    <span>
+        <i class="tags icon"></i>
+    </span>
+
+    
+    <span class="ui tiny label">
+        <a href="/tags/Android/">Android</a>
+    </span>
+
+    
+    <span class="ui tiny label">
+        <a href="/tags/AsyncTask/">AsyncTask</a>
+    </span>
+
+    
+
+    </span>
+</div>
+
+                </div>
+                
+                <div id="pagination" class="nav-web ui text container pagination">
+
+    <div class="ui stackable two column divided grid container">
+        <div class="row">
+            <div class="column nav-left">
+                
+
+                <a href="/2015/10/15/bitmap1/" class="ui tiny button">
+
+                    <i class="angle left icon"></i>
+                    
+                    Android Bitmap 优化(1) - 图片压缩
+                    
+
+                </a>
+
+                
+            </div>
+            <div class="column nav-right">
+                
+
+                <a href="/2015/08/31/2015_8_31_asynctask/" class="ui tiny button">
+                    
+                    Android AsyncTask(1)-使用方法和线程池解析
+                    
+                    <i class="angle right icon"></i></a>
+                
+            </div>
+        </div>
+    </div>
+
+</div>
+                
+            </div>
+
+            
+            <div class="three wide computer three wide tablet column">
+
+                <div class="ui sticky article-toc" id="article-toc">
+                    <!-- toc -->
+                    <ol class="ui ordered list"><li><a href="#AsyncTask构造函数"><span>AsyncTask构造函数</span></a><ol><li><a href="#结论：doInBackground是在WorkerRunnable的call方法中被回调执行的-（见代码12行）"><span>结论：doInBackground是在WorkerRunnable的call方法中被回调执行的 （见代码12行）</span></a></li></ol></li><li><a href="#WorkerRunnable【mWorker】"><span>WorkerRunnable【mWorker】</span></a></li><li><a href="#FutureTask【mFuture】"><span>FutureTask【mFuture】</span></a></li><li><a href="#execute方法"><span>execute方法</span></a></li><li><a href="#executeOnExecutor方法"><span>executeOnExecutor方法</span></a></li><li><a href="#SerialExecutor"><span>SerialExecutor</span></a><ol><li><a href="#结论：FutureTask的run方法是在SerialExecutor的execute方法中执行的。"><span>结论：FutureTask的run方法是在SerialExecutor的execute方法中执行的。</span></a></li><li><a href="#结论：SerialExecutor只是实现任务队列，真正执行线程池的是THREAD-POOL-EXECUTOR。"><span>结论：SerialExecutor只是实现任务队列，真正执行线程池的是THREAD_POOL_EXECUTOR。</span></a></li><li><a href="#结论：doInBackground执行完后立即发送了一个消息给InternalHandler"><span>结论：doInBackground执行完后立即发送了一个消息给InternalHandler</span></a></li><li><a href="#结论：InternalHandler获得消息后执行onPostExecute回调方法，一个AsyncTask任务便到此结束了"><span>结论：InternalHandler获得消息后执行onPostExecute回调方法，一个AsyncTask任务便到此结束了</span></a></li></ol></li></ol>
+                </div>
+
+            </div>
+            
+
+        </div>
+    </div>
+</div>
+
+
+<!-- disqus start -->
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+<!-- following code is copied form hexo theme Next, thanks a lot -->
+
+var disqus_shortname = 'anany';
+var disqus_identifier = '2015/09/03/2015_9_3_asynctask/';
+var disqus_title = 'Android AsyncTask(2)-原理与源码解析';
+
+function run_disqus_script(disqus_script) {
+	var dsq = document.createElement('script');
+	dsq.type = 'text/javascript';
+	dsq.async = true;
+	dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+	(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}
+
+run_disqus_script('count.js');
+
+
+var disqus_config = function () {
+    this.page.url = disqus_url;
+    this.page.identifier = disqus_identifier;
+    this.page.title = disqus_title;
+};
+
+run_disqus_script('embed.js');
+
+
+
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                                
+<!-- disqus end -->
+
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        </div>
+        <div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <div class="ui inverted section divider"></div>
+        &copy; 2019 <a href="/">Anany</a>,
+        Powered by <a href="https://github.com/henryhuang/hexo-theme-aloha" target="_blank">Aloha</a> and <a href="http://hexo.io/" target="_blank">Hexo</a>.
+    </div>
+</div>
+
+    </div>
+
+
+
+
+<!-- scripts list from theme config.yml -->
+
+<script src="//cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+
+<script src="//cdn.bootcss.com/semantic-ui/2.2.4/semantic.min.js"></script>
+
+<script src="//cdn.bootcss.com/algoliasearch/3.18.1/algoliasearch.min.js"></script>
+
+<script src="//cdn.bootcss.com/algoliasearch-helper-js/2.13.0/algoliasearch.helper.min.js"></script>
+
+<script src="/js/semantic-ui-algolia.js"></script>
+
+<script src="/js/aloha-events.js"></script>
+
+
+
+</body>
+</html>
